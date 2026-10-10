@@ -3,6 +3,7 @@ import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { useI18n } from './i18n';
 import { useRoute } from './lib/router';
+import { Dashboard } from './pages/Dashboard';
 import { Landing } from './pages/Landing';
 import { ResultsPage } from './pages/ResultsPage';
 
@@ -13,7 +14,8 @@ export function App() {
   const permitId = route.params.get('permit');
 
   let page;
-  if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} />;
+  if (route.path === '/dashboard') page = <Dashboard />;
+  else if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} />;
   else page = <Landing />;
 
   return (

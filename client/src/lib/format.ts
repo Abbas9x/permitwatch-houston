@@ -33,3 +33,28 @@ export function daysUntil(deadlineIso: string, today: Date = new Date()): number
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   return Math.round((deadline.getTime() - start.getTime()) / 86_400_000);
 }
+
+/** USD with enough precision for fractions of a cent ($0.000412). */
+export function formatUsd(value: number, lang: Language): string {
+  const abs = Math.abs(value);
+  const options: Intl.NumberFormatOptions =
+    abs === 0
+      ? { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }
+      : abs < 1
+        ? { style: 'currency', currency: 'USD', maximumSignificantDigits: 3 }
+        : { style: 'currency', currency: 'USD', maximumFractionDigits: 2 };
+  return new Intl.NumberFormat(locale(lang), options).format(value);
+}
+
+export function formatPercent(value: number, lang: Language): string {
+  return new Intl.NumberFormat(locale(lang), { maximumFractionDigits: 0 }).format(value) + '%';
+}
+
+/** Watt-hours with sensible precision for tiny estimates. */
+export function formatWh(value: number, lang: Language): string {
+  return `${new Intl.NumberFormat(locale(lang), { maximumSignificantDigits: 3 }).format(value)} Wh`;
+}
+
+export function formatCompact(value: number, lang: Language): string {
+  return new Intl.NumberFormat(locale(lang), { notation: 'compact', maximumFractionDigits: 1 }).format(value);
+}

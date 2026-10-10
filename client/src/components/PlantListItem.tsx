@@ -26,6 +26,7 @@ export function PlantListItem({ plant, index, selected, onSelect }: PlantListIte
     >
       <button
         type="button"
+        data-plant-button={permit.id}
         onClick={() => onSelect(permit.id)}
         aria-pressed={selected}
         aria-label={`${permit.company}, ${t('plant.distanceLong', { distance: formatMiles(plant.distanceMiles, lang), direction })}. ${t('plant.viewDetails')}`}

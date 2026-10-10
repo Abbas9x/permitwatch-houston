@@ -1,4 +1,12 @@
-import type { ApiErrorBody, PermitDetailResponse, SearchResponse } from '../../../shared/api';
+import type {
+  ApiErrorBody,
+  AskResponse,
+  CommentDraftResponse,
+  GreenRouteStatsResponse,
+  PermitDetailResponse,
+  SearchResponse,
+} from '../../../shared/api';
+import type { CommentConcern, Language } from '../../../shared/validation';
 
 export class ApiError extends Error {
   constructor(
@@ -70,4 +78,18 @@ export const api = {
     apiRequest<SearchResponse>(`/api/search?q=${encodeURIComponent(q)}`, { signal, timeoutMs: 25_000 }),
   permit: (id: string, signal?: AbortSignal) =>
     apiRequest<PermitDetailResponse>(`/api/permits/${encodeURIComponent(id)}`, { signal }),
+  commentDraft: (
+    id: string,
+    body: { concerns: CommentConcern[]; personalNote: string; language: Language },
+    signal?: AbortSignal,
+  ) =>
+    apiRequest<CommentDraftResponse>(`/api/permits/${encodeURIComponent(id)}/comment-draft`, {
+      method: 'POST',
+      body,
+      signal,
+      timeoutMs: 60_000,
+    }),
+  ask: (id: string, body: { question: string; language: Language }, signal?: AbortSignal) =>
+    apiRequest<AskResponse>(`/api/permits/${encodeURIComponent(id)}/ask`, { method: 'POST', body, signal, timeoutMs: 60_000 }),
+  stats: (signal?: AbortSignal) => apiRequest<GreenRouteStatsResponse>('/api/greenroute/stats', { signal }),
 };
