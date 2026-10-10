@@ -1,0 +1,9 @@
+# Secrets
+.env
+.env.local
+
+# Dependencies
+node_modules/
+
+# Raw scraped HTML/PDF dumps (regenerable)
+data/raw/
