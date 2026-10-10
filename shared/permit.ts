@@ -1,0 +1,40 @@
+import { z } from 'zod';
+
+export const PERMIT_TYPES = ['new', 'renewal', 'amendment', 'unknown'] as const;
+export const PermitTypeSchema = z.enum(PERMIT_TYPES);
+export type PermitType = z.infer<typeof PermitTypeSchema>;
+
+export const LOCATION_SOURCES = ['dataset', 'census_geocoder', 'zip_centroid'] as const;
+export type LocationSource = (typeof LOCATION_SOURCES)[number];
+
+/** A permit as served by the API. Every value comes from the dataset; null means "not listed". */
+export const PermitSchema = z.object({
+  id: z.string(),
+  registrationNumber: z.string(),
+  company: z.string(),
+  address: z.string(),
+  city: z.string(),
+  county: z.string(),
+  zip: z.string(),
+  lat: z.number(),
+  lng: z.number(),
+  locationSource: z.enum(LOCATION_SOURCES),
+  permitType: PermitTypeSchema,
+  maxProductionCydPerHr: z.number().nullable(),
+  maxHoursPerYear: z.number().nullable(),
+  pollutants: z.array(z.string()),
+  controls: z.string().nullable(),
+  noticeType: z.string().nullable(),
+  noticeIssuanceDate: z.string().nullable(),
+  commentDeadline: z.string().nullable(),
+  publicMeetingDate: z.string().nullable(),
+  sourceUrl: z.string(),
+  isSample: z.boolean(),
+});
+export type Permit = z.infer<typeof PermitSchema>;
+
+/** Public TCEQ pages we link to for confirmation. */
+export const TCEQ_LINKS = {
+  eComment: 'https://www14.tceq.texas.gov/epic/eComment/',
+  airPermitSearch: 'https://www.tceq.texas.gov/permitting/air/nav/air_status_permits.html',
+} as const;
