@@ -6,6 +6,14 @@ import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { RAW_DIR, cachedGet } from "./http.js";
 
+// Harris County's extent, rounded outward to two decimals.
+export const HARRIS_BBOX = { minLat: 29.49, maxLat: 30.18, minLng: -95.97, maxLng: -94.9 };
+
+export function inHarrisBbox(lat: number, lng: number): boolean {
+  const { minLat, maxLat, minLng, maxLng } = HARRIS_BBOX;
+  return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
+}
+
 const CENSUS_URL = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress";
 
 interface CensusResponse {

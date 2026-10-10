@@ -25,7 +25,7 @@ const OUTPUT_PATH = join(RAW_DIR, "pending-harris.json");
 // link. Used before the geocoder; see scraper/manual-locations.json.
 const MANUAL_LOCATIONS_PATH = fileURLToPath(new URL("../manual-locations.json", import.meta.url));
 
-interface ManualLocation {
+export interface ManualLocation {
   lat: number;
   lng: number;
   zip?: string;
@@ -167,7 +167,7 @@ async function buildPlant(
 export async function extractPendingHarris(scrapedAt: string): Promise<Plant[]> {
   const rows = parsePendingRows(await loadPendingHtml());
   const listed = await loadListedNotices();
-  const manualLocations = JSON.parse(await readFile(MANUAL_LOCATIONS_PATH, "utf8")) as Record<string, ManualLocation>;
+  const manualLocations = await loadManualLocations();
 
   const kept: Plant[] = [];
   const skipped = { noNotice: 0, noCounty: [] as string[], otherCounty: 0, noIdentity: 0 };
@@ -197,6 +197,10 @@ export async function extractPendingHarris(scrapedAt: string): Promise<Plant[]> 
   console.log(`  skipped, outside Harris County: ${skipped.otherCounty}`);
   console.log(`  kept (Harris County): ${kept.length}`);
   return kept;
+}
+
+export async function loadManualLocations(): Promise<Record<string, ManualLocation>> {
+  return JSON.parse(await readFile(MANUAL_LOCATIONS_PATH, "utf8")) as Record<string, ManualLocation>;
 }
 
 export function nowIso(): string {

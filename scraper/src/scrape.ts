@@ -5,6 +5,7 @@
 
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { EXISTING_SOURCE, extractExistingHarris } from "./existing.js";
 import { extractPendingHarris, nowIso } from "./extract.js";
 import { PENDING_URL } from "./fetchList.js";
 import type { Plant, PlantsFile } from "./types.js";
@@ -23,16 +24,32 @@ export function comparePlants(a: Plant, b: Plant): number {
 
 async function main() {
   const generatedAt = nowIso();
-  const plants = (await extractPendingHarris(generatedAt)).sort(comparePlants);
+  const pending = await extractPendingHarris(generatedAt);
+  const existing = await extractExistingHarris(generatedAt);
+
+  // A plant with a pending application (usually a renewal) that already holds
+  // an effective permit appears in both lists. Keep one record: the pending
+  // one, which has the notice details.
+  const pendingByPermit = new Map(pending.map((p) => [p.permitNumber, p]));
+  const existingOnly = existing.filter((e) => {
+    const p = pendingByPermit.get(e.permitNumber);
+    if (!p) return true;
+    const note = "This plant already holds an effective permit; the pending application is for that permit.";
+    p.notes = p.notes ? `${note} ${p.notes}` : note;
+    return false;
+  });
+  console.log(`${existing.length - existingOnly.length} existing plants also have a pending application; kept as pending`);
+
+  const plants = [...pending, ...existingOnly].sort(comparePlants);
 
   const file: PlantsFile = {
     generatedAt,
-    source: `TCEQ pending air permit applications, Concrete Batch Plant Standard Permits section (${PENDING_URL}), and their public notice PDFs`,
+    source: `TCEQ pending air permit applications, Concrete Batch Plant Standard Permits section (${PENDING_URL}), with their public notice PDFs; and ${EXISTING_SOURCE}`,
     count: plants.length,
     plants,
   };
   await writeFile(OUTPUT_PATH, JSON.stringify(file, null, 2) + "\n", "utf8");
-  console.log(`Wrote ${plants.length} plants to ${OUTPUT_PATH}`);
+  console.log(`Wrote ${plants.length} plants (${pending.length} pending, ${existingOnly.length} existing) to ${OUTPUT_PATH}`);
 }
 
 main().catch((err) => {

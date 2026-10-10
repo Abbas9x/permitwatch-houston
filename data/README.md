@@ -41,8 +41,8 @@ If the source doesn't state a value, or we can't extract it reliably, the field 
 | `lng` | number \| null | Longitude in decimal degrees (WGS84) |
 | `locationSource` | `"tceq_map_link"` \| `"geocoded"` \| `"manual"` \| null | How `lat`/`lng` were obtained. `null` when there are no coordinates |
 | `status` | `"pending"` \| `"existing"` | `pending` is an application still under review. `existing` is an already-permitted plant |
-| `permitType` | `"new"` \| `"renewal"` \| `"amendment"` \| null | Type of application. `null` if not stated |
-| `dateReceived` | string (`YYYY-MM-DD`) \| null | Date TCEQ received the application |
+| `permitType` | `"new"` \| `"renewal"` \| `"amendment"` \| null | Type of application. For `existing` plants, the type of the most recent project on the permit. `null` if not stated |
+| `dateReceived` | string (`YYYY-MM-DD`) \| null | Date TCEQ received the application. For `existing` plants, the date TCEQ received the most recent project on the permit |
 | `commentDeadline` | string (`YYYY-MM-DD`) \| null | Last day for public comment or contested-case hearing requests |
 | `productionRate` | string \| null | Production rate as written in the notice, e.g. `"300 cubic yards per hour"` |
 | `emissions` | `Emission[]` | Listed emissions. Empty array if none are listed |

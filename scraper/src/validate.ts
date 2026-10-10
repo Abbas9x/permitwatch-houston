@@ -5,13 +5,12 @@
 
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { inHarrisBbox } from "./geocode.js";
 import { makeId } from "./ids.js";
 import type { Plant } from "./types.js";
 
 const DATA_PATH = fileURLToPath(new URL("../../data/concrete-plants.json", import.meta.url));
 
-// Harris County's extent, rounded outward to two decimals.
-const HARRIS_BBOX = { minLat: 29.49, maxLat: 30.18, minLng: -95.97, maxLng: -94.9 };
 
 const ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -80,8 +79,7 @@ export function validate(data: unknown): string[] {
     if (hasLat !== hasLng || (!hasLat && p.lat !== null) || (!hasLng && p.lng !== null)) {
       err("lat and lng must both be numbers or both be null");
     } else if (hasLat) {
-      const { minLat, maxLat, minLng, maxLng } = HARRIS_BBOX;
-      if (p.lat! < minLat || p.lat! > maxLat || p.lng! < minLng || p.lng! > maxLng) {
+      if (!inHarrisBbox(p.lat!, p.lng!)) {
         err(`coordinates ${p.lat},${p.lng} are outside Harris County's bounding box`);
       }
       if (p.locationSource === null) err("locationSource must be set when there are coordinates");
