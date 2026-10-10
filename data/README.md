@@ -52,7 +52,7 @@ If the source doesn't state a value, or we can't extract it reliably, the field 
 
 ### Building `id`
 
-- If `permitNumber` is not `null`, `id` is `"tceq-"` plus the permit number, e.g. `"tceq-123456"`.
+- If `permitNumber` is not `null`, `id` is `"tceq-"` plus the permit number as printed, with only leading and trailing whitespace removed, e.g. `"tceq-123456"`.
 - Otherwise, `id` is `"cbp-"` plus a short hash of the normalized name and address, e.g. `"cbp-3f9a1c2b7e4d"`.
 
 To build the hash:
