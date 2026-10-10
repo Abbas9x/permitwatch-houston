@@ -1,5 +1,6 @@
 import { createApp } from './app.js';
 import { loadEnvOrExit } from './config/loadEnv.js';
+import { createRoutes, createServices } from './container.js';
 import { openDatabase } from './db/index.js';
 import { countPermits } from './db/permitsRepo.js';
 import { createLogger } from './lib/logger.js';
@@ -12,7 +13,8 @@ if (countPermits(db) === 0) {
   logger.warn('No permits in the database yet. Run `npm run import` to load data/sample-permits.json.');
 }
 
-const app = createApp({ env, db, logger });
+const services = createServices(env, db, logger);
+const app = createApp({ env, db, logger, routes: createRoutes(db, services) });
 const server = app.listen(env.PORT, () => {
   logger.info({ port: env.PORT, env: env.NODE_ENV, ai: env.GEMINI_MOCK === 'off' ? 'live' : `mock-${env.GEMINI_MOCK}` }, 'PermitWatch API listening');
 });

@@ -1,15 +1,14 @@
 import { z } from 'zod';
 import type { PermitType } from '../../shared/permit.js';
 
+export { TEXAS_BOUNDS } from '../../shared/geo.js';
+
 /**
  * Validation for one row of the teammate-provided permit dataset (JSON or CSV).
  * Lenient about formatting (numbers as strings, ZIP+4, US dates), strict about meaning:
  * nothing is guessed. A bad optional field becomes null plus a warning; a bad required
  * field rejects the whole row.
  */
-
-// Texas bounding box with a small margin. Points outside it are almost always swapped lat/lng.
-export const TEXAS_BOUNDS = { minLat: 25.8, maxLat: 36.6, minLng: -106.7, maxLng: -93.5 } as const;
 
 // eslint-disable-next-line no-control-regex
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;

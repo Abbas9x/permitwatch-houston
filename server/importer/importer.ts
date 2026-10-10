@@ -6,7 +6,8 @@ import type { LocationSource } from '../../shared/permit.js';
 import { nowIso, type DB } from '../db/index.js';
 import { upsertPermit, type PermitRecord } from '../db/permitsRepo.js';
 import type { Logger } from '../lib/logger.js';
-import { normalizePermitType, OPTIONAL_FIELDS, RowSchema, TEXAS_BOUNDS, type PermitRow } from './rowSchema.js';
+import { isInTexasBounds } from '../../shared/geo.js';
+import { normalizePermitType, OPTIONAL_FIELDS, RowSchema, type PermitRow } from './rowSchema.js';
 
 export interface GeocodedPoint {
   lat: number;
@@ -94,12 +95,7 @@ export function validateRow(raw: unknown): RowValidation {
     delete row.lat;
     delete row.lng;
   } else if (hasLat && hasLng) {
-    const inTexas =
-      row.lat! >= TEXAS_BOUNDS.minLat &&
-      row.lat! <= TEXAS_BOUNDS.maxLat &&
-      row.lng! >= TEXAS_BOUNDS.minLng &&
-      row.lng! <= TEXAS_BOUNDS.maxLng;
-    if (!inTexas) {
+    if (!isInTexasBounds({ lat: row.lat!, lng: row.lng! })) {
       warnings.push('lat/lng: outside Texas (swapped?); cleared and the address will be geocoded');
       delete row.lat;
       delete row.lng;

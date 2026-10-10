@@ -1,0 +1,87 @@
+export const en = {
+  'app.name': 'PermitWatch Houston',
+  'app.tagline': "AI that fights pollution shouldn't create more of it.",
+  'nav.skip': 'Skip to main content',
+  'nav.search': 'Search',
+  'nav.dashboard': 'GreenRoute',
+  'nav.language': 'Español',
+  'nav.languageLabel': 'Cambiar a español',
+
+  'hero.kicker': 'Concrete batch plant air permits · Houston',
+  'hero.title1': 'What is being permitted',
+  'hero.title2': 'in the air near you?',
+  'hero.subtitle':
+    'Enter your address or ZIP code. We show every concrete batch plant permit nearby, explained in plain English with the real numbers from the permit, plus how to comment before the deadline.',
+
+  'search.label': 'Houston address or ZIP code',
+  'search.placeholder': 'e.g. 4014 Market St, Houston, TX 77020',
+  'search.submit': 'Search',
+  'search.searching': 'Searching…',
+  'search.try': 'Try:',
+  'search.error.empty': 'Enter a Houston street address or a 5-digit ZIP code.',
+  'search.error.too_short': 'Enter a Houston street address or a 5-digit ZIP code.',
+  'search.error.too_long': 'That is too long. Please shorten it.',
+  'search.error.invalid_zip': 'ZIP codes have exactly 5 digits.',
+  'search.error.invalid_chars': 'Please use only letters, numbers and common address punctuation.',
+
+  'results.heading': 'Concrete batch plants near {place}',
+  'results.approximate': 'Using the center of ZIP {zip} (approximate location).',
+  'results.geocoderDown': 'The address lookup service is not responding, so we used your ZIP code instead.',
+  'results.none': 'No permitted concrete batch plants within {radius} miles in our dataset.',
+  'results.nearest': 'The nearest one we know of is {company}, {distance} miles {direction}.',
+  'results.count.one': '{count} plant within {radius} miles',
+  'results.count.other': '{count} plants within {radius} miles',
+  'results.listLabel': 'Plants sorted by distance',
+  'results.newSearch': 'New search',
+  'results.loadingLabel': 'Loading results',
+
+  'plant.distance': '{distance} mi {direction}',
+  'plant.distanceLong': '{distance} miles {direction} of you',
+  'plant.registration': 'Registration {number}',
+  'plant.viewDetails': 'View permit details',
+  'plant.maxProduction': 'Max production',
+  'plant.maxProductionValue': '{value} cubic yards/hour',
+  'plant.maxHours': 'Max operating hours',
+  'plant.maxHoursValue': '{value} hours/year',
+  'plant.pollutants': 'Permitted to emit',
+  'plant.controls': 'Pollution controls',
+  'plant.noticeType': 'Notice type',
+  'plant.noticeDate': 'Notice issued',
+  'plant.deadline': 'Comment deadline',
+  'plant.meeting': 'Public meeting',
+  'plant.notListed': 'Not listed in notice – check TCEQ',
+  'plant.source': 'Official source',
+  'plant.sourceLink': 'View source notice',
+  'plant.address': 'Location',
+
+  'type.new': 'New',
+  'type.renewal': 'Renewal',
+  'type.amendment': 'Amendment',
+  'type.unknown': 'Type not listed',
+
+  'sample.badge': 'Sample data',
+  'sample.banner': 'These results include SAMPLE DATA (fictional plants) used while the real permit dataset is being prepared.',
+
+  'disclaimer.permits': 'Permits show maximum allowed activity, not measured pollution.',
+
+  'dir.N': 'north',
+  'dir.NE': 'northeast',
+  'dir.E': 'east',
+  'dir.SE': 'southeast',
+  'dir.S': 'south',
+  'dir.SW': 'southwest',
+  'dir.W': 'west',
+  'dir.NW': 'northwest',
+
+  'error.generic': 'Something went wrong. Please try again.',
+  'error.network': "Can't reach PermitWatch right now. Check your connection and try again.",
+  'error.timeout': 'That took too long. Please try again.',
+  'error.retry': 'Try again',
+
+  'footer.data': 'Permit data: Texas Commission on Environmental Quality (TCEQ) public notices.',
+  'footer.geocoder': 'Address lookup: U.S. Census Bureau Geocoder.',
+  'footer.notAdvice': 'PermitWatch is an independent civic tool, not affiliated with TCEQ. Always confirm details on the official notice.',
+} as const;
+
+export type MessageKey = keyof typeof en;
+export type Messages = Record<MessageKey, string>;

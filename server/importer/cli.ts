@@ -7,6 +7,7 @@
  */
 import { parseArgs } from 'node:util';
 import { loadEnvOrExit } from '../config/loadEnv.js';
+import { createServices, importerGeocode } from '../container.js';
 import { openDatabase } from '../db/index.js';
 import { deleteSamplePermits } from '../db/permitsRepo.js';
 import { createLogger } from '../lib/logger.js';
@@ -32,7 +33,8 @@ try {
   process.exit(1);
 }
 
-const report = await importRows(rows, { db, logger, source: file });
+const services = createServices(env, db, logger);
+const report = await importRows(rows, { db, logger, source: file, geocode: importerGeocode(services.geocoder) });
 
 if (values['remove-samples']) {
   const removed = deleteSamplePermits(db);

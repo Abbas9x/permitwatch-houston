@@ -1,0 +1,142 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-night: #05070d;
+  --color-night-2: #0a0f1c;
+  --color-ink: #e8edf5;
+  --color-muted: #a3afc2;
+  --color-faint: #6b7a90;
+  --color-line: rgb(255 255 255 / 0.1);
+
+  --color-air-1: #2dd4bf;
+  --color-air-2: #38bdf8;
+  --color-air-3: #a78bfa;
+
+  /* Permit type colors: chosen for >= 4.5:1 contrast on the night background */
+  --color-new: #fbbf24;
+  --color-renewal: #22d3ee;
+  --color-amendment: #c4a1ff;
+  --color-unknown: #a3afc2;
+  --color-deadline: #fb7185;
+  --color-sample: #fcd34d;
+
+  --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.6);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  @keyframes shimmer {
+    from {
+      background-position: -200% 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    background: var(--color-night);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+  }
+  body {
+    min-height: 100dvh;
+    background: var(--color-night);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-air-2);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  ::selection {
+    background: rgb(56 189 248 / 0.35);
+  }
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(160deg, rgb(255 255 255 / 0.09), rgb(255 255 255 / 0.03));
+    border: 1px solid var(--color-line);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.06) inset,
+      0 20px 50px -20px rgb(0 0 0 / 0.6);
+  }
+  .text-gradient {
+    background: linear-gradient(100deg, var(--color-air-1), var(--color-air-2) 45%, var(--color-air-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.05) 25%, rgb(255 255 255 / 0.12) 50%, rgb(255 255 255 / 0.05) 75%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+    border-radius: 0.5rem;
+  }
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* MapLibre controls restyled for the dark theme */
+.maplibregl-ctrl-group {
+  background: rgb(10 15 28 / 0.85) !important;
+  border: 1px solid var(--color-line);
+}
+.maplibregl-ctrl-group button + button {
+  border-top-color: var(--color-line) !important;
+}
+.maplibregl-ctrl-icon {
+  filter: invert(1) brightness(1.6);
+}
+.maplibregl-ctrl-attrib {
+  background: rgb(5 7 13 / 0.75) !important;
+  color: var(--color-muted) !important;
+  font-size: 11px;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--color-ink) !important;
+}
+.maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
