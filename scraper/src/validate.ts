@@ -3,13 +3,15 @@
 //
 // Usage: npm run validate
 
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { inHarrisBbox } from "./geocode.js";
 import { makeId } from "./ids.js";
-import type { Plant } from "./types.js";
+import type { DemoAddressesFile, Plant } from "./types.js";
 
 const DATA_PATH = fileURLToPath(new URL("../../data/concrete-plants.json", import.meta.url));
+const DEMO_PATH = fileURLToPath(new URL("../../data/demo-addresses.json", import.meta.url));
 
 
 const ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
@@ -100,15 +102,42 @@ export function validate(data: unknown): string[] {
   return errors;
 }
 
+/** Check data/demo-addresses.json against the plants it refers to. */
+export function validateDemo(demo: DemoAddressesFile, plants: Plant[]): string[] {
+  const errors: string[] = [];
+  const byId = new Map(plants.map((p) => [p.id, p]));
+  for (const a of demo.addresses) {
+    const err = (msg: string) => errors.push(`demo address ${a.id}: ${msg}`);
+    if (!inHarrisBbox(a.lat, a.lng)) err("coordinates are outside Harris County's bounding box");
+    const distances = a.nearby.map((n) => n.distanceMiles);
+    if (distances.some((d, i) => i > 0 && d < distances[i - 1])) err("nearby is not sorted nearest first");
+    if (distances.some((d) => d > demo.radiusMiles)) err(`nearby has plants beyond radiusMiles (${demo.radiusMiles})`);
+    for (const n of a.nearby) if (!byId.has(n.plantId)) err(`plantId ${n.plantId} is not in concrete-plants.json`);
+    const within = (r: number) => distances.filter((d) => d <= r).length;
+    if (a.plantsWithin1Mile !== within(1) || a.plantsWithin2Miles !== within(2) || a.plantsWithin3Miles !== within(3)) {
+      err("plantsWithin counts don't match nearby");
+    }
+    if (a.pendingWithin3Miles !== a.nearby.filter((n) => byId.get(n.plantId)?.status === "pending").length) {
+      err("pendingWithin3Miles doesn't match nearby");
+    }
+  }
+  return errors;
+}
+
 async function main() {
   const data = JSON.parse(await readFile(DATA_PATH, "utf8"));
   const errors = validate(data);
+  const hasDemo = existsSync(DEMO_PATH);
+  if (hasDemo && Array.isArray(data.plants)) {
+    errors.push(...validateDemo(JSON.parse(await readFile(DEMO_PATH, "utf8")), data.plants));
+  }
   if (errors.length) {
-    console.error(`${errors.length} problem(s) in ${DATA_PATH}:`);
+    console.error(`${errors.length} problem(s):`);
     for (const e of errors) console.error(`  - ${e}`);
     process.exit(1);
   }
   console.log(`OK: ${data.count} plants in ${DATA_PATH} match the format in data/README.md`);
+  if (hasDemo) console.log(`OK: ${DEMO_PATH} matches the plants`);
 }
 
 main().catch((err) => {

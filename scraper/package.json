@@ -10,7 +10,9 @@
     "extract": "tsx src/extract.ts",
     "scrape": "tsx src/scrape.ts",
     "validate": "tsx src/validate.ts",
-    "existing": "tsx src/existing.ts"
+    "existing": "tsx src/existing.ts",
+    "stats": "tsx src/stats.ts",
+    "demo": "tsx src/demo.ts"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

@@ -5,6 +5,7 @@ This folder holds the output of the scraper (`scraper/`), which the rest of Perm
 | Path | Committed? | Purpose |
 | --- | --- | --- |
 | `concrete-plants.json` | Yes | Cleaned dataset the app consumes |
+| `demo-addresses.json` | Yes | Demo addresses with nearby plants precomputed, for demo mode |
 | `raw/` | No (gitignored) | Raw HTML/PDF downloads kept for debugging and re-parsing |
 
 TypeScript types for this format live in `scraper/src/types.ts`.
@@ -73,6 +74,37 @@ To build the hash:
 | --- | --- | --- |
 | `pollutant` | string | Pollutant name as listed, e.g. `"PM10"`, `"PM2.5"` |
 | `tonsPerYear` | number | Emission amount in tons per year |
+
+## `demo-addresses.json`
+
+Precomputed results for the pitch demo, so demo mode needs no geocoding or network. Generated from `concrete-plants.json` by `npm run demo` in `scraper/`; the places themselves are listed in `scraper/demo-places.json`. The demo places are public places such as schools and libraries, not homes.
+
+### Top-level object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `generatedAt` | string (ISO 8601 UTC timestamp) | When this file was written |
+| `plantsGeneratedAt` | string (ISO 8601 UTC timestamp) | `generatedAt` of the `concrete-plants.json` it was computed from |
+| `radiusMiles` | number | Search radius for `nearby`, currently `3` |
+| `addresses` | `DemoAddress[]` | The demo addresses |
+
+### `DemoAddress` object
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | string | Stable ID, e.g. `"frost-elementary"` |
+| `label` | string | Display name, e.g. `"Frost Elementary School"` |
+| `address` | string | Street address, as typed into the search box |
+| `lat` | number | Latitude in decimal degrees (WGS84) |
+| `lng` | number | Longitude in decimal degrees (WGS84) |
+| `locationSource` | `"geocoded"` \| `"manual"` | How `lat`/`lng` were obtained |
+| `plantsWithin1Mile` | number | Plants with coordinates within 1 mile |
+| `plantsWithin2Miles` | number | Plants with coordinates within 2 miles |
+| `plantsWithin3Miles` | number | Plants with coordinates within 3 miles |
+| `pendingWithin3Miles` | number | How many of those are `pending` |
+| `nearby` | `{ plantId: string, distanceMiles: number }[]` | Plants within `radiusMiles`, nearest first. `plantId` is a `Plant.id` in `concrete-plants.json`; `distanceMiles` is straight-line distance rounded to 2 decimals |
+
+Plants without coordinates can't be measured, so they never appear in `nearby` or the counts.
 
 ## Example
 

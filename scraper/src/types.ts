@@ -42,3 +42,34 @@ export interface PlantsFile {
   count: number;
   plants: Plant[];
 }
+
+// Shape of data/demo-addresses.json. See data/README.md.
+
+export interface NearbyPlant {
+  /** A Plant id in data/concrete-plants.json. */
+  plantId: string;
+  distanceMiles: number;
+}
+
+export interface DemoAddress {
+  id: string;
+  label: string;
+  address: string;
+  lat: number;
+  lng: number;
+  locationSource: "geocoded" | "manual";
+  plantsWithin1Mile: number;
+  plantsWithin2Miles: number;
+  plantsWithin3Miles: number;
+  pendingWithin3Miles: number;
+  /** Plants with coordinates within radiusMiles, nearest first. */
+  nearby: NearbyPlant[];
+}
+
+export interface DemoAddressesFile {
+  generatedAt: string;
+  /** generatedAt of the concrete-plants.json these were computed from. */
+  plantsGeneratedAt: string;
+  radiusMiles: number;
+  addresses: DemoAddress[];
+}

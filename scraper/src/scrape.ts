@@ -4,7 +4,7 @@
 // Usage: npm run scrape [-- --refresh]
 
 import { writeFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { EXISTING_SOURCE, extractExistingHarris } from "./existing.js";
 import { extractPendingHarris, nowIso } from "./extract.js";
 import { PENDING_URL } from "./fetchList.js";
@@ -52,7 +52,9 @@ async function main() {
   console.log(`Wrote ${plants.length} plants (${pending.length} pending, ${existingOnly.length} existing) to ${OUTPUT_PATH}`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

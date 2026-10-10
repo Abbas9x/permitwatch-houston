@@ -1,0 +1,129 @@
+{
+  "generatedAt": "2026-10-10T23:28:26Z",
+  "plantsGeneratedAt": "2026-10-10T23:10:48Z",
+  "radiusMiles": 3,
+  "addresses": [
+    {
+      "id": "frost-elementary",
+      "label": "Frost Elementary School",
+      "address": "5002 Almeda Genoa Rd, Houston, TX 77048",
+      "lat": 29.620910408131,
+      "lng": -95.337424974076,
+      "locationSource": "geocoded",
+      "plantsWithin1Mile": 1,
+      "plantsWithin2Miles": 9,
+      "plantsWithin3Miles": 11,
+      "pendingWithin3Miles": 0,
+      "nearby": [
+        {
+          "plantId": "tceq-136961",
+          "distanceMiles": 1
+        },
+        {
+          "plantId": "tceq-55078",
+          "distanceMiles": 1.07
+        },
+        {
+          "plantId": "tceq-72039",
+          "distanceMiles": 1.08
+        },
+        {
+          "plantId": "tceq-131789",
+          "distanceMiles": 1.21
+        },
+        {
+          "plantId": "tceq-75323",
+          "distanceMiles": 1.22
+        },
+        {
+          "plantId": "tceq-50653",
+          "distanceMiles": 1.33
+        },
+        {
+          "plantId": "tceq-49005",
+          "distanceMiles": 1.58
+        },
+        {
+          "plantId": "tceq-130769",
+          "distanceMiles": 1.72
+        },
+        {
+          "plantId": "tceq-150646",
+          "distanceMiles": 2
+        },
+        {
+          "plantId": "tceq-135854",
+          "distanceMiles": 2.05
+        },
+        {
+          "plantId": "tceq-144445L001",
+          "distanceMiles": 2.95
+        }
+      ]
+    },
+    {
+      "id": "odom-elementary",
+      "label": "Odom Elementary School",
+      "address": "14701 Henry Rd, Houston, TX 77060",
+      "lat": 29.913214681107,
+      "lng": -95.382598166847,
+      "locationSource": "geocoded",
+      "plantsWithin1Mile": 2,
+      "plantsWithin2Miles": 3,
+      "plantsWithin3Miles": 4,
+      "pendingWithin3Miles": 0,
+      "nearby": [
+        {
+          "plantId": "tceq-51178",
+          "distanceMiles": 0.45
+        },
+        {
+          "plantId": "tceq-157195",
+          "distanceMiles": 0.74
+        },
+        {
+          "plantId": "tceq-148312",
+          "distanceMiles": 1.54
+        },
+        {
+          "plantId": "tceq-78606",
+          "distanceMiles": 2.69
+        }
+      ]
+    },
+    {
+      "id": "hobby-elementary",
+      "label": "Hobby Elementary School",
+      "address": "4021 Woodmont Dr, Houston, TX 77045",
+      "lat": 29.635888296446,
+      "lng": -95.436981792258,
+      "locationSource": "geocoded",
+      "plantsWithin1Mile": 0,
+      "plantsWithin2Miles": 3,
+      "plantsWithin3Miles": 5,
+      "pendingWithin3Miles": 1,
+      "nearby": [
+        {
+          "plantId": "tceq-77728",
+          "distanceMiles": 1.18
+        },
+        {
+          "plantId": "tceq-123329",
+          "distanceMiles": 1.31
+        },
+        {
+          "plantId": "tceq-178869",
+          "distanceMiles": 1.31
+        },
+        {
+          "plantId": "tceq-147030",
+          "distanceMiles": 2.14
+        },
+        {
+          "plantId": "tceq-131670",
+          "distanceMiles": 2.46
+        }
+      ]
+    }
+  ]
+}
