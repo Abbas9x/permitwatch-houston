@@ -1,8 +1,9 @@
 /**
- * Import a permit dataset into SQLite.
+ * Import a permit dataset into SQLite, then batch-generate AI summaries (English + Spanish).
  *
  *   npm run import                          # loads data/sample-permits.json
  *   npm run import -- path/to/permits.csv   # teammate's real dataset (.json or .csv)
+ *   npm run import -- file.json --no-ai     # skip AI summaries (data-only template summaries instead)
  *   npm run import -- file.json --remove-samples   # also deletes SAMPLE rows (destructive)
  */
 import { parseArgs } from 'node:util';
@@ -10,6 +11,7 @@ import { loadEnvOrExit } from '../config/loadEnv.js';
 import { createServices, importerGeocode } from '../container.js';
 import { openDatabase } from '../db/index.js';
 import { deleteSamplePermits } from '../db/permitsRepo.js';
+import { generateSummaries } from '../greenroute/batch.js';
 import { createLogger } from '../lib/logger.js';
 import { importRows, readDatasetFile } from './importer.js';
 
@@ -17,6 +19,7 @@ const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
     'remove-samples': { type: 'boolean', default: false },
+    'no-ai': { type: 'boolean', default: false },
   },
 });
 
@@ -34,6 +37,7 @@ try {
 }
 
 const services = createServices(env, db, logger);
+
 const report = await importRows(rows, { db, logger, source: file, geocode: importerGeocode(services.geocoder) });
 
 if (values['remove-samples']) {
@@ -51,4 +55,10 @@ for (const issue of report.rejected) {
 for (const issue of report.warnings) {
   console.warn(`  warning  row ${issue.rowNumber}${issue.rowId ? ` (${issue.rowId})` : ''}: ${issue.messages.join('; ')}`);
 }
+
+const batch = await generateSummaries({ db, logger, engine: values['no-ai'] ? null : services.engine });
+console.warn(
+  `Summaries: ${batch.total} needed -> ${batch.ai} by ${services.engine.mode === 'mock' ? 'MOCK AI' : 'GreenRoute AI'}` +
+    ` (${batch.cacheHits} from cache), ${batch.template} data-only templates.`,
+);
 db.close();

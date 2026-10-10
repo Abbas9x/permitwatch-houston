@@ -33,7 +33,7 @@ export default defineConfig([
   {
     // Type-aware rules for the server: unhandled promises are bugs in request handlers.
     files: ['server/**/*.ts'],
-    ignores: ['server/**/*.test.ts', 'server/testUtils.ts'],
+    ignores: ['server/**/*.test.ts', 'server/testUtils.ts', 'server/**/testing.ts'],
     languageOptions: {
       globals: globals.node,
       parserOptions: { project: ['./tsconfig.server.json'], tsconfigRootDir: import.meta.dirname },
@@ -45,7 +45,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['server/**/*.test.ts', 'server/testUtils.ts', 'shared/**/*.ts', 'e2e/**/*.ts', 'scripts/**/*.mjs', '*.config.{js,ts}'],
+    files: ['server/**/*.test.ts', 'server/testUtils.ts', 'server/**/testing.ts', 'shared/**/*.ts', 'e2e/**/*.ts', 'scripts/**/*.mjs', '*.config.{js,ts}'],
     languageOptions: { globals: globals.node },
   },
   {
