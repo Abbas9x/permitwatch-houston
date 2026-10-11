@@ -3,7 +3,7 @@ import type { NearbyPlant } from '../../../shared/api';
 import { useI18n } from '../i18n';
 import { daysUntil, formatDate, formatMiles, formatNumber } from '../lib/format';
 import { TYPE_COLORS } from '../lib/permitColors';
-import { PermitTypeBadge, SampleBadge } from './Badges';
+import { CategoryBadge, PermitTypeBadge, SampleBadge } from './Badges';
 
 interface PlantListItemProps {
   plant: NearbyPlant;
@@ -42,11 +42,15 @@ export function PlantListItem({ plant, index, selected, onSelect }: PlantListIte
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+              <CategoryBadge category={permit.category} />
               <PermitTypeBadge type={permit.permitType} />
               {permit.isSample && <SampleBadge />}
             </div>
             <h3 className="truncate font-display text-base font-semibold text-ink">{permit.company}</h3>
-            <p className="mt-0.5 text-xs text-muted">{t('plant.registration', { number: permit.registrationNumber })}</p>
+            {permit.facilityName && <p className="truncate text-xs text-ink/80">{permit.facilityName}</p>}
+            <p className="mt-0.5 text-xs text-muted">
+              {t(permit.category === 'air_permit' ? 'plant.permitNumber' : 'plant.registration', { number: permit.registrationNumber })}
+            </p>
           </div>
           <div className="shrink-0 text-right">
             <p className="font-display text-xl font-semibold text-ink tabular-nums">

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { LocationSource, Permit, PermitType } from '../../shared/permit.js';
+import type { LocationSource, Permit, PermitCategory, PermitType } from '../../shared/permit.js';
 import type { DB } from './index.js';
 
 export interface PermitRecord {
@@ -25,6 +25,8 @@ export interface PermitRecord {
   source_url: string;
   raw_text: string;
   is_sample: 0 | 1;
+  category: PermitCategory;
+  facility_name: string | null;
   content_hash: string;
   imported_at: string;
 }
@@ -60,6 +62,8 @@ export function toPermit(record: PermitRecord): Permit {
     publicMeetingDate: record.public_meeting_date,
     sourceUrl: record.source_url,
     isSample: record.is_sample === 1,
+    category: record.category,
+    facilityName: record.facility_name,
   };
 }
 
@@ -69,12 +73,12 @@ export function upsertPermit(db: DB, record: PermitRecord): void {
        id, registration_number, company, address, city, county, zip, lat, lng, location_source,
        permit_type, max_production_cyd_per_hr, max_hours_per_year, pollutants_json, controls,
        notice_type, notice_issuance_date, comment_deadline, public_meeting_date, source_url,
-       raw_text, is_sample, content_hash, imported_at
+       raw_text, is_sample, category, facility_name, content_hash, imported_at
      ) VALUES (
        @id, @registration_number, @company, @address, @city, @county, @zip, @lat, @lng, @location_source,
        @permit_type, @max_production_cyd_per_hr, @max_hours_per_year, @pollutants_json, @controls,
        @notice_type, @notice_issuance_date, @comment_deadline, @public_meeting_date, @source_url,
-       @raw_text, @is_sample, @content_hash, @imported_at
+       @raw_text, @is_sample, @category, @facility_name, @content_hash, @imported_at
      )
      ON CONFLICT (id) DO UPDATE SET
        registration_number = excluded.registration_number,
@@ -98,6 +102,8 @@ export function upsertPermit(db: DB, record: PermitRecord): void {
        source_url = excluded.source_url,
        raw_text = excluded.raw_text,
        is_sample = excluded.is_sample,
+       category = excluded.category,
+       facility_name = excluded.facility_name,
        content_hash = excluded.content_hash,
        imported_at = excluded.imported_at`,
   ).run(record);

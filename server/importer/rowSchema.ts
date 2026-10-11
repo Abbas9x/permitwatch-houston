@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { PERMIT_ID_PATTERN } from '../../shared/validation.js';
-import type { PermitType } from '../../shared/permit.js';
+import { PERMIT_CATEGORIES, type PermitType } from '../../shared/permit.js';
 
 export { TEXAS_BOUNDS } from '../../shared/geo.js';
 
@@ -160,6 +160,12 @@ export const RowSchema = z.object({
     (v) => v === true || v === 1 || (typeof v === 'string' && ['true', '1', 'yes'].includes(v.trim().toLowerCase())),
     z.boolean(),
   ),
+  // Older datasets were concrete-only, so a missing category means concrete. Unknown values reject the row.
+  category: z.preprocess(
+    (v) => (isBlank(v) ? 'concrete_batch_plant' : v === 'pending_air_permit' ? 'air_permit' : v),
+    z.enum(PERMIT_CATEGORIES, { error: 'must be concrete_batch_plant or air_permit' }),
+  ),
+  facility_name: optionalText(200),
 });
 
 export type PermitRow = z.infer<typeof RowSchema>;
@@ -177,4 +183,5 @@ export const OPTIONAL_FIELDS = new Set<string>([
   'comment_deadline',
   'public_meeting_date',
   'raw_text',
+  'facility_name',
 ]);

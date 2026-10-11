@@ -116,4 +116,9 @@ export const MIGRATIONS: readonly string[] = [
   DROP TABLE IF EXISTS ai_calls;
   DELETE FROM permit_summaries WHERE generator <> 'template';
   `,
+  /* 3: permit category (concrete batch plant vs. industrial air permit) and facility name. */ `
+  ALTER TABLE permits ADD COLUMN category TEXT NOT NULL DEFAULT 'concrete_batch_plant'
+    CHECK (category IN ('concrete_batch_plant', 'air_permit'));
+  ALTER TABLE permits ADD COLUMN facility_name TEXT;
+  `,
 ];

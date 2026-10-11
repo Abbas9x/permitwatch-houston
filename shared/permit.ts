@@ -4,6 +4,10 @@ export const PERMIT_TYPES = ['new', 'renewal', 'amendment', 'unknown'] as const;
 export const PermitTypeSchema = z.enum(PERMIT_TYPES);
 export type PermitType = z.infer<typeof PermitTypeSchema>;
 
+/** What kind of permit a record is. Air permits are TCEQ case-by-case permits for industrial facilities. */
+export const PERMIT_CATEGORIES = ['concrete_batch_plant', 'air_permit'] as const;
+export type PermitCategory = (typeof PERMIT_CATEGORIES)[number];
+
 export const LOCATION_SOURCES = ['dataset', 'census_geocoder', 'zip_centroid'] as const;
 export type LocationSource = (typeof LOCATION_SOURCES)[number];
 
@@ -11,7 +15,10 @@ export type LocationSource = (typeof LOCATION_SOURCES)[number];
 export const PermitSchema = z.object({
   id: z.string(),
   registrationNumber: z.string(),
+  category: z.enum(PERMIT_CATEGORIES),
   company: z.string(),
+  /** Facility name from the source (e.g. "ALBEMARLE CATALYSTS"), when it is more than a generic label. */
+  facilityName: z.string().nullable(),
   address: z.string(),
   city: z.string(),
   county: z.string(),

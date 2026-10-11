@@ -135,6 +135,8 @@ export function toRecord(row: PermitRow, location: { lat: number; lng: number; s
     source_url: row.source_url,
     raw_text: row.raw_text,
     is_sample: row.is_sample ? 1 : 0,
+    category: row.category,
+    facility_name: row.facility_name ?? null,
     content_hash: contentHash(row),
     imported_at: nowIso(),
   };

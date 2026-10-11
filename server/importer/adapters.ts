@@ -86,6 +86,13 @@ function splitContaminants(text: unknown): string[] {
     .filter((p) => p.length > 0 && p.length <= 120);
 }
 
+/** A facility name worth showing: not a generic label like "CONCRETE BATCH PLANT" and not just the operator again. */
+export function facilityName(name: unknown, operator: unknown): string | undefined {
+  const n = str(name);
+  if (!n || /^(concrete batch plant|standard permit|change of representations|existing relocation)\b/i.test(n)) return undefined;
+  return n.toLowerCase() === str(operator)?.toLowerCase() ? undefined : n;
+}
+
 export function adaptSites(file: SitesFile): unknown[] {
   return file.sites.flatMap((raw) => {
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [raw];
@@ -125,6 +132,8 @@ export function adaptSites(file: SitesFile): unknown[] {
         source_url: str(s.sourceUrl) ?? TCEQ_LINKS.airPermitSearch,
         raw_text: recordText(flat, str(s.source)),
         is_sample: false,
+        category: s.category === 'concrete_batch_plant' ? 'concrete_batch_plant' : 'air_permit',
+        facility_name: facilityName(s.name, s.operator),
       },
     ];
   });
@@ -154,6 +163,8 @@ export function adaptTceqScrape(file: TceqScrapeFile): unknown[] {
     source_url: str(p.noticeUrl) ?? (p.status === 'pending' ? pages.pending : pages.search),
     raw_text: recordText(p, source),
     is_sample: false,
+    category: 'concrete_batch_plant',
+    facility_name: facilityName(p.name, p.operator),
   });
   });
 }

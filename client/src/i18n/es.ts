@@ -10,11 +10,11 @@ export const es: Messages = {
   'nav.language': 'English',
   'nav.languageLabel': 'Switch to English',
 
-  'hero.kicker': 'Permisos de aire de plantas de concreto · Houston',
+  'hero.kicker': 'Permisos de aire cerca de usted · Houston',
   'hero.title1': '¿Qué se está permitiendo',
   'hero.title2': 'en el aire cerca de usted?',
   'hero.subtitle':
-    'Ingrese su dirección o código postal. Le mostramos cada permiso de planta de concreto cercana, explicado en lenguaje sencillo con los números reales del permiso, y cómo comentar antes de la fecha límite.',
+    'Ingrese su dirección o código postal. Le mostramos cada permiso de aire cercano (plantas de concreto e instalaciones industriales), explicado en lenguaje sencillo con los datos reales del permiso, y cómo comentar antes de la fecha límite.',
 
   'radius.label': 'Distancia de búsqueda',
   'radius.hint': 'Distancia en línea recta desde la ubicación buscada.',
@@ -32,14 +32,14 @@ export const es: Messages = {
   'search.error.invalid_zip': 'Los códigos postales tienen exactamente 5 dígitos.',
   'search.error.invalid_chars': 'Use solo letras, números y signos comunes de direcciones.',
 
-  'results.heading': 'Plantas de concreto cerca de {place}',
+  'results.heading': 'Permisos de aire cerca de {place}',
   'results.approximate': 'Usando el centro del código postal {zip} (ubicación aproximada).',
   'results.geocoderDown': 'El servicio de búsqueda de direcciones no responde, así que usamos su código postal.',
-  'results.none': 'No hay plantas de concreto con permiso a menos de {radius} {unit} en nuestros datos.',
+  'results.none': 'No hay instalaciones con permiso a menos de {radius} {unit} en nuestros datos.',
   'results.nearest': 'La más cercana que conocemos es {company}, a {distance} millas al {direction}.',
-  'results.count.one': '{count} planta a menos de {radius} {unit}',
-  'results.count.other': '{count} plantas a menos de {radius} {unit}',
-  'results.listLabel': 'Plantas ordenadas por distancia',
+  'results.count.one': '{count} permiso a menos de {radius} {unit}',
+  'results.count.other': '{count} permisos a menos de {radius} {unit}',
+  'results.listLabel': 'Permisos ordenados por distancia',
   'results.newSearch': 'Nueva búsqueda',
   'results.loadingLabel': 'Cargando resultados',
 
@@ -69,7 +69,7 @@ export const es: Messages = {
 
   'sample.badge': 'Datos de muestra',
   'sample.banner':
-    'Estos resultados incluyen DATOS DE MUESTRA (plantas ficticias) mientras se prepara el conjunto real de permisos.',
+    'Estos resultados incluyen DATOS DE MUESTRA (instalaciones ficticias) mientras se prepara el conjunto real de permisos.',
 
   'disclaimer.permits': 'Los permisos muestran la actividad máxima permitida, no la contaminación medida.',
 
@@ -92,17 +92,17 @@ export const es: Messages = {
   'footer.notAdvice':
     'PermitWatch es una herramienta cívica independiente, sin afiliación con TCEQ. Confirme siempre los detalles en el aviso oficial.',
   'area.heading': 'Su zona de un vistazo',
-  'area.tile.one': 'planta a menos de {radius} {unit}',
-  'area.tile.other': 'plantas a menos de {radius} {unit}',
-  'area.capacity': 'Capacidad de producción permitida combinada a menos de {radius} {unit}',
+  'area.tile.one': 'permiso a menos de {radius} {unit}',
+  'area.tile.other': 'permisos a menos de {radius} {unit}',
+  'area.capacity': 'Capacidad de producción combinada de plantas de concreto a menos de {radius} {unit}',
   'area.capacityValue': '{value} yardas cúbicas/hora',
   'area.capacityNote': 'Suma de las tasas máximas indicadas en {listed} de {total} avisos. No se cuentan los avisos que no indican una tasa.',
   'area.capacityNone': 'Ninguno de los avisos cercanos indica una tasa de producción.',
-  'map.label': 'Mapa de plantas de concreto a menos de {radius} {unit} de {place}',
-  'map.unavailable': 'El mapa interactivo no está disponible en este dispositivo. Todas las plantas aparecen en la lista.',
+  'map.label': 'Mapa de permisos de aire a menos de {radius} {unit} de {place}',
+  'map.unavailable': 'El mapa interactivo no está disponible en este dispositivo. Todos los permisos aparecen en la lista.',
   'map.you': 'Ubicación de su búsqueda',
   'map.loading': 'Cargando mapa…',
-  'map.slow': 'El mapa está tardando en cargar. Todas las plantas aparecen en la lista.',
+  'map.slow': 'El mapa está tardando en cargar. Todos los permisos aparecen en la lista.',
   'map.markerLabel': '{company}: {type}, a {distance} millas al {direction}',
   'map.legendNew': 'Permiso nuevo',
   'map.legendRenewal': 'Renovación',
@@ -154,8 +154,8 @@ export const es: Messages = {
   'search.recent': 'Reciente',
   'search.example': 'Ejemplo',
   'how.label': 'Cómo funciona PermitWatch',
-  'how.1.title': 'Encuentre plantas cerca de usted',
-  'how.1.body': 'Elija entre 1 y 10 millas para ver permisos de plantas de concreto en un mapa y una lista.',
+  'how.1.title': 'Encuentre permisos cerca de usted',
+  'how.1.body': 'Elija entre 1 y 10 millas para ver permisos de plantas de concreto e instalaciones industriales en un mapa y una lista.',
   'how.2.title': 'Entienda el permiso',
   'how.2.body': 'Resúmenes en inglés y español sencillos que usan los números reales del permiso.',
   'how.3.title': 'Actúe antes de la fecha límite',
@@ -163,4 +163,8 @@ export const es: Messages = {
   'search.place': 'Lugar',
   'results.placeArea': 'Mostrando la zona alrededor de {place}.',
   'footer.places': 'Búsqueda de lugares: Photon de komoot, datos del mapa © colaboradores de OpenStreetMap.',
+  'category.concrete_batch_plant': 'Planta de concreto',
+  'category.air_permit': 'Permiso de aire industrial',
+  'plant.permitNumber': 'Permiso {number}',
+  'plant.airContaminants': 'Contaminantes del aire indicados',
 };

@@ -8,11 +8,11 @@ export const en = {
   'nav.language': 'Español',
   'nav.languageLabel': 'Cambiar a español',
 
-  'hero.kicker': 'Concrete batch plant air permits · Houston',
+  'hero.kicker': 'Air permits near you · Houston',
   'hero.title1': 'What is being permitted',
   'hero.title2': 'in the air near you?',
   'hero.subtitle':
-    'Enter your address or ZIP code. We show every concrete batch plant permit nearby, explained in plain English with the real numbers from the permit, plus how to comment before the deadline.',
+    'Enter your address or ZIP code. We show every air permit nearby (concrete batch plants and industrial facilities), explained in plain English with the real details from the permit, plus how to comment before the deadline.',
 
   'radius.label': 'Search distance',
   'radius.hint': 'Straight-line distance from your search location.',
@@ -30,14 +30,14 @@ export const en = {
   'search.error.invalid_zip': 'ZIP codes have exactly 5 digits.',
   'search.error.invalid_chars': 'Please use only letters, numbers and common address punctuation.',
 
-  'results.heading': 'Concrete batch plants near {place}',
+  'results.heading': 'Air permits near {place}',
   'results.approximate': 'Using the center of ZIP {zip} (approximate location).',
   'results.geocoderDown': 'The address lookup service is not responding, so we used your ZIP code instead.',
-  'results.none': 'No permitted concrete batch plants within {radius} {unit} in our dataset.',
+  'results.none': 'No permitted facilities within {radius} {unit} in our dataset.',
   'results.nearest': 'The nearest one we know of is {company}, {distance} miles {direction}.',
-  'results.count.one': '{count} plant within {radius} {unit}',
-  'results.count.other': '{count} plants within {radius} {unit}',
-  'results.listLabel': 'Plants sorted by distance',
+  'results.count.one': '{count} permit within {radius} {unit}',
+  'results.count.other': '{count} permits within {radius} {unit}',
+  'results.listLabel': 'Permits sorted by distance',
   'results.newSearch': 'New search',
   'results.loadingLabel': 'Loading results',
 
@@ -66,7 +66,7 @@ export const en = {
   'type.unknown': 'Type not listed',
 
   'sample.badge': 'Sample data',
-  'sample.banner': 'These results include SAMPLE DATA (fictional plants) used while the real permit dataset is being prepared.',
+  'sample.banner': 'These results include SAMPLE DATA (fictional facilities) used while the real permit dataset is being prepared.',
 
   'disclaimer.permits': 'Permits show maximum allowed activity, not measured pollution.',
 
@@ -88,17 +88,17 @@ export const en = {
   'footer.geocoder': 'Address lookup: U.S. Census Bureau Geocoder.',
   'footer.notAdvice': 'PermitWatch is an independent civic tool, not affiliated with TCEQ. Always confirm details on the official notice.',
   'area.heading': 'Your area at a glance',
-  'area.tile.one': 'plant within {radius} {unit}',
-  'area.tile.other': 'plants within {radius} {unit}',
-  'area.capacity': 'Combined permitted production capacity within {radius} {unit}',
+  'area.tile.one': 'permit within {radius} {unit}',
+  'area.tile.other': 'permits within {radius} {unit}',
+  'area.capacity': 'Combined concrete plant production capacity within {radius} {unit}',
   'area.capacityValue': '{value} cubic yards/hour',
   'area.capacityNote': 'Sum of the maximum rates listed in {listed} of {total} notices. Notices that do not list a rate are not counted.',
   'area.capacityNone': 'None of the nearby notices list a production rate.',
-  'map.label': 'Map of concrete batch plants within {radius} {unit} of {place}',
-  'map.unavailable': 'The interactive map is not available on this device. Every plant is listed below.',
+  'map.label': 'Map of air permits within {radius} {unit} of {place}',
+  'map.unavailable': 'The interactive map is not available on this device. Every permit is listed below.',
   'map.you': 'Your search location',
   'map.loading': 'Loading map…',
-  'map.slow': 'The map is taking a while to load. Every plant is listed below.',
+  'map.slow': 'The map is taking a while to load. Every permit is listed below.',
   'map.markerLabel': '{company}: {type}, {distance} miles {direction}',
   'map.legendNew': 'New permit',
   'map.legendRenewal': 'Renewal',
@@ -150,8 +150,8 @@ export const en = {
   'search.recent': 'Recent',
   'search.example': 'Example',
   'how.label': 'How PermitWatch works',
-  'how.1.title': 'Find plants near you',
-  'how.1.body': 'Choose 1–10 miles to find concrete batch plant air permits on a map and in a list.',
+  'how.1.title': 'Find permits near you',
+  'how.1.body': 'Choose 1–10 miles to find concrete plant and industrial air permits on a map and in a list.',
   'how.2.title': 'Understand the permit',
   'how.2.body': 'Plain-English and Spanish summaries that use the real numbers from the permit.',
   'how.3.title': 'Act before the deadline',
@@ -159,6 +159,10 @@ export const en = {
   'search.place': 'Place',
   'results.placeArea': 'Showing the area around {place}.',
   'footer.places': 'Place search: Photon by komoot, map data © OpenStreetMap contributors.',
+  'category.concrete_batch_plant': 'Concrete batch plant',
+  'category.air_permit': 'Industrial air permit',
+  'plant.permitNumber': 'Permit {number}',
+  'plant.airContaminants': 'Air contaminants listed',
 } as const;
 
 export type MessageKey = keyof typeof en;

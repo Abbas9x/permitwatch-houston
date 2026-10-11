@@ -30,17 +30,22 @@ export function PermitFacts({ permit }: { permit: Permit }) {
 
   return (
     <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-      <Fact label={t('plant.maxProduction')}>
-        {permit.maxProductionCydPerHr !== null
-          ? t('plant.maxProductionValue', { value: formatNumber(permit.maxProductionCydPerHr, lang, 2) })
-          : missing}
-      </Fact>
-      <Fact label={t('plant.maxHours')}>
-        {permit.maxHoursPerYear !== null
-          ? t('plant.maxHoursValue', { value: formatNumber(permit.maxHoursPerYear, lang) })
-          : missing}
-      </Fact>
-      <Fact label={t('plant.pollutants')} wide>
+      {/* Production rate and operating hours are concrete-plant permit fields. */}
+      {permit.category === 'concrete_batch_plant' && (
+        <>
+          <Fact label={t('plant.maxProduction')}>
+            {permit.maxProductionCydPerHr !== null
+              ? t('plant.maxProductionValue', { value: formatNumber(permit.maxProductionCydPerHr, lang, 2) })
+              : missing}
+          </Fact>
+          <Fact label={t('plant.maxHours')}>
+            {permit.maxHoursPerYear !== null
+              ? t('plant.maxHoursValue', { value: formatNumber(permit.maxHoursPerYear, lang) })
+              : missing}
+          </Fact>
+        </>
+      )}
+      <Fact label={t(permit.category === 'air_permit' ? 'plant.airContaminants' : 'plant.pollutants')} wide>
         {permit.pollutants.length > 0 ? (
           <ul className="flex flex-wrap gap-1.5">
             {permit.pollutants.map((p) => (

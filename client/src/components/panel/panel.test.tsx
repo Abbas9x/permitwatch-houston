@@ -10,6 +10,8 @@ afterEach(cleanup);
 const base: Permit = {
   id: 'p1',
   registrationNumber: '170001',
+  category: 'concrete_batch_plant',
+  facilityName: null,
   company: 'Example Co',
   address: '1 Main St',
   city: 'Houston',

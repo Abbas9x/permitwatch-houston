@@ -79,7 +79,7 @@ export function searchRouter(deps: { db: DB; geocoder: Geocoder; placeSearch?: P
         throw new HttpError(
           422,
           'outside_service_area',
-          `We found ${location.label}, but PermitWatch covers Houston-area (Texas) concrete plant permits only. Try a Houston address, neighborhood, or ZIP code.`,
+          `We found ${location.label}, but PermitWatch covers Houston-area (Texas) air permits only. Try a Houston address, neighborhood, or ZIP code.`,
         );
       }
 

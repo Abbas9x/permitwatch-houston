@@ -11,7 +11,7 @@ test('search, map markers, permit details, templates, refresh and repeat search'
   await page.goto('/');
   const search=page.getByRole('combobox',{name:'Houston address or ZIP code'});
   await search.fill('77020');await search.press('Enter');
-  await expect(page.getByRole('heading',{name:'Concrete batch plants near ZIP 77020'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Air permits near ZIP 77020'})).toBeVisible();
   await expect(page.locator('.maplibregl-canvas')).toBeVisible();
   await expect(page.locator('.pw-marker')).toHaveCount(3);
   await page.locator('.pw-marker[data-plant-id="sample-001"]').click({force:true});
@@ -26,7 +26,7 @@ test('search, map markers, permit details, templates, refresh and repeat search'
   await page.reload();await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button',{name:'Close permit details',exact:true}).click();
   await search.fill('77494');await search.press('Enter');
-  await expect(page.getByText('No permitted concrete batch plants within 3 miles in our dataset.',{exact:true})).toBeVisible();
+  await expect(page.getByText('No permitted facilities within 3 miles in our dataset.',{exact:true})).toBeVisible();
   await expect(page.locator('.pw-marker')).toHaveCount(0);
   await expect(page.locator('header a')).toHaveCount(1);
   expect(requests.every(url=>/\/api\/(?:search\?|geocode\/suggest\?|permits\/[A-Za-z0-9._-]+(?:\/comment-draft)?$)/.test(url))).toBe(true);
@@ -37,7 +37,7 @@ test('invalid input, address suggestions, upstream errors and malformed server r
   await page.goto('/');const search=page.getByRole('combobox',{name:'Houston address or ZIP code'});
   await search.fill('7702');await search.press('Enter');await expect(page.getByRole('alert')).toContainText('ZIP codes have exactly 5 digits');
   await search.fill('Calhoun');await expect(page.getByRole('option',{name:/4800 Calhoun/})).toBeVisible();
-  await page.getByRole('option',{name:/4800 Calhoun/}).click();await expect(page.getByRole('heading',{name:/Concrete batch plants near 4800 Calhoun/})).toBeVisible();
+  await page.getByRole('option',{name:/4800 Calhoun/}).click();await expect(page.getByRole('heading',{name:/Air permits near 4800 Calhoun/})).toBeVisible();
   await page.goto('/?q=unfindable+street');await expect(page.getByRole('alert').filter({hasText:/address lookup service is not responding/})).toBeVisible();
   await page.route('**/api/search?**',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:{code:'unavailable',message:'Search is temporarily unavailable. Please retry.'}})}));
   await page.goto('/?q=77020');await expect(page.getByRole('alert').filter({hasText:'Search is temporarily unavailable'})).toBeVisible();
@@ -95,7 +95,7 @@ test('distance slider synchronizes the map, results, capacity and shared URL', a
   const search = page.getByRole('combobox',{name:'Houston address or ZIP code'});
   await search.fill('77494');await search.press('Enter');
   await expect(slider).toHaveValue('1');
-  await expect(page.getByText('No permitted concrete batch plants within 1 mile in our dataset.',{exact:true})).toBeVisible();
+  await expect(page.getByText('No permitted facilities within 1 mile in our dataset.',{exact:true})).toBeVisible();
 });
 
 test('mobile distance slider supports touch input, direct links and Spanish labels', async ({page}) => {

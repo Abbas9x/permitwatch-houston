@@ -3,7 +3,7 @@ import { useEffect, useRef, type KeyboardEvent } from 'react';
 import type { NearbyPlant } from '../../../../shared/api';
 import { useI18n } from '../../i18n';
 import { formatMiles } from '../../lib/format';
-import { PermitTypeBadge, SampleBadge } from '../Badges';
+import { CategoryBadge, PermitTypeBadge, SampleBadge } from '../Badges';
 import { PermitFacts } from '../PermitFacts';
 import { ActNow } from './ActNow';
 import { KeyNumbers } from './KeyNumbers';
@@ -83,14 +83,16 @@ export function PermitPanel({ plant, onClose, variant }: PermitPanelProps) {
       <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-line bg-night/85 px-5 py-4 backdrop-blur-xl">
         <div className="min-w-0">
           <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+            <CategoryBadge category={permit.category} />
             <PermitTypeBadge type={permit.permitType} />
             {permit.isSample && <SampleBadge />}
           </div>
           <h2 id={headingId} ref={headingRef} tabIndex={-1} className="text-lg leading-tight font-semibold text-ink focus:outline-none">
             {permit.company}
           </h2>
+          {permit.facilityName && <p className="mt-0.5 text-sm text-ink/80">{permit.facilityName}</p>}
           <p className="mt-0.5 text-xs text-muted">
-            {t('plant.registration', { number: permit.registrationNumber })} ·{' '}
+            {t(permit.category === 'air_permit' ? 'plant.permitNumber' : 'plant.registration', { number: permit.registrationNumber })} ·{' '}
             {t('plant.distanceLong', { distance: formatMiles(plant.distanceMiles, lang), direction: t(`dir.${plant.compass}`) })}
           </p>
         </div>
@@ -108,7 +110,7 @@ export function PermitPanel({ plant, onClose, variant }: PermitPanelProps) {
 
       <div className="space-y-6 px-5 py-5">
         <SummaryBlock summary={plant.summary} />
-        <KeyNumbers permit={permit} />
+        {permit.category === 'concrete_batch_plant' && <KeyNumbers permit={permit} />}
         <ActNow permit={permit} />
         <section aria-labelledby={`facts-${permit.id}`}>
           <h3 id={`facts-${permit.id}`} className="mb-3 text-lg font-semibold text-ink">

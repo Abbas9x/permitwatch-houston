@@ -1,4 +1,4 @@
-import type { PermitType } from '../../../shared/permit';
+import type { PermitCategory, PermitType } from '../../../shared/permit';
 import { useI18n } from '../i18n';
 import { TYPE_COLORS } from '../lib/permitColors';
 
@@ -11,6 +11,16 @@ export function PermitTypeBadge({ type }: { type: PermitType }) {
     >
       <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: TYPE_COLORS[type] }} />
       {t(`type.${type}`)}
+    </span>
+  );
+}
+
+/** What kind of permit this is (concrete batch plant vs. industrial air permit). */
+export function CategoryBadge({ category }: { category: PermitCategory }) {
+  const { t } = useI18n();
+  return (
+    <span className="inline-flex items-center rounded-full border border-line bg-ink/5 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-ink uppercase">
+      {t(`category.${category}`)}
     </span>
   );
 }
