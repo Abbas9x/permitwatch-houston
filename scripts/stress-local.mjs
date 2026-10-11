@@ -12,7 +12,7 @@ import { createGeocoder } from '../dist/server/services/geocoder.js';
 import { loadZipCentroids } from '../dist/server/services/zipCentroids.js';
 
 const db=openDatabase(':memory:');const logger=createLogger('silent');
-const imported=await importRows(readDatasetFile('data/concrete-plants.json'),{db,logger,source:'load test'});
+const imported=await importRows(readDatasetFile('data/sites.json'),{db,logger,source:'load test'});
 generateSummaries(db);
 const geocoder=createGeocoder({db,logger,zipCentroids:loadZipCentroids(),fetchImpl:async()=>{throw new Error('External network is disabled during load tests');},retries:0});
 const services={geocoder,addressGeocoder:geocoder,placeSearch:{search:async()=>[]}};

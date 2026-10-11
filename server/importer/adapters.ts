@@ -57,6 +57,79 @@ function recordText(p: Record<string, unknown>, sourceDescription: string | unde
   return lines.filter(Boolean).join('\n');
 }
 
+/**
+ * Adapter for the scraper's sites file (data/sites.json):
+ *   { generatedAt, count, categories, sites: [{ id, category, name, operator, address, city, county,
+ *     zip, lat, lng, status, sourceUrl, source, notes, details: { permitNumber, permitType, ... } }] }
+ * Only categories that are TCEQ permits become permit rows; the other site categories (landfills,
+ * roads, Superfund sites...) don't fit the permit model and are skipped.
+ */
+export interface SitesFile {
+  generatedAt?: string;
+  sites: unknown[];
+}
+
+export const PERMIT_SITE_CATEGORIES = ['concrete_batch_plant', 'pending_air_permit'] as const;
+
+export function isSitesFile(value: unknown): value is SitesFile {
+  if (!value || typeof value !== 'object') return false;
+  return Array.isArray((value as { sites?: unknown }).sites);
+}
+
+/** "particulate matter, sulfur dioxide and nitrogen oxides" -> ["particulate matter", "sulfur dioxide", "nitrogen oxides"] */
+function splitContaminants(text: unknown): string[] {
+  const s = str(text);
+  if (!s) return [];
+  return s
+    .split(/,\s*(?:and\s+)?|\s+and\s+/)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0 && p.length <= 120);
+}
+
+export function adaptSites(file: SitesFile): unknown[] {
+  return file.sites.flatMap((raw) => {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [raw];
+    const s = raw as Record<string, unknown>;
+    if (!(PERMIT_SITE_CATEGORIES as readonly unknown[]).includes(s.category)) return [];
+    const d = (s.details && typeof s.details === 'object' ? s.details : {}) as Record<string, unknown>;
+    const flat = {
+      permitNumber: d.permitNumber,
+      operator: s.operator,
+      name: s.name,
+      address: s.address,
+      city: s.city,
+      county: s.county,
+      status: s.status,
+      permitType: d.permitType,
+      dateReceived: d.dateReceived,
+      productionRate: d.productionRate,
+      notes: [str(d.airContaminants) ? `Air contaminants listed in the notice: ${str(d.airContaminants)}.` : null, str(s.notes)]
+        .filter(Boolean)
+        .join(' '),
+    };
+    return [
+      {
+        id: s.id,
+        registration_number: d.permitNumber,
+        company: s.operator,
+        address: s.address,
+        city: s.city,
+        county: s.county,
+        zip: s.zip ?? '',
+        lat: s.lat,
+        lng: s.lng,
+        permit_type: d.permitType ?? '',
+        max_production_cyd_per_hr: parseProductionRate(d.productionRate),
+        pollutants: splitContaminants(d.airContaminants),
+        comment_deadline: d.commentDeadline ?? undefined,
+        source_url: str(s.sourceUrl) ?? TCEQ_LINKS.airPermitSearch,
+        raw_text: recordText(flat, str(s.source)),
+        is_sample: false,
+      },
+    ];
+  });
+}
+
 export function adaptTceqScrape(file: TceqScrapeFile): unknown[] {
   const source = str(file.source);
   const pages = sourcePages(source);
