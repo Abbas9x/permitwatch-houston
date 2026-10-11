@@ -65,7 +65,7 @@ To build the hash:
 `locationSource` values:
 
 - `tceq_map_link`: coordinates taken from a map link in the TCEQ notice.
-- `geocoded`: coordinates found by geocoding `address`.
+- `geocoded`: coordinates found by geocoding `address` with the U.S. Census geocoder or, when that fails, OpenStreetMap's Nominatim. Records placed by Nominatim say so in `notes`. OpenStreetMap data requires credit, so the map should show "© OpenStreetMap contributors".
 - `manual`: coordinates entered by hand by a team member.
 
 ### `Emission` object

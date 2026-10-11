@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import * as cheerio from "cheerio";
 import { loadManualLocations, nowIso } from "./extract.js";
-import { geocode, inHarrisBbox } from "./geocode.js";
+import { NOMINATIM_NOTE, geocode, inHarrisBbox } from "./geocode.js";
 import { RAW_DIR, cachedPostForm } from "./http.js";
 import { makeId } from "./ids.js";
 import type { PermitType, Plant } from "./types.js";
@@ -120,12 +120,14 @@ export async function extractExistingHarris(scrapedAt: string): Promise<Plant[]>
       locationSource = "manual";
       notes.push(manual.note);
     } else if (address && /^\d/.test(address)) {
-      coords = await geocode([address, city, "TX"].filter(Boolean).join(", "));
-      if (coords && !inHarrisBbox(coords.lat, coords.lng)) {
-        notes.push(`The Census geocoder placed this address outside Harris County (${coords.lat}, ${coords.lng}), so no coordinates are given.`);
-        coords = null;
-      } else if (!coords) {
-        notes.push("The Census geocoder found no single match for the address.");
+      const result = await geocode([address, city, "TX"].filter(Boolean).join(", "));
+      if (result && !inHarrisBbox(result.lat, result.lng)) {
+        notes.push(`The geocoder placed this address outside Harris County (${result.lat}, ${result.lng}), so no coordinates are given.`);
+      } else if (result) {
+        coords = { lat: result.lat, lng: result.lng };
+        if (result.source === "nominatim") notes.push(NOMINATIM_NOTE);
+      } else {
+        notes.push("Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address.");
       }
     } else {
       notes.push("The permit search gives no street address, so the location could not be geocoded.");

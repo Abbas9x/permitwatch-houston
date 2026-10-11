@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T23:10:48Z",
+  "generatedAt": "2026-10-11T00:39:52Z",
   "source": "TCEQ pending air permit applications, Concrete Batch Plant Standard Permits section (https://www.tceq.texas.gov/assets/public/permitting/air/reports/applications/nsr-pending-permits.html), with their public notice PDFs; and TCEQ NSR Air Permits search (https://www2.tceq.texas.gov/airperm/index.cfm?fuseaction=airpermits.start): Harris County standard permits for concrete batch plants with permit status EFFECTIVE",
   "count": 89,
   "plants": [
@@ -23,7 +23,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -46,7 +46,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -69,7 +69,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -92,7 +92,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -115,8 +115,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-55078",
@@ -138,7 +138,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -161,7 +161,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -184,8 +184,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-72039",
@@ -207,7 +207,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -230,7 +230,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -253,7 +253,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -276,7 +276,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -299,7 +299,7 @@
       "productionRate": "less than 200 cubic yards per hour",
       "emissions": [],
       "noticeUrl": "https://www.tceq.texas.gov/permitting/air/newsourcereview/airpermits-pendingpermit-apps#410602",
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": "This plant already holds an effective permit; the pending application is for that permit."
     },
     {
@@ -322,7 +322,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -345,7 +345,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -368,8 +368,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-85521",
@@ -391,7 +391,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -414,7 +414,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -437,7 +437,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -460,7 +460,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -483,7 +483,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -506,7 +506,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -529,7 +529,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -552,7 +552,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": "The permit search gives no street address, so the location could not be geocoded."
     },
     {
@@ -575,7 +575,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -598,7 +598,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -621,7 +621,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -644,7 +644,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -667,7 +667,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -690,7 +690,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -713,8 +713,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-130769",
@@ -736,7 +736,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -759,7 +759,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -782,8 +782,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-131670",
@@ -805,7 +805,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -828,7 +828,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -851,7 +851,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -874,7 +874,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -897,7 +897,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -920,7 +920,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -943,7 +943,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -966,7 +966,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -989,7 +989,7 @@
       "productionRate": "150 cubic yards per hour",
       "emissions": [],
       "noticeUrl": "https://www.tceq.texas.gov/permitting/air/newsourcereview/airpermits-pendingpermit-apps#408368",
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": "This plant already holds an effective permit; the pending application is for that permit."
     },
     {
@@ -1012,7 +1012,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1035,8 +1035,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-144445L001",
@@ -1058,7 +1058,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1081,7 +1081,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1104,7 +1104,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1127,8 +1127,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-147696",
@@ -1150,7 +1150,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1173,7 +1173,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1196,7 +1196,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1219,7 +1219,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1242,8 +1242,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-150603",
@@ -1265,7 +1265,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1288,7 +1288,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1311,7 +1311,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1334,7 +1334,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1357,8 +1357,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-153154L001",
@@ -1380,7 +1380,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1403,7 +1403,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": "The permit search gives no street address, so the location could not be geocoded."
     },
     {
@@ -1426,7 +1426,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1449,7 +1449,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1472,7 +1472,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": "The permit search gives no street address, so the location could not be geocoded."
     },
     {
@@ -1495,7 +1495,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1518,7 +1518,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1531,9 +1531,9 @@
       "city": "HOUSTON",
       "county": "Harris",
       "zip": null,
-      "lat": null,
-      "lng": null,
-      "locationSource": null,
+      "lat": 29.6432632,
+      "lng": -95.3189519,
+      "locationSource": "geocoded",
       "status": "existing",
       "permitType": "new",
       "dateReceived": "2021-06-24",
@@ -1541,8 +1541,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Coordinates from the OpenStreetMap Nominatim geocoder (© OpenStreetMap contributors)."
     },
     {
       "id": "tceq-166082",
@@ -1564,7 +1564,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1587,8 +1587,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-167311",
@@ -1610,8 +1610,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-167400",
@@ -1633,7 +1633,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1656,7 +1656,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1679,7 +1679,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1702,7 +1702,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1725,7 +1725,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1748,8 +1748,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-170945",
@@ -1771,7 +1771,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1794,7 +1794,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1817,8 +1817,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-173662",
@@ -1840,7 +1840,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1863,8 +1863,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-176393L001",
@@ -1886,7 +1886,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1909,8 +1909,8 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
-      "notes": "The Census geocoder found no single match for the address."
+      "scrapedAt": "2026-10-11T00:39:52Z",
+      "notes": "Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address."
     },
     {
       "id": "tceq-177898",
@@ -1932,7 +1932,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1955,7 +1955,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -1978,7 +1978,7 @@
       "productionRate": "200 cubic yards per hour",
       "emissions": [],
       "noticeUrl": "https://www.tceq.texas.gov/permitting/air/newsourcereview/airpermits-pendingpermit-apps#401409",
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -2001,7 +2001,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     },
     {
@@ -2024,7 +2024,7 @@
       "productionRate": "200 cubic yards per hour",
       "emissions": [],
       "noticeUrl": "https://www.tceq.texas.gov/permitting/air/newsourcereview/airpermits-pendingpermit-apps#404754",
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": "Coordinates and ZIP entered by hand from a map lookup of 14900 Market St, Channelview, TX 77530. The point is approximate, not the exact plant location."
     },
     {
@@ -2047,7 +2047,7 @@
       "productionRate": null,
       "emissions": [],
       "noticeUrl": null,
-      "scrapedAt": "2026-10-10T23:10:48Z",
+      "scrapedAt": "2026-10-11T00:39:52Z",
       "notes": null
     }
   ]

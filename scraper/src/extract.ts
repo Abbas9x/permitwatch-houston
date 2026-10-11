@@ -13,7 +13,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadPendingHtml, parsePendingRows, type PendingRow } from "./fetchList.js";
-import { geocode } from "./geocode.js";
+import { NOMINATIM_NOTE, geocode } from "./geocode.js";
 import { RAW_DIR } from "./http.js";
 import { makeId } from "./ids.js";
 import { getNotices, loadListedNotices, type Notice } from "./notices.js";
@@ -122,9 +122,14 @@ async function buildPlant(
     // Only geocode street addresses, not driving directions.
     if (/^\d/.test(location.address)) {
       const query = [location.address, location.city, `TX ${location.zip ?? ""}`.trim()].filter(Boolean).join(", ");
-      coords = await geocode(query);
-      if (coords) locationSource = "geocoded";
-      else notes.push("No map link in the notice, and the Census geocoder found no single match for the address.");
+      const result = await geocode(query);
+      if (result) {
+        coords = { lat: result.lat, lng: result.lng };
+        locationSource = "geocoded";
+        if (result.source === "nominatim") notes.push(NOMINATIM_NOTE);
+      } else {
+        notes.push("No map link in the notice, and neither the Census nor the OpenStreetMap geocoder found a single exact match for the address.");
+      }
     } else {
       notes.push("No map link in the notice, and the location is given as directions, not a street address.");
     }

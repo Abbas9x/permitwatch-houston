@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-10T23:28:26Z",
-  "plantsGeneratedAt": "2026-10-10T23:10:48Z",
+  "generatedAt": "2026-10-11T00:39:58Z",
+  "plantsGeneratedAt": "2026-10-11T00:39:52Z",
   "radiusMiles": 3,
   "addresses": [
     {
@@ -11,8 +11,8 @@
       "lng": -95.337424974076,
       "locationSource": "geocoded",
       "plantsWithin1Mile": 1,
-      "plantsWithin2Miles": 9,
-      "plantsWithin3Miles": 11,
+      "plantsWithin2Miles": 10,
+      "plantsWithin3Miles": 12,
       "pendingWithin3Miles": 0,
       "nearby": [
         {
@@ -46,6 +46,10 @@
         {
           "plantId": "tceq-130769",
           "distanceMiles": 1.72
+        },
+        {
+          "plantId": "tceq-165627",
+          "distanceMiles": 1.9
         },
         {
           "plantId": "tceq-150646",
