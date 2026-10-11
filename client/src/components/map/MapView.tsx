@@ -17,6 +17,7 @@ export interface MapPlant {
 }
 
 export interface MapViewProps {
+  onReady?: () => void;
   center: LatLng;
   radiusMiles: number;
   plants: MapPlant[];
@@ -77,6 +78,7 @@ export default function MapView(props: MapViewProps) {
   const [slow, setSlow] = useState(false);
 
   const select = useEffectEvent((id: string) => props.onSelect(id));
+  const reveal = useEffectEvent(() => props.onReady?.());
 
   // Create the map once.
   useEffect(() => {
@@ -206,6 +208,27 @@ export default function MapView(props: MapViewProps) {
       map.setStyle(nextStyle, {diff: false});
     }
   }, [theme]);
+
+  // Reveal after the location camera and its tiles settle. Slow/offline maps must
+  // still expose the results and the existing slow-network notice.
+  useEffect(() => {
+    if (!webgl) {
+      reveal();
+      return;
+    }
+    const map = mapRef.current;
+    const onIdle = () => {
+      if (hasPositioned.current) reveal();
+    };
+    map?.on('idle', onIdle);
+    const timeout = window.setTimeout(() => reveal(), 12_000);
+    return () => {
+      map?.off('idle', onIdle);
+      window.clearTimeout(timeout);
+    };
+  }, [webgl, ready, center.lat, center.lng]);
+
+
 
   // Update only boundary colors when the device appearance changes; keep the map and camera in place.
   useEffect(() => {

@@ -28,7 +28,7 @@ function whenIdle(callback: () => void): () => void {
   return () => clearTimeout(id);
 }
 
-export function Landing() {
+export function Landing({ onDive }: { onDive: () => void }) {
   const { t } = useI18n();
   const reducedMotion = useReducedMotion() ?? false;
   const [background, setBackground] = useState<BackgroundMode>('static');
@@ -37,12 +37,13 @@ export function Landing() {
 
   useEffect(() => whenIdle(() => setBackground(!isLowPowerDevice() && supportsWebGL() ? 'animated' : 'static')), []);
 
-  // Preserve the globe while the hero fades, then fly the same map to the search location.
+  // Blur over the landing scene before transferring the globe to the results.
   const beforeNavigate = async () => {
     holdEarthForSearch();
-    if (reducedMotion) return;
     setDiving(true);
-    await new Promise((resolve) => setTimeout(resolve, 420));
+    onDive();
+    if (reducedMotion) return;
+    await new Promise((resolve) => setTimeout(resolve, 560));
   };
 
   const steps = [
@@ -60,8 +61,8 @@ export function Landing() {
             aria-hidden="true"
             className="absolute inset-0 -z-10"
             initial={{ opacity: 0 }}
-            animate={{ opacity: sceneReady ? 1 : 0 }}
-            transition={{ duration: 1.2 }}
+            animate={{ opacity: sceneReady ? 1 : 0, scale: diving && !reducedMotion ? 1.35 : 1 }}
+            transition={{ duration: diving ? 0.55 : 1.2 }}
           >
             <EarthBackground reducedMotion={reducedMotion} onReady={() => setSceneReady(true)} />
           </motion.div>
@@ -76,7 +77,7 @@ export function Landing() {
 
       <motion.div
         className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 py-14 sm:px-6"
-        animate={diving ? { opacity: 0, scale: 1.03, filter: 'blur(6px)' } : { opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        animate={{ opacity: 1, scale: diving && !reducedMotion ? 1.12 : 1 }}
         transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       >
         <motion.p
@@ -110,7 +111,7 @@ export function Landing() {
 
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: diving ? 0 : 1 }}
+        animate={{ opacity: 1 }}
         transition={{ delay: diving ? 0 : 0.35 }}
         className="mx-auto w-full max-w-5xl px-4 pb-8 sm:px-6"
       >

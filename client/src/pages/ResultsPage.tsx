@@ -20,10 +20,6 @@ import { useMediaQuery } from '../lib/useMediaQuery';
 
 const MapView = lazy(() => import('../components/map/MapView'));
 
-function MapSkeleton() {
-  return <div className="skeleton h-full w-full rounded-none" />;
-}
-
 function MapLegend() {
   const { t } = useI18n();
   const items = [
@@ -48,13 +44,18 @@ function SampleBanner() {
   return <p className="rounded-xl border border-sample/40 bg-sample/10 px-4 py-3 text-sm text-sample">{t('sample.banner')}</p>;
 }
 
-function Results({ data, selectedId, coords }: { data: SearchResponse; selectedId: string | null; coords: Coords | null }) {
+function Results({ data, selectedId, coords, onReady }: { onReady: () => void; data: SearchResponse; selectedId: string | null; coords: Coords | null }) {
   const { t, tn, lang } = useI18n();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const reducedMotion = useReducedMotion() ?? false;
   const headingRef = useRef<HTMLHeadingElement>(null);
   const unit = t(data.radiusMiles === 1 ? 'radius.unit.one' : 'radius.unit.other');
   const selected = data.plants.find((p) => p.permit.id === selectedId) ?? null;
+
+  useEffect(() => {
+    // Reveal the destination as soon as its content mounts, not when map tiles finish loading.
+    onReady();
+  }, [onReady]);
 
   useEffect(() => {
     // Announce new results to screen readers without jumping the page.
@@ -108,7 +109,7 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
       </div>
 
       <div className="relative h-[46vh] min-h-[300px] overflow-hidden [grid-area:map] lg:h-full">
-        <Suspense fallback={<MapSkeleton />}>
+        <Suspense fallback={null}>
           <MapView
             center={data.location}
             radiusMiles={data.radiusMiles}
@@ -169,31 +170,19 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
   );
 }
 
-function ResultsSkeleton() {
-  const { t } = useI18n();
-  return (
-    <div role="status" aria-label={t('results.loadingLabel')} className="mx-auto max-w-3xl space-y-3 px-4 py-6 sm:px-6">
-      <div className="skeleton h-12 w-full rounded-2xl" />
-      <div className="skeleton h-7 w-2/3" />
-      <div className="skeleton h-4 w-1/3" />
-      <div className="skeleton h-[40vh] w-full rounded-2xl" />
-      {[0, 1].map((i) => (
-        <div key={i} className="skeleton h-28 w-full rounded-2xl" />
-      ))}
-    </div>
-  );
-}
-
-export function ResultsPage({ q, selectedId, coords, radiusMiles }: { q: string; selectedId: string | null; coords: Coords | null; radiusMiles: number }) {
+export function ResultsPage({ q, selectedId, coords, radiusMiles, onReady }: { onReady: () => void; q: string; selectedId: string | null; coords: Coords | null; radiusMiles: number }) {
   const key = coords ? `${q}@${coords.lat},${coords.lng}` : q;
   const { state, retry } = useAsync(key, (signal) => api.search(q, coords, signal, MAX_SEARCH_RADIUS_MILES));
 
   useEffect(() => {
-    if (state?.status === 'error') discardHeldEarth();
-  }, [state?.status]);
+    if (state?.status === 'error') {
+      discardHeldEarth();
+      onReady();
+    }
+  }, [state?.status, onReady]);
 
   const data = useMemo(() => state?.status === 'success' ? resultsForRadius(state.data, radiusMiles) : null, [state, radiusMiles]);
-  if (data) return <Results data={data} selectedId={selectedId} coords={coords} />;
+  if (data) return <Results onReady={onReady} data={data} selectedId={selectedId} coords={coords} />;
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6">
       {state?.status === 'error' ? (
@@ -202,7 +191,7 @@ export function ResultsPage({ q, selectedId, coords, radiusMiles }: { q: string;
           <ErrorNotice error={state.error} onRetry={retry} />
         </>
       ) : (
-        <ResultsSkeleton />
+        null
       )}
     </div>
   );
