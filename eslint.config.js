@@ -7,7 +7,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules', 'coverage', 'playwright-report', 'test-results', 'lighthouse']),
+  globalIgnores(['dist', 'node_modules', 'coverage', 'playwright-report', 'test-results', 'lighthouse', 'scraper', 'data/raw']),
   js.configs.recommended,
   tseslint.configs.recommended,
   {

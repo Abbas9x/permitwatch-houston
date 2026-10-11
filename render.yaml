@@ -6,7 +6,7 @@ services:
     runtime: node
     plan: free
     # Build the app and import the real permit dataset with data-only summaries.
-    buildCommand: npm ci --include=dev && npm run build && npm run import:prod -- data/concrete-plants.json
+    buildCommand: npm ci --include=dev && npm run build && npm run import:prod -- data/sites.json
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true

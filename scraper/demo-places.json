@@ -1,0 +1,17 @@
+[
+  {
+    "id": "frost-elementary",
+    "label": "Frost Elementary School",
+    "address": "5002 Almeda Genoa Rd, Houston, TX 77048"
+  },
+  {
+    "id": "odom-elementary",
+    "label": "Odom Elementary School",
+    "address": "14701 Henry Rd, Houston, TX 77060"
+  },
+  {
+    "id": "hobby-elementary",
+    "label": "Hobby Elementary School",
+    "address": "4021 Woodmont Dr, Houston, TX 77045"
+  }
+]
