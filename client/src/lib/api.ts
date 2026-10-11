@@ -5,8 +5,10 @@ import type {
   GreenRouteStatsResponse,
   PermitDetailResponse,
   SearchResponse,
+  SuggestResponse,
 } from '../../../shared/api';
 import type { CommentConcern, Language } from '../../../shared/validation';
+import type { Coords } from './router';
 
 export class ApiError extends Error {
   constructor(
@@ -74,8 +76,16 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 }
 
 export const api = {
-  search: (q: string, signal?: AbortSignal) =>
-    apiRequest<SearchResponse>(`/api/search?q=${encodeURIComponent(q)}`, { signal, timeoutMs: 25_000 }),
+  search: (q: string, coords: Coords | null, signal?: AbortSignal) => {
+    const params = new URLSearchParams({ q });
+    if (coords && Number.isFinite(coords.lat) && Number.isFinite(coords.lng)) {
+      params.set('lat', String(coords.lat));
+      params.set('lng', String(coords.lng));
+    }
+    return apiRequest<SearchResponse>(`/api/search?${params.toString()}`, { signal, timeoutMs: 25_000 });
+  },
+  suggest: (q: string, signal?: AbortSignal) =>
+    apiRequest<SuggestResponse>(`/api/geocode/suggest?q=${encodeURIComponent(q)}`, { signal, timeoutMs: 6_000 }),
   permit: (id: string, signal?: AbortSignal) =>
     apiRequest<PermitDetailResponse>(`/api/permits/${encodeURIComponent(id)}`, { signal }),
   commentDraft: (

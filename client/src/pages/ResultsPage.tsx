@@ -10,7 +10,7 @@ import { useI18n } from '../i18n';
 import { api } from '../lib/api';
 import { formatMiles } from '../lib/format';
 import { TYPE_HEX } from '../lib/permitColors';
-import { navigate, searchHref } from '../lib/router';
+import { navigate, searchHref, type Coords } from '../lib/router';
 import { useAsync } from '../lib/useAsync';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
@@ -28,7 +28,7 @@ function MapLegend() {
     { color: TYPE_HEX.amendment, label: t('map.legendOther') },
   ];
   return (
-    <ul className="pointer-events-none absolute bottom-8 left-3 z-10 space-y-1 rounded-xl border border-line bg-night/80 px-3 py-2 text-xs text-ink backdrop-blur">
+    <ul className="pointer-events-none absolute top-3 left-3 z-10 space-y-1 rounded-xl border border-line bg-night/80 px-3 py-2 text-xs text-ink backdrop-blur lg:top-auto lg:bottom-8">
       {items.map((item) => (
         <li key={item.label} className="flex items-center gap-2">
           <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: item.color, boxShadow: `0 0 8px ${item.color}` }} />
@@ -44,7 +44,7 @@ function SampleBanner() {
   return <p className="rounded-xl border border-sample/40 bg-sample/10 px-4 py-3 text-sm text-sample">{t('sample.banner')}</p>;
 }
 
-function Results({ data, selectedId }: { data: SearchResponse; selectedId: string | null }) {
+function Results({ data, selectedId, coords }: { data: SearchResponse; selectedId: string | null; coords: Coords | null }) {
   const { t, tn, lang } = useI18n();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const reducedMotion = useReducedMotion() ?? false;
@@ -73,10 +73,10 @@ function Results({ data, selectedId }: { data: SearchResponse; selectedId: strin
     [data, t, lang],
   );
 
-  const select = (id: string) => navigate(searchHref(data.query, id), { replace: true });
+  const select = (id: string) => navigate(searchHref(data.query, id, coords), { replace: true });
   const close = () => {
     const id = selectedId;
-    navigate(searchHref(data.query), { replace: true });
+    navigate(searchHref(data.query, null, coords), { replace: true });
     if (id) {
       requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-plant-button="${CSS.escape(id)}"]`)?.focus());
     }
@@ -91,7 +91,10 @@ function Results({ data, selectedId }: { data: SearchResponse; selectedId: strin
             {t('results.heading', { place: data.location.label })}
           </h1>
           <p className="mt-1 text-sm text-muted">{tn('results.count', data.plants.length, { radius: data.radiusMiles })}</p>
-          {data.location.approximate && data.location.zip && (
+          {data.location.source === 'place_search' && data.location.approximate && (
+            <p className="mt-1 text-xs text-muted">{t('results.placeArea', { place: data.location.label })}</p>
+          )}
+          {data.location.source === 'zip_centroid' && data.location.zip && (
             <p className="mt-1 text-xs text-muted">{t('results.approximate', { zip: data.location.zip })}</p>
           )}
           {!data.geocoderAvailable && <p className="mt-1 text-xs text-sample">{t('results.geocoderDown')}</p>}
@@ -110,6 +113,7 @@ function Results({ data, selectedId }: { data: SearchResponse; selectedId: strin
             youLabel={t('map.you')}
             unavailableText={t('map.unavailable')}
             loadingText={t('map.loading')}
+            slowText={t('map.slow')}
             panelPadding={isDesktop ? { right: 500, bottom: 40 } : { right: 40, bottom: 40 }}
           />
         </Suspense>
@@ -173,10 +177,11 @@ function ResultsSkeleton() {
   );
 }
 
-export function ResultsPage({ q, selectedId }: { q: string; selectedId: string | null }) {
-  const { state, retry } = useAsync(q, (signal) => api.search(q, signal));
+export function ResultsPage({ q, selectedId, coords }: { q: string; selectedId: string | null; coords: Coords | null }) {
+  const key = coords ? `${q}@${coords.lat},${coords.lng}` : q;
+  const { state, retry } = useAsync(key, (signal) => api.search(q, coords, signal));
 
-  if (state?.status === 'success') return <Results data={state.data} selectedId={selectedId} />;
+  if (state?.status === 'success') return <Results data={state.data} selectedId={selectedId} coords={coords} />;
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6">
       {state?.status === 'error' ? (

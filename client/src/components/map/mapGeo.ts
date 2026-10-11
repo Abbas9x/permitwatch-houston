@@ -18,7 +18,9 @@ export function ringsGeoJson(center: LatLng) {
 
 /** Where to pin each ring's "1 mi / 2 mi / 3 mi" label (due north of the center). */
 export function ringLabelPoints(center: LatLng) {
-  return SEARCH_RADII_MILES.map((radius) => ({ radius, point: destinationPoint(center, 0, radius) }));
+  // On the near (south) side of the rings: the tilted camera looks north, so the rings are spread
+  // furthest apart there and the labels don't stack.
+  return SEARCH_RADII_MILES.map((radius) => ({ radius, point: destinationPoint(center, 195, radius) }));
 }
 
 /** [[west, south], [east, north]] around the outermost ring. */
@@ -40,4 +42,25 @@ export function hasWebGL(): boolean {
   } catch {
     return false;
   }
+}
+
+/** Wall thickness of the 3D rings, in miles (~45 m). */
+const WALL_MILES = 0.028;
+/** Wall height per ring in meters: the nearest ring stands tallest. */
+export const RING_WALL_HEIGHT_M: Record<number, number> = { 1: 440, 2: 340, 3: 260 };
+
+/** Thin annulus per radius, extruded by MapLibre into a translucent 3D wall. */
+export function ringWallsGeoJson(center: LatLng) {
+  return {
+    type: 'FeatureCollection' as const,
+    features: SEARCH_RADII_MILES.map((radius) => ({
+      type: 'Feature' as const,
+      properties: { radius, h: RING_WALL_HEIGHT_M[radius] ?? 300 },
+      geometry: {
+        type: 'Polygon' as const,
+        // Outer ring + reversed inner ring = hole, so only the wall is extruded.
+        coordinates: [circleRing(center, radius), circleRing(center, radius - WALL_MILES).reverse()],
+      },
+    })),
+  };
 }

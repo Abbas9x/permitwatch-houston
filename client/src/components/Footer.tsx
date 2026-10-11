@@ -8,6 +8,7 @@ export function Footer() {
         <p className="font-medium text-ink">{t('disclaimer.permits')}</p>
         <p>{t('footer.data')}</p>
         <p>{t('footer.geocoder')}</p>
+        <p>{t('footer.places')}</p>
         <p>{t('footer.notAdvice')}</p>
         <p className="pt-2 text-faint">{t('app.tagline')}</p>
       </div>

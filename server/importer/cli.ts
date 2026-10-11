@@ -46,7 +46,7 @@ try {
 
 const services = createServices(env, db, logger);
 
-const report = await importRows(rows, { db, logger, source: file, geocode: importerGeocode(services.geocoder) });
+const report = await importRows(rows, { db, logger, source: file, geocode: importerGeocode(services.addressGeocoder) });
 
 if (values['remove-samples']) {
   const removed = deleteSamplePermits(db);

@@ -4,7 +4,7 @@ import { Map as MapLibreMap, Marker, NavigationControl, setWorkerUrl, type GeoJS
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { MAX_SEARCH_RADIUS_MILES, type LatLng } from '../../../../shared/geo';
-import { DARK_STYLE_URL, hasWebGL, HOUSTON_OVERVIEW, ringBounds, ringLabelPoints, ringsGeoJson } from './mapGeo';
+import { DARK_STYLE_URL, hasWebGL, HOUSTON_OVERVIEW, ringBounds, ringLabelPoints, ringsGeoJson, ringWallsGeoJson } from './mapGeo';
 
 export interface MapPlant {
   id: string;
@@ -24,6 +24,8 @@ export interface MapViewProps {
   youLabel: string;
   unavailableText: string;
   loadingText: string;
+  /** Shown when tiles take unusually long (slow network or cold server), instead of claiming the map is unsupported. */
+  slowText: string;
   /** Map padding that keeps a selected plant visible beside an open side panel (desktop). */
   panelPadding: { right: number; bottom: number };
 }
@@ -31,6 +33,7 @@ export interface MapViewProps {
 setWorkerUrl(maplibreWorkerUrl);
 
 const RING_SOURCE = 'pw-rings';
+const RING_WALL_SOURCE = 'pw-ring-walls';
 const RING_OPACITY: Record<number, number> = { 1: 0.95, 2: 0.65, 3: 0.4 };
 
 function plantElement(plant: MapPlant): HTMLButtonElement {
@@ -77,7 +80,7 @@ export default function MapView(props: MapViewProps) {
       zoom: HOUSTON_OVERVIEW.zoom,
       pitch: HOUSTON_OVERVIEW.pitch,
       bearing: HOUSTON_OVERVIEW.bearing,
-      maxPitch: 70,
+      maxPitch: 75,
       attributionControl: { compact: true },
       // On phones the map sits in the page flow: two-finger pan so one finger still scrolls the page.
       cooperativeGestures: window.matchMedia('(max-width: 1023px)').matches,
@@ -87,8 +90,22 @@ export default function MapView(props: MapViewProps) {
     map.addControl(new NavigationControl({ visualizePitch: true }), 'top-right');
     const slowTimer = window.setTimeout(() => setSlow(true), 12_000);
 
-    map.on('load', () => {
+    // 'style.load' fires as soon as the style is parsed; 'load' would also wait for every initial tile,
+    // which at a tilted city-wide view takes many seconds. Tiles keep streaming in behind the rings and markers.
+    map.once('style.load', () => {
       window.clearTimeout(slowTimer);
+      // Atmosphere: a lit horizon and fog instead of a black void when the map is tilted or rotated.
+      map.setSky({
+        'sky-color': '#081428',
+        'horizon-color': '#1a3d63',
+        'fog-color': '#0a1424',
+        'sky-horizon-blend': 0.75,
+        'horizon-fog-blend': 0.55,
+        'fog-ground-blend': 0.35,
+        'atmosphere-blend': 0,
+      });
+      // Directional light so 3D buildings and ring walls get shaded faces.
+      map.setLight({ anchor: 'viewport', color: '#d6e6ff', intensity: 0.4, position: [1.4, 210, 35] });
       const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
       if (map.getSource('openmaptiles')) {
         map.addLayer(
@@ -100,15 +117,31 @@ export default function MapView(props: MapViewProps) {
             minzoom: 13,
             filter: ['!=', ['get', 'hide_3d'], true],
             paint: {
-              'fill-extrusion-color': '#1a2338',
-              'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 13, 0, 14.5, ['coalesce', ['get', 'render_height'], 0]],
+              'fill-extrusion-color': '#22304a',
+              // Full height as soon as building data exists (tiles carry buildings from zoom 13).
+              'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 13, 0, 13.4, ['coalesce', ['get', 'render_height'], 0]],
               'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-              'fill-extrusion-opacity': 0.8,
+              'fill-extrusion-opacity': 0.9,
+              'fill-extrusion-vertical-gradient': true,
             },
           },
           firstSymbol,
         );
       }
+      map.addSource(RING_WALL_SOURCE, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+      map.addLayer({
+        id: 'pw-rings-walls',
+        type: 'fill-extrusion',
+        source: RING_WALL_SOURCE,
+        paint: {
+          'fill-extrusion-color': ['match', ['get', 'radius'], 1, '#2dd4bf', 2, '#38bdf8', '#a78bfa'],
+          'fill-extrusion-height': 0,
+          'fill-extrusion-base': 0,
+          // Strong in the overview, fading as you zoom into streets so the walls never cover buildings.
+          'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 12.5, 0.42, 14, 0.18, 15.5, 0.06],
+          'fill-extrusion-vertical-gradient': true,
+        },
+      });
       map.addSource(RING_SOURCE, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       map.addLayer({
         id: 'pw-rings-fill',
@@ -143,6 +176,7 @@ export default function MapView(props: MapViewProps) {
     const map = mapRef.current;
     if (!ready || !map) return;
     (map.getSource(RING_SOURCE) as GeoJSONSource | undefined)?.setData(ringsGeoJson(center));
+    (map.getSource(RING_WALL_SOURCE) as GeoJSONSource | undefined)?.setData(ringWallsGeoJson(center));
 
     for (const m of overlayMarkers.current) m.remove();
     const you = document.createElement('div');
@@ -159,11 +193,17 @@ export default function MapView(props: MapViewProps) {
     }
     overlayMarkers.current = markers;
 
-    // Rings fade in one after another (instantly with reduced motion).
+    // Rings appear one after another and their 3D walls rise as the camera arrives (instant with reduced motion).
     let frame = 0;
-    const start = performance.now();
+    const start = performance.now() + (reducedMotion ? 0 : 1500);
+    const easeOut = (x: number) => 1 - (1 - Math.max(0, Math.min(1, x))) ** 3;
     const animateRings = (now: number) => {
-      const t = reducedMotion ? 1 : Math.min(1, (now - start) / 1400);
+      const t = reducedMotion ? 1 : Math.max(0, Math.min(1, (now - start) / 1600));
+      map.setPaintProperty('pw-rings-walls', 'fill-extrusion-height', [
+        '*',
+        ['get', 'h'],
+        ['match', ['get', 'radius'], 1, easeOut(t * 2), 2, easeOut(t * 2 - 0.5), easeOut(t * 2 - 1)],
+      ]);
       map.setPaintProperty('pw-rings-line', 'line-opacity', [
         'match',
         ['get', 'radius'],
@@ -179,7 +219,8 @@ export default function MapView(props: MapViewProps) {
     frame = requestAnimationFrame(animateRings);
 
     const camera = map.cameraForBounds(ringBounds(center, MAX_SEARCH_RADIUS_MILES), { padding: 36 });
-    const target = { center: [center.lng, center.lat] as [number, number], zoom: camera?.zoom ?? 12.5, pitch: 48, bearing: -14 };
+    // Tilted enough that the ring walls and buildings read as 3D, while all three rings stay in view.
+    const target = { center: [center.lng, center.lat] as [number, number], zoom: camera?.zoom ?? 12.5, pitch: 56, bearing: -18 };
     if (reducedMotion) map.jumpTo(target);
     else map.flyTo({ ...target, duration: 3200, curve: 1.5, essential: false });
 
@@ -250,7 +291,7 @@ export default function MapView(props: MapViewProps) {
       {!ready && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-night/60">
           <p role="status" className="rounded-full border border-line bg-night/80 px-4 py-2 text-sm text-muted">
-            {slow ? props.unavailableText : props.loadingText}
+            {slow ? props.slowText : props.loadingText}
           </p>
         </div>
       )}

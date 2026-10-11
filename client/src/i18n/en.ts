@@ -92,6 +92,7 @@ export const en = {
   'map.unavailable': 'The interactive map is not available on this device. Every plant is listed below.',
   'map.you': 'Your search location',
   'map.loading': 'Loading map…',
+  'map.slow': 'The map is taking a while to load. Every plant is listed below.',
   'map.markerLabel': '{company}: {type}, {distance} miles {direction}',
   'map.legendNew': 'New permit',
   'map.legendRenewal': 'Renewal',
@@ -214,6 +215,9 @@ export const en = {
   'how.3.body': 'Draft a respectful comment with AI, edit it, and send it yourself on TCEQ eComment.',
   'how.greenroute': 'Powered by GreenRoute: every AI task goes to the cheapest model that can do it.',
   'how.greenrouteLink': 'See the savings',
+  'search.place': 'Place',
+  'results.placeArea': 'Showing the area around {place}.',
+  'footer.places': 'Place search: Photon by komoot, map data © OpenStreetMap contributors.',
 } as const;
 
 export type MessageKey = keyof typeof en;

@@ -1,8 +1,10 @@
-import { useId, useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useId, useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
+import type { PlaceSuggestion } from '../../../shared/api';
 import { checkSearchInput, SEARCH_QUERY_MAX } from '../../../shared/validation';
 import { useI18n } from '../i18n';
+import { api } from '../lib/api';
 import { addRecentSearch, getRecentSearches } from '../lib/recentSearches';
-import { navigate, searchHref } from '../lib/router';
+import { navigate, searchHref, type Coords } from '../lib/router';
 
 const EXAMPLES = ['4014 Market St, Houston, TX 77020', '77026', '77494'];
 
@@ -16,12 +18,14 @@ interface SearchBarProps {
 
 interface Suggestion {
   value: string;
-  kind: 'recent' | 'example';
+  kind: 'place' | 'recent' | 'example';
+  coords?: Coords;
 }
 
 /**
- * Address search as an ARIA 1.2 combobox: recent searches (stored only in this browser)
- * and examples appear as you type; arrow keys move, Enter picks, Escape closes.
+ * Location search as an ARIA 1.2 combobox, like a maps app: matching places (addresses, cities,
+ * ZIPs, landmarks) appear as you type, plus recent searches (stored only in this browser) and
+ * examples. Arrow keys move, Enter picks, Escape closes.
  */
 export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false, onBeforeNavigate }: SearchBarProps) {
   const { t } = useI18n();
@@ -30,20 +34,41 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const [recent, setRecent] = useState<string[]>(getRecentSearches);
+  const [places, setPlaces] = useState<{ query: string; items: PlaceSuggestion[] }>({ query: '', items: [] });
   const ids = { input: useId(), error: useId(), list: useId(), option: useId() };
   const hero = size === 'hero';
 
+  // Live place suggestions: debounced, cancelled when the text changes, silent if the service is down.
+  useEffect(() => {
+    const query = value.replace(/\s+/g, ' ').trim();
+    if (!open || query.length < 3 || checkSearchInput(query) !== null) return;
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      api.suggest(query, controller.signal).then(
+        (res) => setPlaces({ query, items: res.suggestions }),
+        () => setPlaces({ query, items: [] }),
+      );
+    }, 280);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [value, open]);
+
   const suggestions = useMemo<Suggestion[]>(() => {
-    const needle = value.trim().toLowerCase();
+    const trimmed = value.replace(/\s+/g, ' ').trim();
+    const needle = trimmed.toLowerCase();
     const matches = (s: string) => needle.length === 0 || s.toLowerCase().includes(needle);
+    const placeMatches: Suggestion[] =
+      places.query === trimmed ? places.items.map((p) => ({ value: p.label, kind: 'place', coords: { lat: p.lat, lng: p.lng } })) : [];
     const recentMatches = recent.filter(matches).map((v) => ({ value: v, kind: 'recent' as const }));
     const exampleMatches = EXAMPLES.filter((e) => matches(e) && !recent.includes(e)).map((v) => ({ value: v, kind: 'example' as const }));
-    return [...recentMatches, ...exampleMatches].slice(0, 6);
-  }, [value, recent]);
+    return [...placeMatches.slice(0, 5), ...recentMatches.slice(0, 3), ...exampleMatches].slice(0, 8);
+  }, [value, recent, places]);
 
   const showList = open && suggestions.length > 0;
 
-  const submit = async (query: string) => {
+  const submit = async (query: string, coords?: Coords) => {
     const cleaned = query.replace(/\s+/g, ' ').trim();
     const problem = checkSearchInput(cleaned);
     if (problem) {
@@ -55,13 +80,13 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
     addRecentSearch(cleaned);
     setRecent(getRecentSearches());
     await onBeforeNavigate?.(cleaned);
-    navigate(searchHref(cleaned));
+    navigate(searchHref(cleaned, null, coords));
     window.scrollTo({ top: 0 });
   };
 
   const choose = (suggestion: Suggestion) => {
     setValue(suggestion.value);
-    void submit(suggestion.value);
+    void submit(suggestion.value, suggestion.coords);
   };
 
   const onSubmit = (event: FormEvent) => {
@@ -168,11 +193,15 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
               }`}
             >
               <span aria-hidden="true" className="text-faint">
-                {suggestion.kind === 'recent' ? '↺' : '→'}
+                {suggestion.kind === 'place' ? '⌖' : suggestion.kind === 'recent' ? '↺' : '→'}
               </span>
               <span className="truncate">{suggestion.value}</span>
               <span className="ml-auto shrink-0 text-xs text-faint">
-                {suggestion.kind === 'recent' ? t('search.recent') : t('search.example')}
+                {suggestion.kind === 'place'
+                  ? t('search.place')
+                  : suggestion.kind === 'recent'
+                    ? t('search.recent')
+                    : t('search.example')}
               </span>
             </div>
           ))}

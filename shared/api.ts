@@ -50,9 +50,19 @@ export interface SearchLocation {
   lat: number;
   lng: number;
   label: string;
-  source: 'census_geocoder' | 'zip_centroid';
+  source: 'census_geocoder' | 'zip_centroid' | 'place_search';
   approximate: boolean;
   zip: string | null;
+}
+
+export interface PlaceSuggestion {
+  label: string;
+  lat: number;
+  lng: number;
+}
+
+export interface SuggestResponse {
+  suggestions: PlaceSuggestion[];
 }
 
 export interface SearchResponse {

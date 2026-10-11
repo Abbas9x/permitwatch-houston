@@ -11,10 +11,15 @@ import type { Logger } from './lib/logger.js';
 import { aiRouter } from './routes/ai.js';
 import { searchRouter } from './routes/search.js';
 import { createGeocoder, type Geocoder } from './services/geocoder.js';
+import { createPlaceSearch, type PlaceSearch } from './services/placeSearch.js';
 import { loadZipCentroids } from './services/zipCentroids.js';
 
 export interface Services {
+  /** Addresses, ZIPs and place names (search box). */
   geocoder: Geocoder;
+  /** Addresses and ZIPs only (importer: no loose place-name matches for permit locations). */
+  addressGeocoder: Geocoder;
+  placeSearch: PlaceSearch;
   engine: GreenRoute;
 }
 
@@ -32,8 +37,12 @@ export function createServices(env: Env, db: DB, logger: Logger, llm: LlmClient 
       logger.warn({ model }, 'model not in the GreenRoute pricing table; costs will be estimated conservatively');
     }
   }
+  const zipCentroids = loadZipCentroids();
+  const placeSearch = createPlaceSearch();
   return {
-    geocoder: createGeocoder({ db, logger, zipCentroids: loadZipCentroids() }),
+    geocoder: createGeocoder({ db, logger, zipCentroids, placeSearch }),
+    addressGeocoder: createGeocoder({ db, logger, zipCentroids }),
+    placeSearch,
     engine: createGreenRoute({
       db,
       logger,
@@ -45,14 +54,15 @@ export function createServices(env: Env, db: DB, logger: Logger, llm: LlmClient 
 }
 
 export function createRoutes(db: DB, services: Services): NonNullable<AppDeps['routes']> {
-  return [searchRouter({ db, geocoder: services.geocoder }), aiRouter({ db, engine: services.engine })];
+  return [searchRouter({ db, geocoder: services.geocoder, placeSearch: services.placeSearch }), aiRouter({ db, engine: services.engine })];
 }
 
 /** Adapts the address geocoder for the importer (rows without lat/lng). */
 export function importerGeocode(geocoder: Geocoder): GeocodeFn {
   return async ({ address, city, zip }) => {
     const outcome = await geocoder.geocode(`${address}, ${city}, TX ${zip}`);
-    if (outcome.status !== 'found') return null;
+    // Permit locations must come from the dataset, the Census geocoder, or a ZIP point, never a fuzzy place match.
+    if (outcome.status !== 'found' || outcome.result.source === 'place_search') return null;
     return { lat: outcome.result.lat, lng: outcome.result.lng, source: outcome.result.source };
   };
 }

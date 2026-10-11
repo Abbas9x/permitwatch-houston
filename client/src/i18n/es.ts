@@ -96,6 +96,7 @@ export const es: Messages = {
   'map.unavailable': 'El mapa interactivo no está disponible en este dispositivo. Todas las plantas aparecen en la lista.',
   'map.you': 'Ubicación de su búsqueda',
   'map.loading': 'Cargando mapa…',
+  'map.slow': 'El mapa está tardando en cargar. Todas las plantas aparecen en la lista.',
   'map.markerLabel': '{company}: {type}, a {distance} millas al {direction}',
   'map.legendNew': 'Permiso nuevo',
   'map.legendRenewal': 'Renovación',
@@ -218,4 +219,7 @@ export const es: Messages = {
   'how.3.body': 'Redacte un comentario respetuoso con IA, edítelo y envíelo usted mismo en TCEQ eComment.',
   'how.greenroute': 'Con tecnología GreenRoute: cada tarea de IA va al modelo más barato que puede hacerla.',
   'how.greenrouteLink': 'Vea los ahorros',
+  'search.place': 'Lugar',
+  'results.placeArea': 'Mostrando la zona alrededor de {place}.',
+  'footer.places': 'Búsqueda de lugares: Photon de komoot, datos del mapa © colaboradores de OpenStreetMap.',
 };

@@ -76,7 +76,7 @@ export function Landing() {
       />
 
       <motion.div
-        className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 py-14 sm:px-6"
+        className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 py-14 sm:px-6"
         animate={diving ? { opacity: 0, scale: 1.03, filter: 'blur(6px)' } : { opacity: 1, scale: 1, filter: 'blur(0px)' }}
         transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       >

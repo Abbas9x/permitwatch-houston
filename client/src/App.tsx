@@ -3,7 +3,7 @@ import { lazy, Suspense } from 'react';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { useI18n } from './i18n';
-import { useRoute } from './lib/router';
+import { coordsFromParams, useRoute } from './lib/router';
 import { Landing } from './pages/Landing';
 
 // Only the landing page ships in the first bundle; results (map, panel) and the dashboard load on demand.
@@ -28,7 +28,7 @@ export function App() {
 
   let page;
   if (route.path === '/dashboard') page = <Dashboard />;
-  else if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} />;
+  else if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} coords={coordsFromParams(route.params)} />;
   else page = <Landing />;
 
   return (

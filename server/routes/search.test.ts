@@ -5,6 +5,7 @@ import { createApp } from '../app.js';
 import type { DB } from '../db/index.js';
 import { importRows, readDatasetFile } from '../importer/importer.js';
 import type { GeocodeOutcome, Geocoder } from '../services/geocoder.js';
+import type { PlaceSearch } from '../services/placeSearch.js';
 import { silentLogger, testDb, testEnv } from '../testUtils.js';
 import { searchRouter } from './search.js';
 
@@ -130,5 +131,48 @@ describe('GET /api/permits/:id', () => {
   it('404s unknown permits and 400s malformed IDs', async () => {
     expect((await request(app).get('/api/permits/nope')).status).toBe(404);
     expect((await request(app).get('/api/permits/bad%20id!')).status).toBe(400);
+  });
+});
+
+describe('place search endpoints', () => {
+  const places: PlaceSearch = {
+    search: async (q) =>
+      q.toLowerCase().startsWith('pasad')
+        ? [{ label: 'Pasadena, Texas', lat: 29.69, lng: -95.21, state: 'Texas', countryCode: 'US', postcode: null, precise: false }]
+        : [],
+  };
+  const placesApp = () =>
+    createApp({
+      env: testEnv(),
+      db,
+      logger: silentLogger(),
+      routes: [searchRouter({ db, geocoder: fakeGeocoder, placeSearch: places })],
+      clientDir: 'none',
+    });
+
+  it('suggests places as you type (3+ characters)', async () => {
+    const res = await request(placesApp()).get('/api/geocode/suggest').query({ q: 'pasad' });
+    expect(res.status).toBe(200);
+    expect(res.body.suggestions).toEqual([{ label: 'Pasadena, Texas', lat: 29.69, lng: -95.21 }]);
+    const short = await request(placesApp()).get('/api/geocode/suggest').query({ q: 'pa' });
+    expect(short.body.suggestions).toEqual([]);
+  });
+
+  it('searches at the exact coordinates of a picked place', async () => {
+    const res = await request(placesApp()).get('/api/search').query({ q: 'Lyons Ave area', lat: 29.7785, lng: -95.329 });
+    expect(res.status).toBe(200);
+    expect(res.body.location).toMatchObject({ label: 'Lyons Ave area', source: 'place_search', approximate: true });
+    expect(res.body.plants[0].permit.id).toBe('sample-001');
+  });
+
+  it('rejects half or out-of-range coordinates', async () => {
+    expect((await request(placesApp()).get('/api/search').query({ q: 'x place', lat: 29.7 })).status).toBe(400);
+    expect((await request(placesApp()).get('/api/search').query({ q: 'x place', lat: 129.7, lng: 0 })).status).toBe(400);
+  });
+
+  it('names the place it found when it is outside Texas', async () => {
+    const res = await request(placesApp()).get('/api/search').query({ q: 'Pasadena, California', lat: 34.15, lng: -118.14 });
+    expect(res.status).toBe(422);
+    expect(res.body.error.message).toContain('Pasadena, California');
   });
 });
