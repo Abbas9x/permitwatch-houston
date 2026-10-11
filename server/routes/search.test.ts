@@ -65,6 +65,7 @@ describe('GET /api/search', () => {
   it('summarizes the area using only values present in the data', async () => {
     const body = (await request(app).get('/api/search').query({ q: '77020' })).body as SearchResponse;
     expect(body.area).toEqual({
+      withinRadius: 3,
       within1: 1,
       within2: 2,
       within3: 3,
@@ -174,5 +175,29 @@ describe('place search endpoints', () => {
     const res = await request(placesApp()).get('/api/search').query({ q: 'Pasadena, California', lat: 34.15, lng: -118.14 });
     expect(res.status).toBe(422);
     expect(res.body.error.message).toContain('Pasadena, California');
+  });
+});
+
+
+describe('adjustable search distance', () => {
+  it.each([
+    [1, ['sample-003'], 250, 1],
+    [10, ['sample-003', 'sample-001', 'sample-002', 'sample-005'], 750, 3],
+  ])('filters permits and capacity within %i miles', async (radius, ids, capacity, listed) => {
+    const res = await request(app).get('/api/search').query({q:'77020', radius});
+    expect(res.status).toBe(200);
+    expect(res.body.radiusMiles).toBe(radius);
+    expect(res.body.plants.map((p: SearchResponse['plants'][number]) => p.permit.id)).toEqual(ids);
+    expect(res.body.area.withinRadius).toBe(ids.length);
+    expect(res.body.area.combinedCapacityCydPerHr).toBe(capacity);
+    expect(res.body.area.capacityListedCount).toBe(listed);
+  });
+  it.each(['0','11','1.5','nope',''])('rejects unsupported distance %s', async radius => {
+    const res = await request(app).get('/api/search').query({q:'77020', radius});
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('invalid_query');
+  });
+  it('rejects repeated distance parameters', async () => {
+    expect((await request(app).get('/api/search?q=77020&radius=1&radius=10')).status).toBe(400);
   });
 });

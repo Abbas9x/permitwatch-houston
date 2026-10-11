@@ -6,9 +6,10 @@ export interface LatLng {
 /** IUGG mean Earth radius (6371.0088 km) in statute miles. */
 export const EARTH_RADIUS_MILES = 3958.7613;
 
-/** Search radii shown in the UI, in miles. */
-export const SEARCH_RADII_MILES = [1, 2, 3] as const;
-export const MAX_SEARCH_RADIUS_MILES = 3;
+/** Neighborhood exploration distance, not an environmental exposure boundary. */
+export const MIN_SEARCH_RADIUS_MILES = 1;
+export const DEFAULT_SEARCH_RADIUS_MILES = 3;
+export const MAX_SEARCH_RADIUS_MILES = 10;
 
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const toDeg = (rad: number) => (rad * 180) / Math.PI;

@@ -1,3 +1,4 @@
+import { MAX_SEARCH_RADIUS_MILES } from '../../../shared/geo';
 import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 import type { SearchResponse } from '../../../shared/api';
@@ -5,12 +6,14 @@ import { AreaGlance } from '../components/AreaGlance';
 import { ErrorNotice } from '../components/ErrorNotice';
 import { PermitPanel } from '../components/panel/PermitPanel';
 import { PlantListItem } from '../components/PlantListItem';
+import { RadiusSlider } from '../components/RadiusSlider';
 import { SearchBar } from '../components/SearchBar';
 import { useI18n } from '../i18n';
 import { api } from '../lib/api';
 import { formatMiles } from '../lib/format';
 import { TYPE_HEX } from '../lib/permitColors';
 import { navigate, searchHref, type Coords } from '../lib/router';
+import { resultsForRadius } from '../lib/searchResults';
 import { useAsync } from '../lib/useAsync';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
@@ -49,6 +52,7 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const reducedMotion = useReducedMotion() ?? false;
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const unit = t(data.radiusMiles === 1 ? 'radius.unit.one' : 'radius.unit.other');
   const selected = data.plants.find((p) => p.permit.id === selectedId) ?? null;
 
   useEffect(() => {
@@ -73,10 +77,10 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
     [data, t, lang],
   );
 
-  const select = (id: string) => navigate(searchHref(data.query, id, coords), { replace: true });
+  const select = (id: string) => navigate(searchHref(data.query, id, coords, data.radiusMiles), { replace: true });
   const close = () => {
     const id = selectedId;
-    navigate(searchHref(data.query, null, coords), { replace: true });
+    navigate(searchHref(data.query, null, coords, data.radiusMiles), { replace: true });
     if (id) {
       requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-plant-button="${CSS.escape(id)}"]`)?.focus());
     }
@@ -85,12 +89,13 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] [grid-template-areas:'head'_'map'_'body'] lg:h-[calc(100dvh-3.5rem)] lg:grid-cols-[minmax(360px,440px)_1fr] lg:grid-rows-[auto_1fr] lg:[grid-template-areas:'head_map'_'body_map']">
       <div className="space-y-3 border-line px-4 pt-5 pb-4 [grid-area:head] sm:px-6 lg:border-r lg:border-b">
-        <SearchBar key={data.query} initialValue={data.query} size="compact" />
+        <SearchBar key={data.query} initialValue={data.query} size="compact" radiusMiles={data.radiusMiles} />
+        <RadiusSlider value={data.radiusMiles} onChange={radius => navigate(searchHref(data.query, null, coords, radius), {replace:true})} />
         <div>
           <h1 ref={headingRef} tabIndex={-1} className="text-xl leading-tight font-semibold text-ink focus:outline-none sm:text-2xl">
             {t('results.heading', { place: data.location.label })}
           </h1>
-          <p className="mt-1 text-sm text-muted">{tn('results.count', data.plants.length, { radius: data.radiusMiles })}</p>
+          <p aria-live="polite" className="mt-1 text-sm text-muted">{tn('results.count', data.plants.length, { radius: data.radiusMiles, unit })}</p>
           {data.location.source === 'place_search' && data.location.approximate && (
             <p className="mt-1 text-xs text-muted">{t('results.placeArea', { place: data.location.label })}</p>
           )}
@@ -105,11 +110,12 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
         <Suspense fallback={<MapSkeleton />}>
           <MapView
             center={data.location}
+            radiusMiles={data.radiusMiles}
             plants={mapPlants}
             selectedId={selectedId}
             onSelect={select}
             reducedMotion={reducedMotion}
-            ariaLabel={t('map.label', { place: data.location.label })}
+            ariaLabel={t('map.label', { place: data.location.label, radius: data.radiusMiles, unit })}
             youLabel={t('map.you')}
             unavailableText={t('map.unavailable')}
             loadingText={t('map.loading')}
@@ -124,11 +130,11 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
       </div>
 
       <div className="space-y-5 px-4 py-5 [grid-area:body] sm:px-6 lg:overflow-y-auto lg:border-r lg:border-line">
-        <AreaGlance area={data.area} />
+        <AreaGlance area={data.area} radiusMiles={data.radiusMiles} />
         {data.hasSampleData && <SampleBanner />}
         {data.plants.length === 0 ? (
           <div className="glass rounded-2xl p-5 text-sm text-ink">
-            <p>{t('results.none', { radius: data.radiusMiles })}</p>
+            <p>{t('results.none', { radius: data.radiusMiles, unit })}</p>
             {data.nearestOutside && (
               <p className="mt-2 text-muted">
                 {t('results.nearest', {
@@ -177,16 +183,17 @@ function ResultsSkeleton() {
   );
 }
 
-export function ResultsPage({ q, selectedId, coords }: { q: string; selectedId: string | null; coords: Coords | null }) {
+export function ResultsPage({ q, selectedId, coords, radiusMiles }: { q: string; selectedId: string | null; coords: Coords | null; radiusMiles: number }) {
   const key = coords ? `${q}@${coords.lat},${coords.lng}` : q;
-  const { state, retry } = useAsync(key, (signal) => api.search(q, coords, signal));
+  const { state, retry } = useAsync(key, (signal) => api.search(q, coords, signal, MAX_SEARCH_RADIUS_MILES));
 
-  if (state?.status === 'success') return <Results data={state.data} selectedId={selectedId} coords={coords} />;
+  const data = useMemo(() => state?.status === 'success' ? resultsForRadius(state.data, radiusMiles) : null, [state, radiusMiles]);
+  if (data) return <Results data={data} selectedId={selectedId} coords={coords} />;
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6">
       {state?.status === 'error' ? (
         <>
-          <SearchBar key={q} initialValue={q} size="compact" />
+          <SearchBar key={q} initialValue={q} size="compact" radiusMiles={radiusMiles} />
           <ErrorNotice error={state.error} onRetry={retry} />
         </>
       ) : (

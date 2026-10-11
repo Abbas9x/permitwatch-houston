@@ -18,6 +18,6 @@ describe('exact area counts', () => {
     } finally {db.close();}
   });
   it('handles an empty dataset with no invented capacity', () => {
-    expect(summarizeArea([])).toEqual({within1:0,within2:0,within3:0,combinedCapacityCydPerHr:null,capacityListedCount:0});
+    expect(summarizeArea([])).toEqual({withinRadius:0,within1:0,within2:0,within3:0,combinedCapacityCydPerHr:null,capacityListedCount:0});
   });
 });

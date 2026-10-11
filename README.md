@@ -2,7 +2,7 @@
 
 > **Understand the permits in your neighborhood.**
 
-Enter a Houston address or ZIP code. PermitWatch shows every concrete batch plant air permit (TCEQ) nearby and explains each one in plain English, using the numbers printed in the permit. It shows the public comment deadline when the notice lists one and helps you draft a comment.
+Enter a Houston address or ZIP code, then choose a search distance from 1–10 miles (default 3). The slider updates one map boundary, permit markers, results, and listed capacity together; links and page refresh preserve the selected distance. PermitWatch shows every concrete batch plant air permit (TCEQ) nearby and explains each one in plain English, using the numbers printed in the permit. It shows the public comment deadline when the notice lists one and helps you draft a comment.
 
 Summaries and editable comment drafts are built directly from the dataset fields and your selected concerns. No AI provider or API key is required. Always verify the current comment window with the official source.
 

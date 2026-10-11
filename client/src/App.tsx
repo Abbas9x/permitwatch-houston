@@ -3,7 +3,7 @@ import { lazy, Suspense } from 'react';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { useI18n } from './i18n';
-import { coordsFromParams, useRoute } from './lib/router';
+import { coordsFromParams, radiusFromParams, useRoute } from './lib/router';
 import { Landing } from './pages/Landing';
 
 // Only the landing page ships in the first bundle; results (map, panel) load on demand.
@@ -26,7 +26,7 @@ export function App() {
   const permitId = route.params.get('permit');
 
   let page;
-  if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} coords={coordsFromParams(route.params)} />;
+  if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} coords={coordsFromParams(route.params)} radiusMiles={radiusFromParams(route.params)} />;
   else page = <Landing />;
 
   return (

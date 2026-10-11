@@ -58,3 +58,56 @@ test('mobile details tolerate missing optional data and direct navigation',async
   await page.getByRole('button',{name:'Close permit details',exact:true}).click();
   await expect(panel).not.toBeVisible();expect(errors).toEqual([]);
 });
+
+
+test('distance slider synchronizes the map, results, capacity and shared URL', async ({page}) => {
+  const searches: string[] = [];
+  page.on('request', request => { if (request.url().includes('/api/search?')) searches.push(request.url()); });
+  await page.goto('/?q=77020');
+  const slider = page.getByRole('slider', {name:'Search distance'});
+  await expect(slider).toHaveValue('3');
+  await expect(page.locator('.pw-ring-label')).toHaveCount(1);
+  await slider.focus();await slider.press('End');
+  await expect(slider).toHaveValue('10');
+  await expect(page).toHaveURL(/radius=10/);
+  await expect(page.locator('.pw-marker')).toHaveCount(4);
+  await expect(page.locator('.pw-ring-label')).toHaveText('10 mi');
+  await expect(page.getByRole('region',{name:'Your area at a glance'})).toContainText('750 cubic yards/hour');
+  await page.locator('.pw-marker[data-plant-id="sample-001"]').click({force:true});
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByRole('button',{name:'Close permit details',exact:true}).click();
+  await slider.focus();await slider.press('Home');
+  await expect(slider).toHaveValue('1');
+  await expect(page.locator('.pw-marker')).toHaveCount(1);
+  await expect(page.locator('.pw-ring-label')).toHaveText('1 mi');
+  await expect.poll(async () => {
+    const map = await page.locator('.maplibregl-map').boundingBox();
+    const you = await page.locator('.pw-you').boundingBox();
+    if (!map || !you) return Infinity;
+    return Math.abs(you.x + you.width / 2 - (map.x + map.width / 2));
+  }).toBeLessThan(5); // Detail-panel camera padding must not offset the resized boundary.
+
+  await expect(page.getByRole('region',{name:'Your area at a glance'})).toContainText('250 cubic yards/hour');
+  await expect(page.getByText('1 plant within 1 mile',{exact:true})).toBeVisible();
+  expect(searches).toHaveLength(1); // Moving the distance does not repeat geocoding/search requests.
+  await page.reload();await expect(slider).toHaveValue('1');
+  await expect(page.locator('.pw-marker')).toHaveCount(1);
+  const search = page.getByRole('combobox',{name:'Houston address or ZIP code'});
+  await search.fill('77494');await search.press('Enter');
+  await expect(slider).toHaveValue('1');
+  await expect(page.getByText('No permitted concrete batch plants within 1 mile in our dataset.',{exact:true})).toBeVisible();
+});
+
+test('mobile distance slider supports touch input, direct links and Spanish labels', async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/?q=77020&radius=10&permit=sample-001');
+  const slider = page.getByRole('slider',{name:'Search distance'});
+  await expect(slider).toHaveValue('10');
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByRole('button',{name:'Close permit details',exact:true}).click();
+  await slider.fill('1');
+  await expect(page.locator('.pw-marker')).toHaveCount(1);
+  await page.getByRole('button',{name:'Cambiar a español'}).click();
+  await expect(page.getByRole('slider',{name:'Distancia de búsqueda'})).toHaveValue('1');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+});

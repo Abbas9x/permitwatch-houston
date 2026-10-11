@@ -1,10 +1,10 @@
-import type { AreaSummary, NearbyPlant, SearchResponse } from '../../shared/api.js';
+import type { NearbyPlant, SearchResponse } from '../../shared/api.js';
 import {
   bearingDegrees,
   boundingBox,
   compassPoint,
   haversineMiles,
-  MAX_SEARCH_RADIUS_MILES,
+  DEFAULT_SEARCH_RADIUS_MILES,
   type LatLng,
 } from '../../shared/geo.js';
 import type { DB } from '../db/index.js';
@@ -14,7 +14,7 @@ import { getSummaries } from '../db/summariesRepo.js';
 const round = (n: number, places: number) => Math.round(n * 10 ** places) / 10 ** places;
 
 /** Every plant within `radiusMiles`, nearest first. */
-export function findNearby(db: DB, center: LatLng, radiusMiles = MAX_SEARCH_RADIUS_MILES): NearbyPlant[] {
+export function findNearby(db: DB, center: LatLng, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES): NearbyPlant[] {
   const candidates = listPermitRecordsInBox(db, boundingBox(center, radiusMiles));
   const summaries = getSummaries(db, candidates.map((c) => c.id));
   return candidates
@@ -36,17 +36,7 @@ export function findNearby(db: DB, center: LatLng, radiusMiles = MAX_SEARCH_RADI
     .map(({ exact: _exact, ...plant }) => plant);
 }
 
-/** Counts and combined capacity, computed only from values present in the data. */
-export function summarizeArea(plants: NearbyPlant[]): AreaSummary {
-  const listed = plants.map((p) => p.permit.maxProductionCydPerHr).filter((v): v is number => v !== null);
-  return {
-    within1: plants.filter((p) => p.distanceMiles <= 1).length,
-    within2: plants.filter((p) => p.distanceMiles <= 2).length,
-    within3: plants.filter((p) => p.distanceMiles <= 3).length,
-    combinedCapacityCydPerHr: listed.length > 0 ? listed.reduce((sum, v) => sum + v, 0) : null,
-    capacityListedCount: listed.length,
-  };
-}
+export { summarizeArea } from '../../shared/area.js';
 
 /** Nearest plant anywhere in the dataset (used when nothing is within the search radius). */
 export function findNearestOverall(db: DB, center: LatLng): SearchResponse['nearestOutside'] {

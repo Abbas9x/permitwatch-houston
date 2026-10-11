@@ -1,3 +1,4 @@
+import { DEFAULT_SEARCH_RADIUS_MILES } from '../../../shared/geo';
 import { useEffect, useId, useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
 import type { PlaceSuggestion } from '../../../shared/api';
 import { checkSearchInput, SEARCH_QUERY_MAX } from '../../../shared/validation';
@@ -11,6 +12,7 @@ const EXAMPLES = ['4014 Market St, Houston, TX 77020', '77026', '77494'];
 interface SearchBarProps {
   initialValue?: string;
   size?: 'hero' | 'compact';
+  radiusMiles?: number;
   autoFocus?: boolean;
   /** Runs before navigating (the landing page uses it to play its "dive" transition). */
   onBeforeNavigate?: (query: string) => Promise<void> | void;
@@ -27,7 +29,7 @@ interface Suggestion {
  * ZIPs, landmarks) appear as you type, plus recent searches (stored only in this browser) and
  * examples. Arrow keys move, Enter picks, Escape closes.
  */
-export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false, onBeforeNavigate }: SearchBarProps) {
+export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false, onBeforeNavigate, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES }: SearchBarProps) {
   const { t } = useI18n();
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState<string | null>(null);
@@ -80,7 +82,7 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
     addRecentSearch(cleaned);
     setRecent(getRecentSearches());
     await onBeforeNavigate?.(cleaned);
-    navigate(searchHref(cleaned, null, coords));
+    navigate(searchHref(cleaned, null, coords, radiusMiles));
     window.scrollTo({ top: 0 });
   };
 

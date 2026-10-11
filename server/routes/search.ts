@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import type { PermitDetailResponse, SearchResponse, SuggestResponse } from '../../shared/api.js';
-import { isInTexasBounds, MAX_SEARCH_RADIUS_MILES } from '../../shared/geo.js';
+import { DEFAULT_SEARCH_RADIUS_MILES, isInTexasBounds, MAX_SEARCH_RADIUS_MILES, MIN_SEARCH_RADIUS_MILES } from '../../shared/geo.js';
 import { checkSearchInput, PERMIT_ID_PATTERN, SEARCH_QUERY_MAX } from '../../shared/validation.js';
 import type { Limiters } from '../app.js';
 import type { DB } from '../db/index.js';
@@ -34,6 +34,7 @@ const coordinate = (min: number, max: number) => z.coerce.number().finite().min(
 const SearchQuerySchema = z
   .object({
     q: queryText,
+    radius: z.coerce.number().int().min(MIN_SEARCH_RADIUS_MILES).max(MAX_SEARCH_RADIUS_MILES).default(DEFAULT_SEARCH_RADIUS_MILES),
     // Set when the resident picked a suggested place: search right there, no second lookup.
     lat: coordinate(-90, 90).optional(),
     lng: coordinate(-180, 180).optional(),
@@ -54,7 +55,7 @@ export function searchRouter(deps: { db: DB; geocoder: Geocoder; placeSearch?: P
         const message = parsed.error.issues[0]?.message ?? 'Enter a Houston street address or a 5-digit ZIP code.';
         throw new HttpError(400, 'invalid_query', message);
       }
-      const { q, lat, lng } = parsed.data;
+      const { q, lat, lng, radius } = parsed.data;
 
       const outcome: GeocodeOutcome =
         lat !== undefined && lng !== undefined
@@ -82,7 +83,7 @@ export function searchRouter(deps: { db: DB; geocoder: Geocoder; placeSearch?: P
         );
       }
 
-      const plants = findNearby(deps.db, location, MAX_SEARCH_RADIUS_MILES);
+      const plants = findNearby(deps.db, location, radius);
       const nearestOutside = plants.length === 0 ? findNearestOverall(deps.db, location) : null;
       const body: SearchResponse = {
         query: q,
@@ -95,7 +96,7 @@ export function searchRouter(deps: { db: DB; geocoder: Geocoder; placeSearch?: P
           zip: location.zip,
         },
         geocoderAvailable: outcome.geocoderAvailable,
-        radiusMiles: MAX_SEARCH_RADIUS_MILES,
+        radiusMiles: radius,
         plants,
         area: summarizeArea(plants),
         nearestOutside,

@@ -37,12 +37,14 @@ export interface NearbyPlant {
 }
 
 export interface AreaSummary {
+  /** Number of plants within the selected search distance. */
+  withinRadius: number;
   within1: number;
   within2: number;
   within3: number;
-  /** Sum of listed max production rates within 3 miles; null when no plant lists one. */
+  /** Sum of listed max production rates within the selected distance; null when no plant lists one. */
   combinedCapacityCydPerHr: number | null;
-  /** How many of the plants within 3 miles list a production rate. */
+  /** How many of the plants within the selected distance list a production rate. */
   capacityListedCount: number;
 }
 

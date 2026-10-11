@@ -3,7 +3,7 @@ import { Map as MapLibreMap, Marker, NavigationControl, setWorkerUrl, type GeoJS
 // MapLibre 6 loads its tile worker from a sibling file; bundlers move it, so point MapLibre at the emitted asset.
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
-import { MAX_SEARCH_RADIUS_MILES, type LatLng } from '../../../../shared/geo';
+import type { LatLng } from '../../../../shared/geo';
 import { DARK_STYLE_URL, hasWebGL, HOUSTON_OVERVIEW, ringBounds, ringLabelPoints, ringsGeoJson, ringWallsGeoJson } from './mapGeo';
 
 export interface MapPlant {
@@ -16,6 +16,7 @@ export interface MapPlant {
 
 export interface MapViewProps {
   center: LatLng;
+  radiusMiles: number;
   plants: MapPlant[];
   selectedId: string | null;
   onSelect: (id: string) => void;
@@ -34,7 +35,6 @@ setWorkerUrl(maplibreWorkerUrl);
 
 const RING_SOURCE = 'pw-rings';
 const RING_WALL_SOURCE = 'pw-ring-walls';
-const RING_OPACITY: Record<number, number> = { 1: 0.95, 2: 0.65, 3: 0.4 };
 
 function plantElement(plant: MapPlant): HTMLButtonElement {
   const el = document.createElement('button');
@@ -58,9 +58,10 @@ function updatePlantElement(el: HTMLButtonElement, plant: MapPlant) {
 }
 
 export default function MapView(props: MapViewProps) {
-  const { center, plants, selectedId, reducedMotion } = props;
+  const { center, radiusMiles, plants, selectedId, reducedMotion } = props;
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const hasPositioned = useRef(false);
   const plantMarkers = useRef(new Map<string, { marker: Marker; el: HTMLButtonElement }>());
   const overlayMarkers = useRef<Marker[]>([]);
   const [webgl] = useState(hasWebGL);
@@ -134,7 +135,7 @@ export default function MapView(props: MapViewProps) {
         type: 'fill-extrusion',
         source: RING_WALL_SOURCE,
         paint: {
-          'fill-extrusion-color': ['match', ['get', 'radius'], 1, '#2dd4bf', 2, '#38bdf8', '#a78bfa'],
+          'fill-extrusion-color': '#38bdf8',
           'fill-extrusion-height': 0,
           'fill-extrusion-base': 0,
           // Strong in the overview, fading as you zoom into streets so the walls never cover buildings.
@@ -154,8 +155,8 @@ export default function MapView(props: MapViewProps) {
         type: 'line',
         source: RING_SOURCE,
         paint: {
-          'line-color': ['match', ['get', 'radius'], 1, '#2dd4bf', 2, '#38bdf8', '#a78bfa'],
-          'line-width': ['match', ['get', 'radius'], 1, 2, 1.5],
+          'line-color': '#38bdf8',
+          'line-width': 2,
           'line-opacity': 0,
         },
       });
@@ -175,8 +176,8 @@ export default function MapView(props: MapViewProps) {
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    (map.getSource(RING_SOURCE) as GeoJSONSource | undefined)?.setData(ringsGeoJson(center));
-    (map.getSource(RING_WALL_SOURCE) as GeoJSONSource | undefined)?.setData(ringWallsGeoJson(center));
+    (map.getSource(RING_SOURCE) as GeoJSONSource | undefined)?.setData(ringsGeoJson(center, radiusMiles));
+    (map.getSource(RING_WALL_SOURCE) as GeoJSONSource | undefined)?.setData(ringWallsGeoJson(center, radiusMiles));
 
     for (const m of overlayMarkers.current) m.remove();
     const you = document.createElement('div');
@@ -184,7 +185,7 @@ export default function MapView(props: MapViewProps) {
     you.setAttribute('role', 'img');
     you.setAttribute('aria-label', props.youLabel);
     const markers = [new Marker({ element: you }).setLngLat([center.lng, center.lat]).addTo(map)];
-    for (const { radius, point } of ringLabelPoints(center)) {
+    for (const { radius, point } of ringLabelPoints(center, radiusMiles)) {
       const label = document.createElement('div');
       label.className = 'pw-ring-label';
       label.setAttribute('aria-hidden', 'true');
@@ -193,40 +194,30 @@ export default function MapView(props: MapViewProps) {
     }
     overlayMarkers.current = markers;
 
-    // Rings appear one after another and their 3D walls rise as the camera arrives (instant with reduced motion).
+    // Animate the first arrival, then resize quickly without rebuilding the map.
+    const firstView = !hasPositioned.current;
+    hasPositioned.current = true;
     let frame = 0;
-    const start = performance.now() + (reducedMotion ? 0 : 1500);
-    const easeOut = (x: number) => 1 - (1 - Math.max(0, Math.min(1, x))) ** 3;
-    const animateRings = (now: number) => {
-      const t = reducedMotion ? 1 : Math.max(0, Math.min(1, (now - start) / 1600));
-      map.setPaintProperty('pw-rings-walls', 'fill-extrusion-height', [
-        '*',
-        ['get', 'h'],
-        ['match', ['get', 'radius'], 1, easeOut(t * 2), 2, easeOut(t * 2 - 0.5), easeOut(t * 2 - 1)],
-      ]);
-      map.setPaintProperty('pw-rings-line', 'line-opacity', [
-        'match',
-        ['get', 'radius'],
-        1,
-        RING_OPACITY[1]! * Math.min(1, t * 3),
-        2,
-        RING_OPACITY[2]! * Math.max(0, Math.min(1, t * 3 - 1)),
-        RING_OPACITY[3]! * Math.max(0, Math.min(1, t * 3 - 2)),
-      ]);
-      map.setPaintProperty('pw-rings-fill', 'fill-opacity', 0.045 * t);
-      if (t < 1) frame = requestAnimationFrame(animateRings);
+    const start = performance.now() + (reducedMotion || !firstView ? 0 : 1500);
+    const animateRing = (now: number) => {
+      const t = reducedMotion ? 1 : Math.max(0, Math.min(1, (now - start) / (firstView ? 1600 : 350)));
+      const eased = 1 - (1 - t) ** 3;
+      map.setPaintProperty('pw-rings-walls', 'fill-extrusion-height', ['*', ['get', 'h'], eased]);
+      map.setPaintProperty('pw-rings-line', 'line-opacity', 0.85 * eased);
+      map.setPaintProperty('pw-rings-fill', 'fill-opacity', 0.045 * eased);
+      if (t < 1) frame = requestAnimationFrame(animateRing);
     };
-    frame = requestAnimationFrame(animateRings);
+    frame = requestAnimationFrame(animateRing);
 
-    const camera = map.cameraForBounds(ringBounds(center, MAX_SEARCH_RADIUS_MILES), { padding: 36 });
-    // Tilted enough that the ring walls and buildings read as 3D, while all three rings stay in view.
-    const target = { center: [center.lng, center.lat] as [number, number], zoom: camera?.zoom ?? 12.5, pitch: 56, bearing: -18 };
+    const camera = map.cameraForBounds(ringBounds(center, radiusMiles), { padding: 36 });
+    const target = { center: [center.lng, center.lat] as [number, number], zoom: camera?.zoom ?? 12.5, pitch: 56, bearing: -18, padding: {top:0,bottom:0,left:0,right:0} };
     if (reducedMotion) map.jumpTo(target);
-    else map.flyTo({ ...target, duration: 3200, curve: 1.5, essential: false });
+    else if (firstView) map.flyTo({ ...target, duration: 3200, curve: 1.5, essential: false });
+    else map.easeTo({ ...target, duration: 450 });
 
     return () => cancelAnimationFrame(frame);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-run only when the location changes
-  }, [ready, center.lat, center.lng, reducedMotion]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- react to location, distance and motion preference
+  }, [ready, center.lat, center.lng, radiusMiles, reducedMotion]);
 
   // Plant markers: keep DOM buttons in sync with the result list.
   useEffect(() => {

@@ -1,14 +1,14 @@
-import { circleRing, destinationPoint, SEARCH_RADII_MILES, type LatLng } from '../../../../shared/geo';
+import { circleRing, destinationPoint, DEFAULT_SEARCH_RADIUS_MILES, type LatLng } from '../../../../shared/geo';
 
 export const DARK_STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
 
 /** Wide, tilted view of Houston used as the starting point of the fly-in. */
 export const HOUSTON_OVERVIEW = { center: [-95.3698, 29.7604] as [number, number], zoom: 9.3, pitch: 58, bearing: -24 };
 
-export function ringsGeoJson(center: LatLng) {
+export function ringsGeoJson(center: LatLng, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES) {
   return {
     type: 'FeatureCollection' as const,
-    features: SEARCH_RADII_MILES.map((radius) => ({
+    features: [radiusMiles].map((radius) => ({
       type: 'Feature' as const,
       properties: { radius },
       geometry: { type: 'Polygon' as const, coordinates: [circleRing(center, radius)] },
@@ -16,11 +16,11 @@ export function ringsGeoJson(center: LatLng) {
   };
 }
 
-/** Where to pin each ring's "1 mi / 2 mi / 3 mi" label (due north of the center). */
-export function ringLabelPoints(center: LatLng) {
+/** Label the single selected distance on the near side of the boundary. */
+export function ringLabelPoints(center: LatLng, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES) {
   // On the near (south) side of the rings: the tilted camera looks north, so the rings are spread
   // furthest apart there and the labels don't stack.
-  return SEARCH_RADII_MILES.map((radius) => ({ radius, point: destinationPoint(center, 195, radius) }));
+  return [radiusMiles].map((radius) => ({ radius, point: destinationPoint(center, 195, radius) }));
 }
 
 /** [[west, south], [east, north]] around the outermost ring. */
@@ -46,16 +46,16 @@ export function hasWebGL(): boolean {
 
 /** Wall thickness of the 3D rings, in miles (~45 m). */
 const WALL_MILES = 0.028;
-/** Wall height per ring in meters: the nearest ring stands tallest. */
-export const RING_WALL_HEIGHT_M: Record<number, number> = { 1: 440, 2: 340, 3: 260 };
+/** Keep the selected boundary visible without suggesting different exposure zones. */
+const RING_WALL_HEIGHT_M = 300;
 
 /** Thin annulus per radius, extruded by MapLibre into a translucent 3D wall. */
-export function ringWallsGeoJson(center: LatLng) {
+export function ringWallsGeoJson(center: LatLng, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES) {
   return {
     type: 'FeatureCollection' as const,
-    features: SEARCH_RADII_MILES.map((radius) => ({
+    features: [radiusMiles].map((radius) => ({
       type: 'Feature' as const,
-      properties: { radius, h: RING_WALL_HEIGHT_M[radius] ?? 300 },
+      properties: { radius, h: RING_WALL_HEIGHT_M },
       geometry: {
         type: 'Polygon' as const,
         // Outer ring + reversed inner ring = hole, so only the wall is extruded.

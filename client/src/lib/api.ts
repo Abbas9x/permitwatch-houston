@@ -1,3 +1,4 @@
+import { DEFAULT_SEARCH_RADIUS_MILES } from '../../../shared/geo';
 import type {
   ApiErrorBody,
   CommentDraftResponse,
@@ -76,8 +77,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 }
 
 export const api = {
-  search: (q: string, coords: Coords | null, signal?: AbortSignal) => {
-    const params = new URLSearchParams({ q });
+  search: (q: string, coords: Coords | null, signal?: AbortSignal, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES) => {
+    const params = new URLSearchParams({ q, radius: String(radiusMiles) });
     if (coords && Number.isFinite(coords.lat) && Number.isFinite(coords.lng)) {
       params.set('lat', String(coords.lat));
       params.set('lng', String(coords.lng));
