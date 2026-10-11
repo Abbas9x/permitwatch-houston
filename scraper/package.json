@@ -13,7 +13,9 @@
     "existing": "tsx src/existing.ts",
     "stats": "tsx src/stats.ts",
     "demo": "tsx src/demo.ts",
-    "permits": "tsx src/refreshPermits.ts --refresh-lists"
+    "permits": "tsx src/refreshPermits.ts --refresh-lists",
+    "water": "tsx src/refreshWaterPermits.ts",
+    "waste": "tsx src/refreshWastePermits.ts"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

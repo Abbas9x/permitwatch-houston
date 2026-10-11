@@ -154,8 +154,14 @@
   padding: 0;
 }
 .pw-marker-core {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  color: #111;
   border-radius: 9999px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--c) 65%, white), var(--c));
   border: 2px solid var(--color-night);

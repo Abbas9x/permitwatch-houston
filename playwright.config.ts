@@ -17,10 +17,16 @@ export default defineConfig({
       args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
     },
   },
-  webServer: {
+  webServer: [{
     command: 'npx tsx scripts/test-server.ts',
     url: 'http://127.0.0.1:8790/api/health',
     timeout: 30_000,
     reuseExistingServer: false,
-  },
+  }, {
+    command: 'npx tsx scripts/test-server.ts',
+    env: {TEST_PORT:'8791',TEST_REAL_DATA:'1'},
+    url: 'http://127.0.0.1:8791/api/health',
+    timeout: 30_000,
+    reuseExistingServer: false,
+  }],
 });

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import {PERMIT_CATEGORIES, PERMIT_STATUSES} from '../../shared/permit.js';
 import { z } from 'zod';
 import type { PermitDetailResponse, SearchResponse, SuggestResponse } from '../../shared/api.js';
 import { DEFAULT_SEARCH_RADIUS_MILES, isInTexasBounds, MAX_SEARCH_RADIUS_MILES, MIN_SEARCH_RADIUS_MILES } from '../../shared/geo.js';
@@ -34,6 +35,8 @@ const coordinate = (min: number, max: number) => z.coerce.number().finite().min(
 const SearchQuerySchema = z
   .object({
     q: queryText,
+    category: z.enum(PERMIT_CATEGORIES).optional(),
+    status: z.enum(PERMIT_STATUSES).optional(),
     radius: z.coerce.number().int().min(MIN_SEARCH_RADIUS_MILES).max(MAX_SEARCH_RADIUS_MILES).default(DEFAULT_SEARCH_RADIUS_MILES),
     // Set when the resident picked a suggested place: search right there, no second lookup.
     lat: coordinate(-90, 90).optional(),
@@ -55,7 +58,7 @@ export function searchRouter(deps: { db: DB; geocoder: Geocoder; placeSearch?: P
         const message = parsed.error.issues[0]?.message ?? 'Enter a Houston street address or a 5-digit ZIP code.';
         throw new HttpError(400, 'invalid_query', message);
       }
-      const { q, lat, lng, radius } = parsed.data;
+      const { q, lat, lng, radius, category, status } = parsed.data;
 
       const outcome: GeocodeOutcome =
         lat !== undefined && lng !== undefined
@@ -79,12 +82,12 @@ export function searchRouter(deps: { db: DB; geocoder: Geocoder; placeSearch?: P
         throw new HttpError(
           422,
           'outside_service_area',
-          `We found ${location.label}, but PermitWatch covers Houston-area (Texas) air permits only. Try a Houston address, neighborhood, or ZIP code.`,
+          `We found ${location.label}, but PermitWatch covers Houston-area (Texas) environmental permits. Try a Houston address, neighborhood, or ZIP code.`,
         );
       }
 
-      const plants = findNearby(deps.db, location, radius);
-      const nearestOutside = plants.length === 0 ? findNearestOverall(deps.db, location) : null;
+      const plants = findNearby(deps.db, location, radius, {category,status});
+      const nearestOutside = plants.length === 0 ? findNearestOverall(deps.db, location, {category,status}) : null;
       const body: SearchResponse = {
         query: q,
         location: {

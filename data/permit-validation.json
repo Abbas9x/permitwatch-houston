@@ -1,12 +1,112 @@
 {
-  "generatedAt": "2026-10-11T08:16:42.083Z",
-  "source": "data/permit-sites.json",
-  "sourceGeneratedAt": "2026-10-11T08:16:32Z",
-  "sourceSha256": "fac7b8c0ab1ee3679bc62348d7d569034b329d91c0a09e261112313acd4fab87",
-  "refreshMode": "Reprocessed cached official indexes and downloaded notice documents from the preceding refresh.",
-  "sourceRecords": 214,
-  "eligible": 214,
-  "accepted": 213,
+  "generatedAt": "2026-10-11T09:03:57.639Z",
+  "sources": [
+    {
+      "source": "data/permit-sites.json",
+      "sourceGeneratedAt": "2026-10-11T08:16:32Z",
+      "sourceSha256": "fac7b8c0ab1ee3679bc62348d7d569034b329d91c0a09e261112313acd4fab87",
+      "eligible": 214,
+      "exclusions": null,
+      "scope": null
+    },
+    {
+      "source": "data/water-permits.json",
+      "sourceGeneratedAt": "2026-10-11T08:35:49.910Z",
+      "sourceSha256": "c67992698c333d00fd7d9e9ba2f0e0b2f827dbdf6622dbddd8b5b1afc1d5871e",
+      "eligible": 559,
+      "exclusions": {
+        "coarse_coordinates": 548,
+        "not_individual_wastewater_id": 368,
+        "outside_region_coordinates": 8,
+        "duplicate_permit": 16,
+        "outside_region_county": 11,
+        "missing_county": 3
+      },
+      "scope": {
+        "counties": [
+          "Austin",
+          "Brazoria",
+          "Chambers",
+          "Colorado",
+          "Fort Bend",
+          "Galveston",
+          "Harris",
+          "Liberty",
+          "Matagorda",
+          "Montgomery",
+          "Walker",
+          "Waller",
+          "Wharton"
+        ],
+        "sic": "4952",
+        "activity_filter": "Y",
+        "permit_id_pattern": "^TX0[0-9]{6}$",
+        "maximum_known_coordinate_accuracy_meters": 1000
+      }
+    },
+    {
+      "source": "data/waste-permits.json",
+      "sourceGeneratedAt": "2026-10-11T09:01:59.133Z",
+      "sourceSha256": "6df6df62b46756062ff2841d1c6e41a282bd321b1d7b3cad092dd221a11b9428",
+      "eligible": 35,
+      "exclusions": {
+        "not_a_permit": 15,
+        "missing_physical_location": 1
+      },
+      "scope": "Active landfill and transfer-station GIS layers joined by authorization number and RN to TCEQ MSW spreadsheet; registrations excluded."
+    }
+  ],
+  "eligible": 808,
+  "accepted": 807,
+  "categories": {
+    "concrete_batch_plant": {
+      "count": 144,
+      "coordinates": 144,
+      "officialLinks": 144,
+      "commentDeadlines": 0,
+      "operators": 144,
+      "permittees": 0,
+      "statuses": {
+        "unknown": 139,
+        "pending": 5
+      }
+    },
+    "air_permit": {
+      "count": 69,
+      "coordinates": 69,
+      "officialLinks": 69,
+      "commentDeadlines": 0,
+      "operators": 69,
+      "permittees": 0,
+      "statuses": {
+        "pending": 69
+      }
+    },
+    "wastewater_permit": {
+      "count": 559,
+      "coordinates": 559,
+      "officialLinks": 559,
+      "commentDeadlines": 0,
+      "operators": 0,
+      "permittees": 559,
+      "statuses": {
+        "effective": 514,
+        "administratively_continued": 22,
+        "expired": 23
+      }
+    },
+    "solid_waste_permit": {
+      "count": 35,
+      "coordinates": 35,
+      "officialLinks": 35,
+      "commentDeadlines": 0,
+      "operators": 0,
+      "permittees": 0,
+      "statuses": {
+        "issued": 35
+      }
+    }
+  },
   "rejected": [
     {
       "rowNumber": 200,
@@ -17,13 +117,90 @@
     }
   ],
   "warnings": [],
+  "sameLocations": [
+    {
+      "coordinates": "30.063038275647,-95.955785490694",
+      "count": 2
+    },
+    {
+      "coordinates": "29.942138240013,-95.0328027006",
+      "count": 2
+    },
+    {
+      "coordinates": "30.309902171218,-95.340024271427",
+      "count": 2
+    },
+    {
+      "coordinates": "30.30819926232,-95.477685090732",
+      "count": 2
+    },
+    {
+      "coordinates": "30.292209263343,-95.410878913015",
+      "count": 2
+    },
+    {
+      "coordinates": "30.058861685352,-95.589689263942",
+      "count": 2
+    },
+    {
+      "coordinates": "29.76037107051,-95.455219170569",
+      "count": 2
+    },
+    {
+      "coordinates": "29.224444,-95.1975",
+      "count": 2
+    },
+    {
+      "coordinates": "28.999722,-95.41",
+      "count": 2
+    },
+    {
+      "coordinates": "29.300979,-94.823249",
+      "count": 2
+    },
+    {
+      "coordinates": "29.731388,-95.103055",
+      "count": 2
+    },
+    {
+      "coordinates": "29.739432,-95.267198",
+      "count": 2
+    },
+    {
+      "coordinates": "29.81271,-95.20992",
+      "count": 3
+    },
+    {
+      "coordinates": "30.538127,-95.493617",
+      "count": 2
+    },
+    {
+      "coordinates": "29.75253,-95.46009",
+      "count": 2
+    },
+    {
+      "coordinates": "29.75602,-95.10531",
+      "count": 2
+    },
+    {
+      "coordinates": "29.633977,-95.673232",
+      "count": 2
+    },
+    {
+      "coordinates": "30.07527,-95.43493",
+      "count": 2
+    }
+  ],
   "coverage": {
     "commentDeadlines": 0,
     "productionRates": 5,
     "pollutantLists": 57
   },
   "limitations": [
-    "Validation confirms required fields and usable coordinates, not the current legal status of each permit.",
-    "Missing deadlines and production limits are left absent, never calculated or invented."
+    "This is a source-scoped snapshot, not a complete inventory of Houston permits.",
+    "Permit status is distinct from facility operation. Older concrete records have unknown legal status.",
+    "EPA reported addresses may be mailing addresses; provider coordinate reference and accuracy are preserved in location notes.",
+    "Missing deadlines, operators and limits remain absent. Proximity is not a health assessment.",
+    "Multiple distinct authorizations may share a facility point; only identical category/permit IDs are deduplicated."
   ]
 }

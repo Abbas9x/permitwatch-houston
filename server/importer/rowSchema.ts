@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { PERMIT_ID_PATTERN } from '../../shared/validation.js';
-import { PERMIT_CATEGORIES, type PermitType } from '../../shared/permit.js';
+import { PERMIT_CATEGORIES, PERMIT_STATUSES, type PermitType } from '../../shared/permit.js';
 
 export { TEXAS_BOUNDS } from '../../shared/geo.js';
 
@@ -163,9 +163,18 @@ export const RowSchema = z.object({
   // Older datasets were concrete-only, so a missing category means concrete. Unknown values reject the row.
   category: z.preprocess(
     (v) => (isBlank(v) ? 'concrete_batch_plant' : v === 'pending_air_permit' ? 'air_permit' : v),
-    z.enum(PERMIT_CATEGORIES, { error: 'must be concrete_batch_plant or air_permit' }),
+    z.enum(PERMIT_CATEGORIES, { error: 'must be a supported permit category' }),
   ),
   facility_name: optionalText(200),
+  permit_status: z.preprocess(v => isBlank(v) ? 'unknown' : v, z.enum(PERMIT_STATUSES)),
+  source_status: optionalText(200),
+  operator_name: optionalText(200),
+  permittee_name: optionalText(200),
+  data_source: optionalText(500),
+  retrieved_at: z.preprocess(v => isBlank(v) ? undefined : v, z.iso.datetime().optional()),
+  application_date: optionalDate,
+  notice_url: z.preprocess(v => isBlank(v) ? undefined : v, z.url({protocol: /^https$/}).max(2000).optional()),
+  location_notes: optionalText(2000),
 });
 
 export type PermitRow = z.infer<typeof RowSchema>;
@@ -183,5 +192,5 @@ export const OPTIONAL_FIELDS = new Set<string>([
   'comment_deadline',
   'public_meeting_date',
   'raw_text',
-  'facility_name',
+  'facility_name', 'source_status', 'operator_name', 'permittee_name', 'data_source', 'retrieved_at', 'application_date', 'notice_url', 'location_notes',
 ]);

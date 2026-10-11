@@ -5,8 +5,13 @@ export const PermitTypeSchema = z.enum(PERMIT_TYPES);
 export type PermitType = z.infer<typeof PermitTypeSchema>;
 
 /** What kind of permit a record is. Air permits are TCEQ case-by-case permits for industrial facilities. */
-export const PERMIT_CATEGORIES = ['concrete_batch_plant', 'air_permit'] as const;
+export const PERMIT_CATEGORIES = ['concrete_batch_plant', 'air_permit', 'wastewater_permit', 'solid_waste_permit'] as const;
 export type PermitCategory = (typeof PERMIT_CATEGORIES)[number];
+
+export const PERMIT_STATUSES = ['pending', 'effective', 'issued', 'administratively_continued', 'expired', 'unknown'] as const;
+export type PermitStatus = (typeof PERMIT_STATUSES)[number];
+
+export interface PermitFilters { category?: PermitCategory; status?: PermitStatus; }
 
 export const LOCATION_SOURCES = ['dataset', 'census_geocoder', 'zip_centroid'] as const;
 export type LocationSource = (typeof LOCATION_SOURCES)[number];
@@ -37,6 +42,15 @@ export const PermitSchema = z.object({
   publicMeetingDate: z.string().nullable(),
   sourceUrl: z.string(),
   isSample: z.boolean(),
+  permitStatus: z.enum(PERMIT_STATUSES).optional(),
+  sourceStatus: z.string().nullable().optional(),
+  operatorName: z.string().nullable().optional(),
+  permitteeName: z.string().nullable().optional(),
+  dataSource: z.string().nullable().optional(),
+  retrievedAt: z.string().nullable().optional(),
+  applicationDate: z.string().nullable().optional(),
+  noticeUrl: z.string().nullable().optional(),
+  locationNotes: z.string().nullable().optional(),
 });
 export type Permit = z.infer<typeof PermitSchema>;
 

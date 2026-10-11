@@ -1,4 +1,5 @@
 import { DEFAULT_SEARCH_RADIUS_MILES, MAX_SEARCH_RADIUS_MILES, MIN_SEARCH_RADIUS_MILES } from '../../../shared/geo';
+import {PERMIT_CATEGORIES, PERMIT_STATUSES, type PermitFilters} from '../../../shared/permit';
 import { useSyncExternalStore } from 'react';
 
 /** Minimal history-API router: the app only has "/" (search, with ?q= and ?permit=). */
@@ -39,7 +40,7 @@ export interface Coords {
 }
 
 /** A picked place keeps its exact coordinates in the URL (shareable, no second lookup). */
-export function searchHref(q: string, permitId?: string | null, coords?: Coords | null, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES): string {
+export function searchHref(q: string, permitId?: string | null, coords?: Coords | null, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES, filters: PermitFilters = {}): string {
   const params = new URLSearchParams({ q });
   if (coords) {
     params.set('lat', coords.lat.toFixed(5));
@@ -47,6 +48,8 @@ export function searchHref(q: string, permitId?: string | null, coords?: Coords 
   }
   if (radiusMiles !== DEFAULT_SEARCH_RADIUS_MILES) params.set('radius', String(radiusMiles));
   if (permitId) params.set('permit', permitId);
+  if (filters.category) params.set('category',filters.category);
+  if (filters.status) params.set('status',filters.status);
   return `/?${params.toString()}`;
 }
 
@@ -62,4 +65,12 @@ export function radiusFromParams(params: URLSearchParams): number {
   const value = Number(params.get('radius'));
   return Number.isInteger(value) && value >= MIN_SEARCH_RADIUS_MILES && value <= MAX_SEARCH_RADIUS_MILES
     ? value : DEFAULT_SEARCH_RADIUS_MILES;
+}
+
+export function filtersFromParams(params: URLSearchParams): PermitFilters {
+  const category=params.get('category'); const status=params.get('status');
+  return {
+    ...((PERMIT_CATEGORIES as readonly string[]).includes(category??'') ? {category:category as NonNullable<PermitFilters['category']>} : {}),
+    ...((PERMIT_STATUSES as readonly string[]).includes(status??'') ? {status:status as NonNullable<PermitFilters['status']>} : {}),
+  };
 }

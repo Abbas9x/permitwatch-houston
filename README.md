@@ -2,7 +2,7 @@
 
 > **Understand the permits in your neighborhood.**
 
-Enter a Houston address or ZIP code, then choose a search distance from 1–10 miles (default 3). The slider updates one map boundary, permit markers, results, and listed capacity together; links and page refresh preserve the selected distance. PermitWatch shows every concrete batch plant air permit (TCEQ) nearby and explains each one in plain English, using the numbers printed in the permit. It shows the public comment deadline when the notice lists one and helps you draft a comment.
+Enter a Houston address or ZIP code, then choose a search distance from 1–10 miles (default 3). The slider updates one map boundary, permit markers, results, and listed capacity together; links and page refresh preserve the selected distance. PermitWatch explores four environmental permit categories from TCEQ and EPA: concrete batch plants, industrial air, wastewater discharge and solid waste. Category/status filters, category counts and labeled marker symbols keep the map understandable. The current source-scoped snapshot contains 807 real permits; coverage is not exhaustive. Deadlines and comment opportunities are shown only when supported by the official record.
 
 Summaries and editable comment drafts are built directly from the dataset fields and your selected concerns. No AI provider or API key is required. Always verify the current comment window with the official source.
 
@@ -17,7 +17,7 @@ Requires Node.js 22.12 or newer.
 ```bash
 npm install
 cp .env.example .env       
-npm run import -- data/validated-permits.json # real cached TCEQ permit records
+npm run import -- data/validated-permits.json # real validated TCEQ/EPA permit records
 npm run dev               # API on :8787, web app on :5173
 ```
 
@@ -35,7 +35,7 @@ npm run import -- path/to/permits.json --remove-samples # also deletes the SAMPL
 
 Imports never call an AI service. Rows with missing coordinates are geocoded when possible; unresolved locations are rejected with an import issue and excluded from maps/counts.
 
-Every row is validated with zod. Invalid required fields reject the row. Invalid optional fields are cleared and shown as "Not listed in notice – check TCEQ". All issues are printed and stored in `import_issues`.
+Every row is validated with zod. Invalid required fields reject the row. Invalid optional fields are cleared and shown as "Not listed in source – check official record". All issues are printed and stored in `import_issues`.
 
 ## Scripts
 
@@ -55,9 +55,15 @@ Install Chromium once with `npx playwright install chromium` before running brow
 
 ## Data rules
 
-- Every number shown comes from the permit dataset or a cited API. Missing fields read "Not listed in notice – check TCEQ".
+- Every number shown comes from the permit dataset or a cited API. Missing fields read "Not listed in source – check official record".
 - Comment deadlines are shown only when they appear in the data. Nothing is computed.
 - Permits show maximum allowed activity, not measured pollution. The app makes no health claims.
 - `data/sample-permits.json` is **SAMPLE DATA**: fictional companies, flagged with a "Sample data" badge in the UI.
 
 The header appearance switch uses orange accents on black in dark mode and a white/black palette in light mode. It starts from your device appearance, then remembers your selection locally. The map style and distance wall follow the selected mode.
+
+### Multi-category API
+
+The existing search route accepts a supported optional category and/or permit status, alongside a location and radius: `GET /api/search?q=Houston&lat=29.81068&lng=-95.21326&radius=3&category=wastewater_permit&status=effective`. `GET /api/permits/:id` returns source provenance and nullable details. Category values: `concrete_batch_plant`, `air_permit`, `wastewater_permit`, `solid_waste_permit`; status values: `pending`, `effective`, `issued`, `administratively_continued`, `expired`, `unknown`. Unsupported/repeated values return 400. Filters apply consistently to results, category counts and the nearest matching outside record.
+
+Demo: **5303 S Lake Houston Pkwy, Houston, TX 77049**, default **3 miles** (18 permits across all four categories in this snapshot). See [multi-category verification](docs/multi-permit-verification.md) for coverage, tests and remaining limitations.

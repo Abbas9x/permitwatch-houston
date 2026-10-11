@@ -49,6 +49,8 @@ const AIR_HEADLINE: Record<Language, ByType> = {
 export function facilityPhrase(permit: Pick<Permit, 'category' | 'facilityName'>, lang: Language): string {
   const kinds: Record<PermitCategory, () => string> = {
     concrete_batch_plant: () => (lang === 'en' ? 'a concrete batch plant' : 'una planta de concreto'),
+    wastewater_permit: () => lang === 'en' ? 'a wastewater discharge facility' : 'una instalación de descarga de aguas residuales',
+    solid_waste_permit: () => lang === 'en' ? 'a solid-waste facility' : 'una instalación de residuos sólidos',
     air_permit: () =>
       permit.facilityName
         ? lang === 'en'
@@ -94,6 +96,19 @@ const HEADLINE: Record<Language, ByType> = {
 export function templateSummaryText(permit: Permit, lang: Language): PermitSummaryText {
   const en = lang === 'en';
   const parts: string[] = [];
+  if (permit.category === 'wastewater_permit' || permit.category === 'solid_waste_permit' || (permit.permitStatus !== undefined && permit.permitStatus !== 'pending')) {
+    const names: Record<PermitCategory,string> = {wastewater_permit: en?'Wastewater discharge permit':'Permiso de descarga de aguas residuales',solid_waste_permit: en?'Solid-waste permit':'Permiso de residuos sólidos',air_permit: en?'Industrial air permit record':'Registro de permiso de aire industrial',concrete_batch_plant: en?'Concrete batch plant permit record':'Registro de permiso de planta de concreto'};
+    const category = names[permit.category];
+    const legalStatus = permit.permitStatus === 'unknown' ? (en?'not established by the source':'no establecido por la fuente') : permit.sourceStatus??permit.permitStatus??(en?'not listed':'no indicado');
+    const concreteFacts = permit.category==='concrete_batch_plant' ? (permit.maxProductionCydPerHr !== null ? (en?` The source lists a maximum production rate of ${fmt(permit.maxProductionCydPerHr,lang)} cubic yards per hour.`:` La fuente indica una tasa máxima de producción de ${fmt(permit.maxProductionCydPerHr,lang)} yardas cúbicas por hora.`) : (en?' The source does not list a maximum production rate.':' La fuente no indica una tasa máxima de producción.')) : '';
+    return {
+      headline: category,
+      summary: en
+        ? `${permit.facilityName ?? permit.company} is listed under ${category.toLowerCase()} ${permit.registrationNumber}. Source-reported status: ${legalStatus}. The reported address is ${permit.address}, ${permit.city}. A permit status does not establish current operation or measured pollution.${concreteFacts}`
+        : `${permit.facilityName ?? permit.company} figura bajo ${category.toLowerCase()} ${permit.registrationNumber}. Estado indicado en la fuente: ${legalStatus}. La dirección reportada es ${permit.address}, ${permit.city}. El estado del permiso no establece operación actual ni contaminación medida.${concreteFacts}`,
+      whatsChanging: en ? 'This source lists an authorization record, not a new-change notice. Check the official record for current conditions and comment opportunities.' : 'Esta fuente indica un registro de autorización, no un aviso de cambios. Consulte el registro oficial para condiciones actuales y oportunidades de comentar.',
+    };
+  }
   if (permit.category === 'air_permit') {
     // Industrial case-by-case permit: production rate and hours are concrete-plant fields, so they are not mentioned.
     parts.push(
@@ -124,8 +139,8 @@ export function templateSummaryText(permit: Permit, lang: Language): PermitSumma
   if (permit.maxProductionCydPerHr !== null) {
     parts.push(
       en
-        ? `It is permitted to produce up to ${fmt(permit.maxProductionCydPerHr, lang)} cubic yards of concrete per hour.`
-        : `Tiene permiso para producir hasta ${fmt(permit.maxProductionCydPerHr, lang)} yardas cúbicas de concreto por hora.`,
+        ? `The source lists a maximum production rate of ${fmt(permit.maxProductionCydPerHr, lang)} cubic yards of concrete per hour.`
+        : `La fuente indica una tasa máxima de producción de ${fmt(permit.maxProductionCydPerHr, lang)} yardas cúbicas de concreto por hora.`,
     );
   } else {
     parts.push(en ? 'The notice does not list a maximum production rate.' : 'El aviso no indica una tasa máxima de producción.');
@@ -133,8 +148,8 @@ export function templateSummaryText(permit: Permit, lang: Language): PermitSumma
   if (permit.maxHoursPerYear !== null) {
     parts.push(
       en
-        ? `It may operate up to ${fmt(permit.maxHoursPerYear, lang)} hours per year.`
-        : `Puede operar hasta ${fmt(permit.maxHoursPerYear, lang)} horas al año.`,
+        ? `The source lists an operating limit of ${fmt(permit.maxHoursPerYear, lang)} hours per year.`
+        : `La fuente indica un límite de operación de ${fmt(permit.maxHoursPerYear, lang)} horas al año.`,
     );
   } else {
     parts.push(en ? 'The notice does not list annual operating hours.' : 'El aviso no indica las horas de operación anuales.');
@@ -142,8 +157,8 @@ export function templateSummaryText(permit: Permit, lang: Language): PermitSumma
   if (permit.pollutants.length > 0) {
     parts.push(
       en
-        ? `It is permitted to emit: ${listJoin(permit.pollutants, lang)}.`
-        : `Tiene permiso para emitir: ${listJoin(permit.pollutants, lang)}.`,
+        ? `The source lists these pollutants: ${listJoin(permit.pollutants, lang)}.`
+        : `La fuente indica estos contaminantes: ${listJoin(permit.pollutants, lang)}.`,
     );
   }
   if (permit.controls) {
@@ -200,8 +215,8 @@ export function templateCommentDraft(
   lines.push('');
   lines.push(
     en
-      ? `I am writing about the air permit for ${permit.company}, ${permit.category === 'air_permit' ? 'permit' : 'registration'} ${permit.registrationNumber}, for ${facilityPhrase(permit, lang)} at ${permit.address}, ${permit.city}.`
-      : `Escribo sobre el permiso de aire de ${permit.company}, ${permit.category === 'air_permit' ? 'permiso' : 'registro'} ${permit.registrationNumber}, para ${facilityPhrase(permit, lang)} en ${permit.address}, ${permit.city}.`,
+      ? `I am writing about the ${permit.category === 'wastewater_permit' ? 'wastewater discharge' : permit.category === 'solid_waste_permit' ? 'solid-waste' : 'air'} permit for ${permit.company}, ${permit.category === 'concrete_batch_plant' ? 'registration' : 'permit'} ${permit.registrationNumber}, for ${facilityPhrase(permit, lang)} at ${permit.address}, ${permit.city}.`
+      : `Escribo sobre el permiso ${permit.category === 'wastewater_permit' ? 'de descarga de aguas residuales' : permit.category === 'solid_waste_permit' ? 'de residuos sólidos' : 'de aire'} de ${permit.company}, ${permit.category === 'concrete_batch_plant' ? 'registro' : 'permiso'} ${permit.registrationNumber}, para ${facilityPhrase(permit, lang)} en ${permit.address}, ${permit.city}.`,
   );
   const facts: string[] = [];
   if (permit.maxProductionCydPerHr !== null) {

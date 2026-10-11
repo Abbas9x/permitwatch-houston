@@ -134,6 +134,14 @@ export function adaptSites(file: SitesFile): unknown[] {
         is_sample: false,
         category: s.category === 'concrete_batch_plant' ? 'concrete_batch_plant' : 'air_permit',
         facility_name: facilityName(s.name, s.operator),
+        operator_name: s.operator,
+        permit_status: s.status === 'pending' ? 'pending' : 'unknown',
+        source_status: s.status,
+        data_source: s.source,
+        // Processing time is not proof of when cached source documents were downloaded.
+        retrieved_at: s.retrievedAt,
+        application_date: d.dateReceived,
+        location_notes: s.locationSource ? `Location supplied by ${String(s.locationSource)}.` : undefined,
       },
     ];
   });

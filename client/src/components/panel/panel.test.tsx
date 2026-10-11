@@ -78,9 +78,9 @@ describe('KeyNumbers', () => {
     expect(screen.getByText('8,760')).toBeTruthy();
   });
 
-  it('shows "Not listed in notice – check TCEQ" with the source link for missing values', () => {
+  it('shows "Not listed in source – check official record" with the source link for missing values', () => {
     renderEn(<KeyNumbers permit={{ ...base, maxProductionCydPerHr: null, maxHoursPerYear: null }} />);
-    const notListed = screen.getAllByRole('link', { name: /Not listed in notice – check TCEQ/ });
+    const notListed = screen.getAllByRole('link', { name: /Not listed in source – check official record/ });
     expect(notListed).toHaveLength(2);
     expect(notListed[0]!.getAttribute('href')).toBe(base.sourceUrl);
   });

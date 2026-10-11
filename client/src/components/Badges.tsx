@@ -1,4 +1,4 @@
-import type { PermitCategory, PermitType } from '../../../shared/permit';
+import type { PermitCategory, PermitStatus, PermitType } from '../../../shared/permit';
 import { useI18n } from '../i18n';
 import { TYPE_COLORS } from '../lib/permitColors';
 
@@ -15,7 +15,7 @@ export function PermitTypeBadge({ type }: { type: PermitType }) {
   );
 }
 
-/** What kind of permit this is (concrete batch plant vs. industrial air permit). */
+/** Permit category reported by the source. */
 export function CategoryBadge({ category }: { category: PermitCategory }) {
   const { t } = useI18n();
   return (
@@ -30,6 +30,15 @@ export function SampleBadge() {
   return (
     <span className="inline-flex items-center rounded-full border border-sample/50 bg-sample/10 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-sample uppercase">
       {t('sample.badge')}
+    </span>
+  );
+}
+
+export function PermitStatusBadge({ status = 'unknown' }: { status?: PermitStatus }) {
+  const { t } = useI18n();
+  return (
+    <span className="inline-flex items-center rounded-full border border-line bg-ink/5 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-muted uppercase">
+      {t(`status.${status}`)}
     </span>
   );
 }

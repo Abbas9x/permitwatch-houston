@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { LocationSource, Permit, PermitCategory, PermitType } from '../../shared/permit.js';
+import type { LocationSource, Permit, PermitCategory, PermitStatus, PermitType } from '../../shared/permit.js';
 import type { DB } from './index.js';
 
 export interface PermitRecord {
@@ -27,6 +27,15 @@ export interface PermitRecord {
   is_sample: 0 | 1;
   category: PermitCategory;
   facility_name: string | null;
+  permit_status?: PermitStatus;
+  source_status?: string | null;
+  operator_name?: string | null;
+  permittee_name?: string | null;
+  data_source?: string | null;
+  retrieved_at?: string | null;
+  application_date?: string | null;
+  notice_url?: string | null;
+  location_notes?: string | null;
   content_hash: string;
   imported_at: string;
 }
@@ -64,6 +73,16 @@ export function toPermit(record: PermitRecord): Permit {
     isSample: record.is_sample === 1,
     category: record.category,
     facilityName: record.facility_name,
+    permitStatus: record.permit_status ?? 'unknown',
+    sourceStatus: record.source_status ?? null,
+    operatorName: record.operator_name ?? null,
+    permitteeName: record.permittee_name ?? null,
+    dataSource: record.data_source ?? null,
+    retrievedAt: record.retrieved_at ?? null,
+    applicationDate: record.application_date ?? null,
+    noticeUrl: record.notice_url ?? null,
+    locationNotes: record.location_notes ?? null,
+
   };
 }
 
@@ -73,12 +92,12 @@ export function upsertPermit(db: DB, record: PermitRecord): void {
        id, registration_number, company, address, city, county, zip, lat, lng, location_source,
        permit_type, max_production_cyd_per_hr, max_hours_per_year, pollutants_json, controls,
        notice_type, notice_issuance_date, comment_deadline, public_meeting_date, source_url,
-       raw_text, is_sample, category, facility_name, content_hash, imported_at
+       raw_text, is_sample, category, facility_name, permit_status, source_status, operator_name, permittee_name, data_source, retrieved_at, application_date, notice_url, location_notes, content_hash, imported_at
      ) VALUES (
        @id, @registration_number, @company, @address, @city, @county, @zip, @lat, @lng, @location_source,
        @permit_type, @max_production_cyd_per_hr, @max_hours_per_year, @pollutants_json, @controls,
        @notice_type, @notice_issuance_date, @comment_deadline, @public_meeting_date, @source_url,
-       @raw_text, @is_sample, @category, @facility_name, @content_hash, @imported_at
+       @raw_text, @is_sample, @category, @facility_name, @permit_status, @source_status, @operator_name, @permittee_name, @data_source, @retrieved_at, @application_date, @notice_url, @location_notes, @content_hash, @imported_at
      )
      ON CONFLICT (id) DO UPDATE SET
        registration_number = excluded.registration_number,
@@ -104,9 +123,18 @@ export function upsertPermit(db: DB, record: PermitRecord): void {
        is_sample = excluded.is_sample,
        category = excluded.category,
        facility_name = excluded.facility_name,
+       permit_status = excluded.permit_status,
+       source_status = excluded.source_status,
+       operator_name = excluded.operator_name,
+       permittee_name = excluded.permittee_name,
+       data_source = excluded.data_source,
+       retrieved_at = excluded.retrieved_at,
+       application_date = excluded.application_date,
+       notice_url = excluded.notice_url,
+       location_notes = excluded.location_notes,
        content_hash = excluded.content_hash,
        imported_at = excluded.imported_at`,
-  ).run(record);
+  ).run({permit_status: 'unknown', source_status: null, operator_name: null, permittee_name: null, data_source: null, retrieved_at: null, application_date: null, notice_url: null, location_notes: null, ...record});
 }
 
 export function getPermitRecord(db: DB, id: string): PermitRecord | undefined {
