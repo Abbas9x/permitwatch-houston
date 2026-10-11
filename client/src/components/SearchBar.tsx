@@ -1,4 +1,4 @@
-import type {PermitFilters} from '../../../shared/permit';
+import type { PermitFilters } from '../../../shared/permit';
 import { DEFAULT_SEARCH_RADIUS_MILES } from '../../../shared/geo';
 import { useEffect, useId, useMemo, useState, type FormEvent, type KeyboardEvent } from 'react';
 import type { PlaceSuggestion } from '../../../shared/api';
@@ -9,6 +9,25 @@ import { addRecentSearch, getRecentSearches } from '../lib/recentSearches';
 import { navigate, searchHref, type Coords } from '../lib/router';
 
 const EXAMPLES = ['4014 Market St, Houston, TX 77020', '77026', '77494'];
+
+// Approximate Greater Houston search bounds.
+// Includes Houston, Pasadena, Sugar Land, Katy, Pearland,
+// The Woodlands, Baytown, etc.
+const HOUSTON_BOUNDS = {
+  minLat: 28.8,
+  maxLat: 30.25,
+  minLng: -96.15,
+  maxLng: -94.75,
+};
+
+function isInHoustonArea(place: PlaceSuggestion) {
+  return (
+    place.lat >= HOUSTON_BOUNDS.minLat &&
+    place.lat <= HOUSTON_BOUNDS.maxLat &&
+    place.lng >= HOUSTON_BOUNDS.minLng &&
+    place.lng <= HOUSTON_BOUNDS.maxLng
+  );
+}
 
 interface SearchBarProps {
   initialValue?: string;
@@ -49,7 +68,16 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
     const controller = new AbortController();
     const timer = setTimeout(() => {
       api.suggest(query, controller.signal).then(
-        (res) => setPlaces({ query, items: res.suggestions }),
+        (res) => {
+          const houstonSuggestions = res.suggestions
+            .filter(isInHoustonArea)
+            .slice(0, 5);
+
+          setPlaces({
+            query,
+            items: houstonSuggestions,
+          });
+        },
         () => setPlaces({ query, items: [] }),
       );
     }, 280);
@@ -122,9 +150,8 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
           {t('search.label')}
         </label>
         <div
-          className={`glass flex items-center gap-2 rounded-2xl p-1.5 transition-shadow focus-within:shadow-[0_0_0_2px_var(--color-air-2)] ${
-            hero ? 'sm:p-2' : ''
-          }`}
+          className={`glass flex items-center gap-2 rounded-2xl p-1.5 transition-shadow focus-within:shadow-[0_0_0_2px_var(--color-air-2)] ${hero ? 'sm:p-2' : ''
+            }`}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className={`ml-2.5 shrink-0 text-muted ${hero ? 'size-5' : 'size-4'}`}>
             <path
@@ -159,15 +186,13 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
             autoFocus={autoFocus}
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? ids.error : undefined}
-            className={`min-w-0 flex-1 bg-transparent text-ink placeholder:text-faint focus:outline-none ${
-              hero ? 'py-3 text-base sm:text-lg' : 'py-2 text-sm sm:text-base'
-            }`}
+            className={`min-w-0 flex-1 bg-transparent text-ink placeholder:text-faint focus:outline-none ${hero ? 'py-3 text-base sm:text-lg' : 'py-2 text-sm sm:text-base'
+              }`}
           />
           <button
             type="submit"
-            className={`shrink-0 rounded-xl bg-gradient-to-r from-air-1 via-air-2 to-air-3 font-semibold text-night transition-transform hover:scale-[1.02] active:scale-[0.98] ${
-              hero ? 'px-5 py-3 text-base' : 'px-4 py-2 text-sm'
-            }`}
+            className={`shrink-0 rounded-xl bg-gradient-to-r from-air-1 via-air-2 to-air-3 font-semibold text-night transition-transform hover:scale-[1.02] active:scale-[0.98] ${hero ? 'px-5 py-3 text-base' : 'px-4 py-2 text-sm'
+              }`}
           >
             {t('search.submit')}
           </button>
@@ -192,9 +217,8 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
                 if (e.key === 'Enter') choose(suggestion);
               }}
               onMouseEnter={() => setActive(index)}
-              className={`flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm ${
-                index === active ? 'bg-ink/10 text-ink' : 'text-ink/90'
-              }`}
+              className={`flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm ${index === active ? 'bg-ink/10 text-ink' : 'text-ink/90'
+                }`}
             >
               <span aria-hidden="true" className="text-faint">
                 {suggestion.kind === 'place' ? '⌖' : suggestion.kind === 'recent' ? '↺' : '→'}
