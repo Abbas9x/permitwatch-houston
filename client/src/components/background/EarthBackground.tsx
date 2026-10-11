@@ -60,19 +60,57 @@ export default function EarthBackground({
   const notifyReady =
     useEffectEvent(onReady);
 
-  /*
-   * Globe sizing.
-   *
-   * Increase these if you want an even
-   * bigger globe.
-   */
-  const getZoom = () =>
-    window.innerWidth < 640
-      ? 2.4
-      : 3.4;
-
   useEffect(() => {
-    if (!container.current) return;
+  /*
+   * Globe size.
+   */
+  const getZoom = () => {
+    if (window.innerWidth < 640) {
+      return 2.5;
+    }
+
+    return 3.45;
+  };
+
+  /*
+   * Move the globe DOWN without moving the actual canvas.
+   *
+   * The top padding changes the camera's visual center.
+   */
+  const getCameraPadding = () => {
+    const height =
+      container.current?.clientHeight ??
+      window.innerHeight;
+
+    return {
+      top: Math.round(height * 0.52),
+      bottom: 0,
+      left: 0,
+      right: 0,
+    };
+  };
+
+  /*
+   * Apply globe positioning.
+   */
+  const positionGlobe = (
+    map: MapLibreMap
+  ) => {
+    map.jumpTo({
+      center: [-95, 20],
+
+      zoom: getZoom(),
+
+      pitch: 0,
+      bearing: 0,
+
+      padding: getCameraPadding(),
+    });
+  };
+
+    if (!container.current) {
+      return;
+    }
 
     const previous =
       takeEarth(container.current);
@@ -84,7 +122,8 @@ export default function EarthBackground({
     const map =
       previous?.map ??
       new MapLibreMap({
-        container: container.current,
+        container:
+          container.current,
 
         style,
 
@@ -94,9 +133,6 @@ export default function EarthBackground({
 
         center: [-95, 20],
 
-        /*
-         * Bigger globe.
-         */
         zoom: getZoom(),
 
         pitch: 0,
@@ -107,29 +143,10 @@ export default function EarthBackground({
         },
       });
 
-    /*
-     * Reset reused globe.
-     */
-    if (previous) {
-      map.jumpTo({
-        center: [-95, 20],
-
-        zoom: getZoom(),
-
-        pitch: 0,
-        bearing: 0,
-
-        padding: {
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-        },
-      });
-    }
-
     mapRef.current = map;
-    activeStyle.current = style;
+
+    activeStyle.current =
+      style;
 
     registerEarth(
       map,
@@ -137,13 +154,38 @@ export default function EarthBackground({
     );
 
     /*
-     * Remove all text:
+     * IMPORTANT:
      *
-     * - countries
-     * - states
-     * - cities
-     * - roads
-     * - POIs
+     * Let MapLibre render into the full hero-sized canvas.
+     * Then move the camera inside that canvas.
+     */
+    map.resize();
+
+    positionGlobe(map);
+
+    /*
+     * Handle hero/window resizing.
+     */
+    const resizeObserver =
+      new ResizeObserver(() => {
+        if (
+          earthIsHeld(map) ||
+          !ownsEarth(map)
+        ) {
+          return;
+        }
+
+        map.resize();
+
+        positionGlobe(map);
+      });
+
+    resizeObserver.observe(
+      container.current
+    );
+
+    /*
+     * Remove all labels/text from the map.
      */
     const removeAllLabels = () => {
       if (!map.isStyleLoaded()) {
@@ -184,11 +226,14 @@ export default function EarthBackground({
             ''
           );
         } catch {
-          // Ignore unsupported layers.
+          // Ignore unsupported symbol layers.
         }
       }
     };
 
+    /*
+     * Called whenever the style finishes loading.
+     */
     const ready = () => {
       if (!ownsEarth(map)) {
         return;
@@ -204,9 +249,26 @@ export default function EarthBackground({
         true
       );
 
+      /*
+       * Reapply size/position after switching
+       * projection because the projection change
+       * can affect camera rendering.
+       */
+      map.resize();
+
+      positionGlobe(map);
+
       removeAllLabels();
 
       requestAnimationFrame(() => {
+        if (!ownsEarth(map)) {
+          return;
+        }
+
+        map.resize();
+
+        positionGlobe(map);
+
         removeAllLabels();
       });
 
@@ -228,15 +290,19 @@ export default function EarthBackground({
       removeAllLabels
     );
 
+    /*
+     * Reused map may already be loaded.
+     */
     if (
       previous?.ready &&
       map.isStyleLoaded()
     ) {
       ready();
-      removeAllLabels();
     }
 
     return () => {
+      resizeObserver.disconnect();
+
       map.off(
         'style.load',
         ready
@@ -294,6 +360,7 @@ export default function EarthBackground({
 
       if (
         !earthIsHeld(map) &&
+        ownsEarth(map) &&
         document.visibilityState ===
           'visible'
       ) {
@@ -333,7 +400,9 @@ export default function EarthBackground({
     const map =
       mapRef.current;
 
-    if (!map) return;
+    if (!map) {
+      return;
+    }
 
     const style =
       theme === 'light'
@@ -368,6 +437,7 @@ export default function EarthBackground({
     <div
       className="
         pw-earth
+        pointer-events-none
         absolute
         inset-0
         overflow-hidden
@@ -375,16 +445,11 @@ export default function EarthBackground({
       aria-hidden="true"
     >
       {/*
-        Globe
-
-        translate-y-[28%]
-        pushes it downward so only the upper
-        portion / roughly half the globe is visible.
-
-        scale-[1.08]
-        makes it slightly more dominant without
-        needing ridiculous MapLibre zoom values.
-      */}
+       * Keep the actual MapLibre WebGL viewport
+       * exactly the same size as the hero.
+       *
+       * DO NOT translate or scale this.
+       */}
       <div
         ref={container}
         className="
@@ -392,15 +457,12 @@ export default function EarthBackground({
           inset-0
           h-full
           w-full
-          translate-y-[28%]
-          scale-[1.08]
-          origin-center
         "
       />
 
       {/*
-        Soft blur over the globe.
-      */}
+       * Slight blur over the globe.
+       */}
       <div
         className="
           pointer-events-none

@@ -53,7 +53,7 @@ export function Landing({ onDive }: { onDive: () => void }) {
   ];
 
   return (
-    <section className="relative isolate flex min-h-[calc(100dvh-3.5rem)] flex-col overflow-hidden">
+    <section className="relative isolate flex min-h-[calc(100dvh-3.5rem)] flex-col overflow-visible">
       <StaticGradient />
       {background === 'animated' && (
         <Suspense fallback={null}>

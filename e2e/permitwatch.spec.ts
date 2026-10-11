@@ -170,6 +170,28 @@ test('Earth canvas continues into the searched location in both appearances', as
 });
 
 
+test('landing globe keeps its scale without clipping the canvas top', async ({page}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'hardwareConcurrency', {value:8});
+    Object.defineProperty(navigator, 'deviceMemory', {value:8});
+  });
+  await page.goto('/');
+  const canvas = page.locator('.pw-earth .maplibregl-canvas');
+  await expect(canvas).toBeVisible({timeout:15000});
+  for (const viewport of [{width:1440,height:960}, {width:390,height:844}]) {
+    await page.setViewportSize(viewport);
+    await expect.poll(async () => {
+      const scene = await page.locator('.pw-earth').boundingBox();
+      const bounds = await canvas.boundingBox();
+      if (!scene || !bounds) return false;
+      return bounds.y >= scene.y
+        && Math.abs(bounds.width - scene.width) < 1
+        && Math.abs(bounds.height - scene.height) < 1;
+    }).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
+
 test('failed globe searches release the parked canvas and allow retry', async ({page}) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'hardwareConcurrency', {value:8});

@@ -149,7 +149,7 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
             onBlur={() => setOpen(false)}
             onKeyDown={onKeyDown}
             placeholder={t('search.placeholder')}
-            autoComplete="street-address"
+            autoComplete="off"
             enterKeyHint="search"
             spellCheck={false}
             maxLength={SEARCH_QUERY_MAX}
