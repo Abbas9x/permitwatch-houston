@@ -11,7 +11,7 @@ const SummaryTextSchema = z.object({
 export const StoredSummarySchema = z.object({
   en: SummaryTextSchema,
   es: SummaryTextSchema,
-  generatedBy: z.enum(['ai', 'template', 'mock']),
+  generatedBy: z.literal('template'),
 });
 export type StoredSummary = z.infer<typeof StoredSummarySchema>;
 
@@ -25,7 +25,8 @@ interface SummaryRow {
 function rowToSummary(row: SummaryRow): PermitSummary | null {
   try {
     const stored = StoredSummarySchema.parse(JSON.parse(row.summary_json));
-    return { ...stored, generator: row.generator, createdAt: row.created_at };
+    if (row.generator !== 'template') return null;
+    return { ...stored, generator: 'template', createdAt: row.created_at };
   } catch {
     return null;
   }
@@ -58,15 +59,4 @@ export function saveSummary(db: DB, permitId: string, contentHash: string, summa
      ON CONFLICT (permit_id) DO UPDATE SET content_hash = excluded.content_hash,
        summary_json = excluded.summary_json, generator = excluded.generator, created_at = excluded.created_at`,
   ).run(permitId, contentHash, JSON.stringify(StoredSummarySchema.parse(summary)), generator, nowIso());
-}
-
-/** Permits that have no summary, or whose summary was generated from older content (optionally also template-only ones). */
-export function listPermitIdsNeedingSummary(db: DB, includeTemplates = false): string[] {
-  const rows = db
-    .prepare(
-      `SELECT p.id FROM permits p LEFT JOIN permit_summaries s ON s.permit_id = p.id
-        WHERE s.permit_id IS NULL OR s.content_hash <> p.content_hash OR (? = 1 AND s.generator = 'template') ORDER BY p.id`,
-    )
-    .all(includeTemplates ? 1 : 0) as { id: string }[];
-  return rows.map((r) => r.id);
 }

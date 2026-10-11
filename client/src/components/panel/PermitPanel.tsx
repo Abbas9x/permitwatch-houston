@@ -6,7 +6,6 @@ import { formatMiles } from '../../lib/format';
 import { PermitTypeBadge, SampleBadge } from '../Badges';
 import { PermitFacts } from '../PermitFacts';
 import { ActNow } from './ActNow';
-import { AskPermit } from './AskPermit';
 import { KeyNumbers } from './KeyNumbers';
 import { NoticeText } from './NoticeText';
 import { SummaryBlock } from './SummaryBlock';
@@ -118,7 +117,6 @@ export function PermitPanel({ plant, onClose, variant }: PermitPanelProps) {
           <PermitFacts permit={permit} />
         </section>
         <NoticeText permitId={permit.id} />
-        <AskPermit permit={permit} />
         <p className="border-t border-line pt-4 text-xs text-muted">{t('disclaimer.permits')}</p>
       </div>
     </motion.div>

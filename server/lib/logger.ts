@@ -11,10 +11,6 @@ export function createLogger(level: string): Logger {
       paths: [
         'apiKey',
         '*.apiKey',
-        'GEMINI_API_KEY',
-        '*.GEMINI_API_KEY',
-        'headers["x-goog-api-key"]',
-        '*.headers["x-goog-api-key"]',
         'req.headers.authorization',
         'req.headers.cookie',
         'email',

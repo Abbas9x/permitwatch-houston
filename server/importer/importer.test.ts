@@ -211,3 +211,23 @@ describe('importRows', () => {
     expect(unknown.maxProductionCydPerHr).toBeNull();
   });
 });
+
+describe('import resilience', () => {
+  it('handles an empty dataset', async () => {
+    const db=testDb();
+    try { const report=await importRows([],{db,logger:silentLogger(),source:'empty'});expect(report.imported).toBe(0);expect(report.rejected).toEqual([]); }
+    finally {db.close();}
+  });
+  it('rejects non-finite and outside-area results from an injected geocoder', async () => {
+    for(const point of [{lat:NaN,lng:-95.3},{lat:29.7,lng:Infinity},{lat:41.8,lng:-87.6}]) {
+      const db=testDb();
+      try {
+        const report=await importRows([{...validRow,lat:null,lng:null}],{db,logger:silentLogger(),source:'bad-geocode',geocode:async()=>({...point,source:'census_geocoder'})});
+        expect(report.imported).toBe(0);expect(report.rejected).toHaveLength(1);
+      } finally {db.close();}
+    }
+  });
+  it('rejects IDs that the detail API cannot retrieve', () => {
+    expect(validateRow({...validRow,id:'bad id/'}).ok).toBe(false);
+  });
+});

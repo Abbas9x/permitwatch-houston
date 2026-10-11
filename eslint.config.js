@@ -45,7 +45,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['server/**/*.test.ts', 'server/testUtils.ts', 'server/**/testing.ts', 'shared/**/*.ts', 'e2e/**/*.ts', 'scripts/**/*.mjs', '*.config.{js,ts}'],
+    files: ['server/**/*.test.ts', 'server/testUtils.ts', 'server/**/testing.ts', 'shared/**/*.ts', 'e2e/**/*.ts', 'scripts/**/*.{mjs,ts}', '*.config.{js,ts}'],
     languageOptions: { globals: globals.node },
   },
   {

@@ -8,7 +8,7 @@ import { silentLogger, testDb, testEnv } from './testUtils.js';
 function makeApp(options: Parameters<typeof createApp>[0]['rateLimits'] = undefined) {
   const boom = express.Router();
   boom.get('/boom', () => {
-    throw new Error('secret internal detail: GEMINI_API_KEY=abc');
+    throw new Error('secret internal detail: PRIVATE_CONFIG=abc');
   });
   boom.post('/echo', (req, res) => res.json({ received: req.body as unknown }));
   boom.get('/teapot', () => {
@@ -66,7 +66,7 @@ describe('API security middleware', () => {
     expect(res.body.error.code).toBe('internal_error');
     const body = JSON.stringify(res.body);
     expect(body).not.toContain('secret internal detail');
-    expect(body).not.toContain('GEMINI_API_KEY');
+    expect(body).not.toContain('PRIVATE_CONFIG');
     expect(body).not.toMatch(/at .*\.ts:\d+/);
   });
 
@@ -82,7 +82,7 @@ describe('API security middleware', () => {
   });
 
   it('rate limits API requests per client', async () => {
-    const app = makeApp({ apiPerMinute: 3, aiPerMinute: 1, signupsPer10Minutes: 1 });
+    const app = makeApp({ apiPerMinute: 3, draftsPerMinute: 1, signupsPer10Minutes: 1 });
     for (let i = 0; i < 3; i++) expect((await request(app).get('/api/health')).status).toBe(200);
     const limited = await request(app).get('/api/health');
     expect(limited.status).toBe(429);

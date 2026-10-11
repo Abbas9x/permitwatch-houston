@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PERMIT_ID_PATTERN } from '../../shared/validation.js';
 import type { PermitType } from '../../shared/permit.js';
 
 export { TEXAS_BOUNDS } from '../../shared/geo.js';
@@ -131,7 +132,7 @@ function normalizeZip(value: unknown): unknown {
 }
 
 export const RowSchema = z.object({
-  id: requiredText(64),
+  id: requiredText(64).pipe(z.string().regex(PERMIT_ID_PATTERN, 'must use letters, numbers, dots, underscores, or hyphens')),
   registration_number: requiredText(32),
   company: requiredText(200),
   address: requiredText(300),

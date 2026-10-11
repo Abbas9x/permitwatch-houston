@@ -2,7 +2,7 @@
   "name": "permitwatch-houston",
   "version": "0.1.0",
   "private": true,
-  "description": "PermitWatch Houston: find concrete batch plant air permits near you, understand them in plain English, and comment before the deadline. Powered by GreenRoute AI routing.",
+  "description": "PermitWatch Houston: find concrete batch plant air permits near you, understand them in plain English, and comment before the deadline.",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -25,12 +25,11 @@
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run test",
     "scan:secrets": "node scripts/scan-secrets.mjs",
-    "check:gemini": "tsx scripts/check-gemini.ts"
+    "test:stress": "node scripts/stress-local.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/space-grotesk": "^5.3.0",
-    "@google/genai": "^2.28.0",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",
     "better-sqlite3": "^13.0.3",

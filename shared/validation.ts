@@ -35,7 +35,6 @@ export const COMMENT_CONCERNS = [
 export type CommentConcern = (typeof COMMENT_CONCERNS)[number];
 
 export const PERSONAL_NOTE_MAX = 600;
-export const QUESTION_MAX = 300;
 
 export const LANGUAGES = ['en', 'es'] as const;
 export type Language = (typeof LANGUAGES)[number];

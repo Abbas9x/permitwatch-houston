@@ -6,9 +6,8 @@ import { useI18n } from './i18n';
 import { coordsFromParams, useRoute } from './lib/router';
 import { Landing } from './pages/Landing';
 
-// Only the landing page ships in the first bundle; results (map, panel) and the dashboard load on demand.
+// Only the landing page ships in the first bundle; results (map, panel) load on demand.
 const ResultsPage = lazy(() => import('./pages/ResultsPage').then((m) => ({ default: m.ResultsPage })));
-const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 
 function PageSkeleton() {
   return (
@@ -27,8 +26,7 @@ export function App() {
   const permitId = route.params.get('permit');
 
   let page;
-  if (route.path === '/dashboard') page = <Dashboard />;
-  else if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} coords={coordsFromParams(route.params)} />;
+  if (route.path === '/' && q) page = <ResultsPage q={q} selectedId={permitId} coords={coordsFromParams(route.params)} />;
   else page = <Landing />;
 
   return (

@@ -28,13 +28,6 @@ export function Header() {
           >
             {t('nav.search')}
           </Link>
-          <Link
-            href="/dashboard"
-            className={navClass(path === '/dashboard')}
-            aria-current={path === '/dashboard' ? 'page' : undefined}
-          >
-            {t('nav.dashboard')}
-          </Link>
           <button
             type="button"
             onClick={() => setLang(lang === 'en' ? 'es' : 'en')}

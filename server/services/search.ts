@@ -24,7 +24,7 @@ export function findNearby(db: DB, center: LatLng, radiusMiles = MAX_SEARCH_RADI
       const bearing = bearingDegrees(center, permit);
       return {
         permit,
-        distanceMiles: round(distance, 2),
+        distanceMiles: distance,
         bearingDeg: round(bearing, 1),
         compass: compassPoint(bearing),
         summary: summaries.get(permit.id) ?? null,

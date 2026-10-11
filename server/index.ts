@@ -13,10 +13,10 @@ if (countPermits(db) === 0) {
   logger.warn('No permits in the database yet. Run `npm run import` to load data/sample-permits.json.');
 }
 
-const services = createServices(env, db, logger);
+const services = createServices(db, logger);
 const app = createApp({ env, db, logger, routes: createRoutes(db, services) });
 const server = app.listen(env.PORT, () => {
-  logger.info({ port: env.PORT, env: env.NODE_ENV, ai: env.GEMINI_MOCK === 'off' ? 'live' : `mock-${env.GEMINI_MOCK}` }, 'PermitWatch API listening');
+  logger.info({ port: env.PORT, env: env.NODE_ENV }, 'PermitWatch API listening');
 });
 server.requestTimeout = 60_000;
 server.headersTimeout = 20_000;

@@ -56,7 +56,6 @@ export function createApp(deps: AppDeps): Express {
     res.json({
       ok: true,
       permits: countPermits(db),
-      ai: env.GEMINI_MOCK === 'off' ? 'live' : `mock-${env.GEMINI_MOCK}`,
     });
   });
 

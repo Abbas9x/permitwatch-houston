@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-/** Minimal history-API router: the app only has "/" (search, with ?q= and ?permit=) and "/dashboard". */
+/** Minimal history-API router: the app only has "/" (search, with ?q= and ?permit=). */
 const listeners = new Set<() => void>();
 
 function subscribe(listener: () => void) {

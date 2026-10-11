@@ -20,9 +20,9 @@ export interface PermitSummaryText {
 export interface PermitSummary {
   en: PermitSummaryText;
   es: PermitSummaryText;
-  /** Gemini model ID, or "template" when written from the data without AI. */
-  generator: string;
-  generatedBy: 'ai' | 'template' | 'mock';
+  /** Summaries are assembled directly from the dataset fields. */
+  generator: 'template';
+  generatedBy: 'template';
   createdAt: string;
 }
 
@@ -83,61 +83,7 @@ export interface PermitDetailResponse {
   rawText: string;
 }
 
-export interface AiMeta {
-  model: string;
-  routedBy: 'cache' | 'rules' | 'router';
-  cacheHit: boolean;
-  fallback: boolean;
-  costUsd: number;
-  baselineCostUsd: number;
-}
-
 export interface CommentDraftResponse {
   draft: { subject: string; body: string };
-  /** "template" means AI was unavailable and the draft was assembled from permit data only. */
-  generatedBy: 'ai' | 'mock' | 'template';
-  meta: AiMeta | null;
-}
-
-export interface AskResponse {
-  answer: string;
-  answerable: boolean;
-  citedFields: string[];
-  generatedBy: 'ai' | 'mock';
-  meta: AiMeta;
-}
-
-export interface GreenRouteStats {
-  tasks: number;
-  permitsSummarized: number;
-  modelCalls: number;
-  cacheHits: number;
-  rulesRouted: number;
-  routerCalls: number;
-  fallbacks: number;
-  failures: number;
-  modelMix: { model: string; calls: number; inputTokens: number; outputTokens: number; costUsd: number }[];
-  taskMix: { task: string; count: number }[];
-  cost: { actualUsd: number; baselineUsd: number; savedUsd: number; savedPercent: number | null };
-  energy: { actualWh: number; baselineWh: number; savedWh: number; savedPercent: number | null; estimated: true };
-  baselineModel: string;
-  pricingSource: { url: string; retrieved: string; pageUpdated: string };
-  energySource: { note: string; url: string };
-  recent: {
-    createdAt: string;
-    task: string;
-    stage: 'cache' | 'rules' | 'router' | 'execute' | 'fallback';
-    routeReason: string;
-    model: string | null;
-    inputTokens: number;
-    outputTokens: number;
-    costUsd: number;
-    latencyMs: number;
-    success: boolean;
-  }[];
-}
-
-export interface GreenRouteStatsResponse extends GreenRouteStats {
-  mode: 'live' | 'mock';
-  models: { router: string; small: string; large: string };
+  generatedBy: 'template';
 }

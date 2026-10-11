@@ -3,7 +3,7 @@ import type { Permit } from '../../shared/permit.js';
 import type { CommentConcern, Language } from '../../shared/validation.js';
 
 /**
- * Deterministic, data-only text used when AI is unavailable (and by the offline mock).
+ * Deterministic text built directly from source fields, without an external service.
  * Every sentence is built from dataset fields; missing fields are stated as "not listed".
  */
 
@@ -130,8 +130,8 @@ export function templateCommentDraft(
   lines.push('');
   lines.push(
     en
-      ? `I am writing as a resident about the air permit for ${permit.company}, registration ${permit.registrationNumber}, for a concrete batch plant at ${permit.address}, ${permit.city}.`
-      : `Escribo como residente sobre el permiso de aire de ${permit.company}, registro ${permit.registrationNumber}, para una planta de concreto en ${permit.address}, ${permit.city}.`,
+      ? `I am writing about the air permit for ${permit.company}, registration ${permit.registrationNumber}, for a concrete batch plant at ${permit.address}, ${permit.city}.`
+      : `Escribo sobre el permiso de aire de ${permit.company}, registro ${permit.registrationNumber}, para una planta de concreto en ${permit.address}, ${permit.city}.`,
   );
   const facts: string[] = [];
   if (permit.maxProductionCydPerHr !== null) {

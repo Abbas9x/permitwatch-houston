@@ -7,12 +7,7 @@ export function SummaryBlock({ summary }: { summary: PermitSummary | null }) {
     return <p className="rounded-xl border border-line bg-white/[0.03] p-4 text-sm text-muted">{t('panel.summaryMissing')}</p>;
   }
   const text = summary[lang];
-  const provenance =
-    summary.generatedBy === 'ai'
-      ? t('panel.summaryAi', { model: summary.generator })
-      : summary.generatedBy === 'mock'
-        ? t('panel.summaryMock')
-        : t('panel.summaryTemplate');
+  const provenance = t('panel.summaryTemplate');
 
   return (
     <section aria-label={text.headline} className="space-y-3">

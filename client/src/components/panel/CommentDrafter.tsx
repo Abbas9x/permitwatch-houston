@@ -5,7 +5,6 @@ import type { Permit } from '../../../../shared/permit';
 import { COMMENT_CONCERNS, PERSONAL_NOTE_MAX, type CommentConcern } from '../../../../shared/validation';
 import { useI18n } from '../../i18n';
 import { api, ApiError } from '../../lib/api';
-import { formatUsd } from '../../lib/format';
 import { ErrorNotice } from '../ErrorNotice';
 
 type Status = { kind: 'idle' } | { kind: 'loading' } | { kind: 'error'; error: ApiError } | { kind: 'done'; response: CommentDraftResponse };
@@ -64,12 +63,6 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
     }
   };
 
-  const provenance = (response: CommentDraftResponse) => {
-    if (response.generatedBy === 'template') return t('draft.byTemplate');
-    if (response.generatedBy === 'mock') return t('draft.byMock');
-    const route = response.meta ? t(`draft.route.${response.meta.routedBy}`) : '';
-    return t('draft.byAi', { model: response.meta?.model ?? 'Gemini', route });
-  };
 
   return (
     <div className="space-y-4 border-t border-line pt-4">
@@ -169,15 +162,7 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
                   className="w-full resize-y rounded-xl border border-line bg-night/60 px-3 py-2 text-sm leading-relaxed text-ink focus:border-air-2/70 focus:outline-none"
                 />
               </div>
-              <p className="text-xs leading-relaxed text-muted">{provenance(status.response)}</p>
-              {status.response.meta && (
-                <p className="text-xs text-faint">
-                  {t('draft.cost', {
-                    cost: formatUsd(status.response.meta.costUsd, lang),
-                    baseline: formatUsd(status.response.meta.baselineCostUsd, lang),
-                  })}
-                </p>
-              )}
+              <p className="text-xs leading-relaxed text-muted">{t('draft.byTemplate')}</p>
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"

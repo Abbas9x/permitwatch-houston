@@ -111,4 +111,9 @@ export const MIGRATIONS: readonly string[] = [
     UNIQUE (email, zip)
   );
   `,
+  /* 2: retire provider state without changing the shipped version-1 schema. */ `
+  DROP TABLE IF EXISTS ai_cache;
+  DROP TABLE IF EXISTS ai_calls;
+  DELETE FROM permit_summaries WHERE generator <> 'template';
+  `,
 ];

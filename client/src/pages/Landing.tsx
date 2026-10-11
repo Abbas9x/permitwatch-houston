@@ -1,6 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Link } from '../components/Link';
 import { SearchBar } from '../components/SearchBar';
 import { useI18n } from '../i18n';
 import { chooseBackground, type BackgroundMode } from '../lib/capabilities';
@@ -129,12 +128,6 @@ export function Landing() {
             </li>
           ))}
         </ol>
-        <p className="mt-4 text-center text-sm text-muted">
-          {t('how.greenroute')}{' '}
-          <Link href="/dashboard" className="font-medium text-air-1 underline underline-offset-4 hover:text-ink">
-            {t('how.greenrouteLink')} →
-          </Link>
-        </p>
       </motion.div>
     </section>
   );

@@ -1,8 +1,6 @@
 import type {
   ApiErrorBody,
-  AskResponse,
   CommentDraftResponse,
-  GreenRouteStatsResponse,
   PermitDetailResponse,
   SearchResponse,
   SuggestResponse,
@@ -40,6 +38,7 @@ function isApiErrorBody(value: unknown): value is ApiErrorBody {
 
 /** JSON request with a timeout. Throws ApiError with a user-safe message on any failure. */
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  if (options.signal?.aborted) throw new ApiError('aborted', '', 0);
   const controller = new AbortController();
   let timedOut = false;
   const timer = setTimeout(() => {
@@ -64,6 +63,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
       }
       throw new ApiError('http_error', '', response.status);
     }
+    if (data === null) throw new ApiError('invalid_response', '', response.status);
     return data as T;
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -99,7 +99,4 @@ export const api = {
       signal,
       timeoutMs: 60_000,
     }),
-  ask: (id: string, body: { question: string; language: Language }, signal?: AbortSignal) =>
-    apiRequest<AskResponse>(`/api/permits/${encodeURIComponent(id)}/ask`, { method: 'POST', body, signal, timeoutMs: 60_000 }),
-  stats: (signal?: AbortSignal) => apiRequest<GreenRouteStatsResponse>('/api/greenroute/stats', { signal }),
 };

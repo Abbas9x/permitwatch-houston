@@ -87,3 +87,24 @@ describe('TCEQ scrape adapter', () => {
     expect(parseProductionRate(null)).toBeUndefined();
   });
 });
+
+describe('malformed TCEQ input', () => {
+  it('recognizes an empty plants array', () => { expect(isTceqScrape({plants:[]})).toBe(true); });
+  it('preserves malformed rows for rejection instead of crashing the entire import', () => {
+    expect(() => adaptTceqScrape({plants:[null, 'broken', file.plants[0]]} as never)).not.toThrow();
+  });
+  it('ignores malformed source metadata without aborting valid rows', () => {
+    expect(() => adaptTceqScrape({...file,source:42})).not.toThrow();
+  });
+  it('does not turn invalid production-rate strings into positive capacity', () => {
+    for (const rate of ['-150 cubic yards per hour', '1,2 cubic yards per hour', '1e3 cubic yards per hour']) {
+      expect(parseProductionRate(rate)).toBeUndefined();
+    }
+  });
+  it('retains sourced pollutant names from emission objects', () => {
+    const [row]=adaptTceqScrape({...file,plants:[{...file.plants[0],emissions:[{pollutant:'PM10',tonsPerYear:1.2}]}]});
+    const value=validateRow(row);
+    expect(value.ok).toBe(true);
+    if(value.ok) expect(value.row.pollutants).toEqual(['PM10']);
+  });
+});

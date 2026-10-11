@@ -83,11 +83,11 @@ export function requireJsonBody(): RequestHandler {
 
 export interface RateLimits {
   apiPerMinute: number;
-  aiPerMinute: number;
+  draftsPerMinute: number;
   signupsPer10Minutes: number;
 }
 
-export const DEFAULT_RATE_LIMITS: RateLimits = { apiPerMinute: 120, aiPerMinute: 10, signupsPer10Minutes: 5 };
+export const DEFAULT_RATE_LIMITS: RateLimits = { apiPerMinute: 120, draftsPerMinute: 10, signupsPer10Minutes: 5 };
 
 function limiter(limit: number, windowMs: number, message: string): RequestHandler {
   return rateLimit({
@@ -102,7 +102,7 @@ function limiter(limit: number, windowMs: number, message: string): RequestHandl
 export function createLimiters(limits: RateLimits) {
   return {
     api: limiter(limits.apiPerMinute, 60_000, 'Too many requests. Please wait a minute and try again.'),
-    ai: limiter(limits.aiPerMinute, 60_000, 'You have reached the AI request limit (10 per minute). Please wait a minute.'),
+    draft: limiter(limits.draftsPerMinute, 60_000, 'Too many draft requests. Please wait a minute and try again.'),
     signup: limiter(limits.signupsPer10Minutes, 10 * 60_000, 'Too many sign-up attempts. Please try again later.'),
   };
 }

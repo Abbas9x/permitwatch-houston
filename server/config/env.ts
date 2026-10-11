@@ -1,12 +1,5 @@
 import { z } from 'zod';
 
-const modelId = z
-  .string()
-  .trim()
-  .regex(/^[a-z0-9][a-z0-9.-]{2,63}$/, 'must be a Gemini model ID such as "gemini-3.5-flash-lite"');
-
-const thinkingLevel = z.enum(['minimal', 'low', 'medium', 'high']);
-
 const originList = z
   .string()
   .min(1)
@@ -37,36 +30,8 @@ export const EnvSchema = z
     PORT: z.coerce.number().int().min(1).max(65535).default(8787),
     ALLOWED_ORIGINS: originList,
     DATABASE_PATH: z.string().trim().min(1),
-    GEMINI_API_KEY: z
-      .string()
-      .trim()
-      .optional()
-      .transform((value) => (value ? value : undefined)),
-    GEMINI_MODEL_ROUTER: modelId,
-    GEMINI_MODEL_SMALL: modelId,
-    GEMINI_MODEL_LARGE: modelId,
-    GEMINI_THINKING_ROUTER: thinkingLevel.default('minimal'),
-    GEMINI_THINKING_SMALL: thinkingLevel.default('minimal'),
-    GEMINI_THINKING_LARGE: thinkingLevel.default('low'),
-    GEMINI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(120_000).default(25_000),
-    GEMINI_MOCK: z.enum(['off', 'ok', 'down']).default('off'),
     TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
-  })
-  .superRefine((env, ctx) => {
-    if (env.GEMINI_MOCK === 'off' && !env.GEMINI_API_KEY) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['GEMINI_API_KEY'],
-        message: 'is required (or set GEMINI_MOCK=ok for offline development and tests)',
-      });
-    }
-    if (env.NODE_ENV === 'production' && env.GEMINI_MOCK !== 'off') {
-      ctx.addIssue({ code: 'custom', path: ['GEMINI_MOCK'], message: 'must be "off" in production' });
-    }
-    if (env.GEMINI_API_KEY && !/^[A-Za-z0-9._-]{20,200}$/.test(env.GEMINI_API_KEY)) {
-      ctx.addIssue({ code: 'custom', path: ['GEMINI_API_KEY'], message: 'does not look like a valid API key' });
-    }
   });
 
 export type Env = z.infer<typeof EnvSchema>;

@@ -214,6 +214,9 @@ export async function importRows(rows: unknown[], options: ImportOptions): Promi
       }
       if (location) rowWarnings.push(`lat/lng: missing; located via ${location.source}`);
     }
+    if (location && (!Number.isFinite(location.lat) || !Number.isFinite(location.lng) || !isInTexasBounds(location))) {
+      location = null;
+    }
     if (!location) {
       rejected.push({
         rowNumber,

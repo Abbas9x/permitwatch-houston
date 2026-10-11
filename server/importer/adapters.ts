@@ -10,14 +10,14 @@ import { TCEQ_LINKS } from '../../shared/permit.js';
  */
 export interface TceqScrapeFile {
   generatedAt?: string;
-  source?: string;
-  plants: Record<string, unknown>[];
+  source?: unknown;
+  plants: unknown[];
 }
 
 export function isTceqScrape(value: unknown): value is TceqScrapeFile {
   if (!value || typeof value !== 'object') return false;
   const plants = (value as { plants?: unknown }).plants;
-  return Array.isArray(plants) && plants.some((p) => p && typeof p === 'object' && 'permitNumber' in p);
+  return Array.isArray(plants);
 }
 
 const str = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() ? v.trim() : undefined);
@@ -26,8 +26,9 @@ const str = (v: unknown): string | undefined => (typeof v === 'string' && v.trim
 export function parseProductionRate(text: unknown): number | undefined {
   const s = str(text);
   if (!s) return undefined;
-  const m = /([\d,]+(?:\.\d+)?)\s*cubic\s+yards?\s+(?:per|an|\/)\s*hour/i.exec(s);
-  return m ? Number(m[1]!.replace(/,/g, '')) : undefined;
+  const m = /(?:^|\s)([+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)\s*cubic\s+yards?\s+(?:per|an|\/)\s*hour/i.exec(s);
+  const rate = m ? Number(m[1]!.replace(/,/g, '')) : NaN;
+  return Number.isFinite(rate) && rate > 0 ? rate : undefined;
 }
 
 /** The source pages named in the file's own `source` description. */
@@ -56,9 +57,13 @@ function recordText(p: Record<string, unknown>, sourceDescription: string | unde
   return lines.filter(Boolean).join('\n');
 }
 
-export function adaptTceqScrape(file: TceqScrapeFile): Record<string, unknown>[] {
-  const pages = sourcePages(file.source);
-  return file.plants.map((p) => ({
+export function adaptTceqScrape(file: TceqScrapeFile): unknown[] {
+  const source = str(file.source);
+  const pages = sourcePages(source);
+  return file.plants.map((raw) => {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
+    const p = raw as Record<string, unknown>;
+    return ({
     id: p.id,
     registration_number: p.permitNumber,
     company: p.operator,
@@ -70,11 +75,12 @@ export function adaptTceqScrape(file: TceqScrapeFile): Record<string, unknown>[]
     lng: p.lng,
     permit_type: p.permitType ?? '',
     max_production_cyd_per_hr: parseProductionRate(p.productionRate),
-    pollutants: Array.isArray(p.emissions) ? p.emissions : [],
+    pollutants: Array.isArray(p.emissions) ? p.emissions.map(e => e && typeof e === 'object' && !Array.isArray(e) ? (e as Record<string,unknown>).pollutant : e) : [],
     comment_deadline: p.commentDeadline ?? undefined,
     // Rows without their own notice link point to the TCEQ page the record came from.
     source_url: str(p.noticeUrl) ?? (p.status === 'pending' ? pages.pending : pages.search),
-    raw_text: recordText(p, file.source),
+    raw_text: recordText(p, source),
     is_sample: false,
-  }));
+  });
+  });
 }
