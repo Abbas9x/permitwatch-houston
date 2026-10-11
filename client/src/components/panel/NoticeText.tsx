@@ -12,7 +12,7 @@ export function NoticeText({ permitId }: { permitId: string }) {
 
   return (
     <details className="group rounded-xl border border-line" onToggle={(e) => setOpen(e.currentTarget.open)}>
-      <summary className="cursor-pointer list-none rounded-xl px-4 py-3 text-sm font-medium text-ink hover:bg-white/5">
+      <summary className="cursor-pointer list-none rounded-xl px-4 py-3 text-sm font-medium text-ink hover:bg-ink/5">
         <span aria-hidden="true" className="mr-2 inline-block transition-transform group-open:rotate-90">
           ›
         </span>

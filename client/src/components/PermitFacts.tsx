@@ -44,7 +44,7 @@ export function PermitFacts({ permit }: { permit: Permit }) {
         {permit.pollutants.length > 0 ? (
           <ul className="flex flex-wrap gap-1.5">
             {permit.pollutants.map((p) => (
-              <li key={p} className="rounded-md border border-line bg-white/5 px-2 py-0.5 text-xs">
+              <li key={p} className="rounded-md border border-line bg-ink/5 px-2 py-0.5 text-xs">
                 {p}
               </li>
             ))}

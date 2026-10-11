@@ -3,8 +3,9 @@ import { Map as MapLibreMap, Marker, NavigationControl, setWorkerUrl, type GeoJS
 // MapLibre 6 loads its tile worker from a sibling file; bundlers move it, so point MapLibre at the emitted asset.
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useTheme } from '../../lib/theme';
 import type { LatLng } from '../../../../shared/geo';
-import { DARK_STYLE_URL, hasWebGL, HOUSTON_OVERVIEW, ringBounds, ringLabelPoints, ringsGeoJson, ringWallsGeoJson } from './mapGeo';
+import { DARK_STYLE_URL, LIGHT_STYLE_URL, hasWebGL, HOUSTON_OVERVIEW, ringBounds, ringLabelPoints, ringsGeoJson, ringWallsGeoJson } from './mapGeo';
 
 export interface MapPlant {
   id: string;
@@ -59,13 +60,19 @@ function updatePlantElement(el: HTMLButtonElement, plant: MapPlant) {
 
 export default function MapView(props: MapViewProps) {
   const { center, radiusMiles, plants, selectedId, reducedMotion } = props;
+  const { theme } = useTheme();
+  const lightWall = theme === 'light';
+  const styleUrl = useEffectEvent(() => theme === 'light' ? LIGHT_STYLE_URL : DARK_STYLE_URL);
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const hasPositioned = useRef(false);
+  const positionedSearch = useRef<string | null>(null);
+  const positionedSelection = useRef<string | null | undefined>(undefined);
+  const currentStyle = useRef<string | null>(null);
   const plantMarkers = useRef(new Map<string, { marker: Marker; el: HTMLButtonElement }>());
   const overlayMarkers = useRef<Marker[]>([]);
   const [webgl] = useState(hasWebGL);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(0);
   const [slow, setSlow] = useState(false);
 
   const select = useEffectEvent((id: string) => props.onSelect(id));
@@ -74,9 +81,10 @@ export default function MapView(props: MapViewProps) {
   useEffect(() => {
     const container = containerRef.current;
     if (!webgl || !container) return;
+    currentStyle.current = styleUrl();
     const map = new MapLibreMap({
       container,
-      style: DARK_STYLE_URL,
+      style: currentStyle.current,
       center: HOUSTON_OVERVIEW.center,
       zoom: HOUSTON_OVERVIEW.zoom,
       pitch: HOUSTON_OVERVIEW.pitch,
@@ -93,20 +101,20 @@ export default function MapView(props: MapViewProps) {
 
     // 'style.load' fires as soon as the style is parsed; 'load' would also wait for every initial tile,
     // which at a tilted city-wide view takes many seconds. Tiles keep streaming in behind the rings and markers.
-    map.once('style.load', () => {
+    map.on('style.load', () => {
       window.clearTimeout(slowTimer);
       // Atmosphere: a lit horizon and fog instead of a black void when the map is tilted or rotated.
       map.setSky({
-        'sky-color': '#081428',
-        'horizon-color': '#1a3d63',
-        'fog-color': '#0a1424',
+        'sky-color': '#181818',
+        'horizon-color': '#555555',
+        'fog-color': '#222222',
         'sky-horizon-blend': 0.75,
         'horizon-fog-blend': 0.55,
         'fog-ground-blend': 0.35,
         'atmosphere-blend': 0,
       });
       // Directional light so 3D buildings and ring walls get shaded faces.
-      map.setLight({ anchor: 'viewport', color: '#d6e6ff', intensity: 0.4, position: [1.4, 210, 35] });
+      map.setLight({ anchor: 'viewport', color: '#ffffff', intensity: 0.4, position: [1.4, 210, 35] });
       const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id;
       if (map.getSource('openmaptiles')) {
         map.addLayer(
@@ -118,7 +126,7 @@ export default function MapView(props: MapViewProps) {
             minzoom: 13,
             filter: ['!=', ['get', 'hide_3d'], true],
             paint: {
-              'fill-extrusion-color': '#22304a',
+              'fill-extrusion-color': '#777777',
               // Full height as soon as building data exists (tiles carry buildings from zoom 13).
               'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 13, 0, 13.4, ['coalesce', ['get', 'render_height'], 0]],
               'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
@@ -135,7 +143,7 @@ export default function MapView(props: MapViewProps) {
         type: 'fill-extrusion',
         source: RING_WALL_SOURCE,
         paint: {
-          'fill-extrusion-color': '#38bdf8',
+          'fill-extrusion-color': '#f97316',
           'fill-extrusion-height': 0,
           'fill-extrusion-base': 0,
           // Strong in the overview, fading as you zoom into streets so the walls never cover buildings.
@@ -148,19 +156,25 @@ export default function MapView(props: MapViewProps) {
         id: 'pw-rings-fill',
         type: 'fill',
         source: RING_SOURCE,
-        paint: { 'fill-color': '#38bdf8', 'fill-opacity': 0 },
+        paint: { 'fill-color': '#f97316', 'fill-opacity': 0 },
+      });
+      map.addLayer({
+        id: 'pw-rings-outline',
+        type: 'line',
+        source: RING_SOURCE,
+        paint: { 'line-color': '#000000', 'line-width': 6, 'line-opacity': 0 },
       });
       map.addLayer({
         id: 'pw-rings-line',
         type: 'line',
         source: RING_SOURCE,
         paint: {
-          'line-color': '#38bdf8',
+          'line-color': '#f97316',
           'line-width': 2,
           'line-opacity': 0,
         },
       });
-      setReady(true);
+      setReady(version => version + 1);
     });
 
     return () => {
@@ -172,10 +186,30 @@ export default function MapView(props: MapViewProps) {
     };
   }, [webgl]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    const nextStyle = theme === 'light' ? LIGHT_STYLE_URL : DARK_STYLE_URL;
+    if (map && currentStyle.current !== nextStyle) {
+      currentStyle.current = nextStyle;
+      map.setStyle(nextStyle, {diff: false});
+    }
+  }, [theme]);
+
+  // Update only boundary colors when the device appearance changes; keep the map and camera in place.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map || !map.getSource(RING_SOURCE)) return;
+    const color = lightWall ? '#ffffff' : '#f97316';
+    map.setSky({ 'sky-color': lightWall ? '#ffffff' : '#181818', 'horizon-color': lightWall ? '#eeeeee' : '#555555', 'fog-color': lightWall ? '#ffffff' : '#222222' });
+    map.setPaintProperty('pw-rings-walls', 'fill-extrusion-color', color);
+    map.setPaintProperty('pw-rings-fill', 'fill-color', color);
+    map.setPaintProperty('pw-rings-line', 'line-color', color);
+  }, [ready, lightWall]);
+
   // Search location: rings, "you" marker, ring labels, and the camera fly-in.
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map) return;
+    if (!ready || !map || !map.getSource(RING_SOURCE)) return;
     (map.getSource(RING_SOURCE) as GeoJSONSource | undefined)?.setData(ringsGeoJson(center, radiusMiles));
     (map.getSource(RING_WALL_SOURCE) as GeoJSONSource | undefined)?.setData(ringWallsGeoJson(center, radiusMiles));
 
@@ -200,15 +234,20 @@ export default function MapView(props: MapViewProps) {
     let frame = 0;
     const start = performance.now() + (reducedMotion || !firstView ? 0 : 1500);
     const animateRing = (now: number) => {
+      if (!map.getLayer('pw-rings-walls')) return;
       const t = reducedMotion ? 1 : Math.max(0, Math.min(1, (now - start) / (firstView ? 1600 : 350)));
       const eased = 1 - (1 - t) ** 3;
       map.setPaintProperty('pw-rings-walls', 'fill-extrusion-height', ['*', ['get', 'h'], eased]);
       map.setPaintProperty('pw-rings-line', 'line-opacity', 0.85 * eased);
+      map.setPaintProperty('pw-rings-outline', 'line-opacity', 0.95 * eased);
       map.setPaintProperty('pw-rings-fill', 'fill-opacity', 0.045 * eased);
       if (t < 1) frame = requestAnimationFrame(animateRing);
     };
     frame = requestAnimationFrame(animateRing);
 
+    const searchPosition = `${center.lat},${center.lng},${radiusMiles}`;
+    if (positionedSearch.current === searchPosition) return () => cancelAnimationFrame(frame);
+    positionedSearch.current = searchPosition;
     const camera = map.cameraForBounds(ringBounds(center, radiusMiles), { padding: 36 });
     const target = { center: [center.lng, center.lat] as [number, number], zoom: camera?.zoom ?? 12.5, pitch: 56, bearing: -18, padding: {top:0,bottom:0,left:0,right:0} };
     if (reducedMotion) map.jumpTo(target);
@@ -222,7 +261,7 @@ export default function MapView(props: MapViewProps) {
   // Plant markers: keep DOM buttons in sync with the result list.
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map) return;
+    if (!ready || !map || !map.getSource(RING_SOURCE)) return;
     const existing = plantMarkers.current;
     const nextIds = new Set(plants.map((p) => p.id));
     for (const [id, { marker }] of existing) {
@@ -250,13 +289,18 @@ export default function MapView(props: MapViewProps) {
   // Selection: highlight the marker and bring it into view beside the panel.
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map) return;
+    if (!ready || !map || !map.getSource(RING_SOURCE)) return;
     for (const [id, { el }] of plantMarkers.current) {
       el.classList.toggle('is-selected', id === selectedId);
       el.setAttribute('aria-pressed', String(id === selectedId));
     }
+    if (positionedSelection.current === selectedId) return;
     const plant = plants.find((p) => p.id === selectedId);
-    if (!plant) return;
+    if (!plant) {
+      if (selectedId === null) positionedSelection.current = null;
+      return;
+    }
+    positionedSelection.current = selectedId;
     const options = {
       center: [plant.lng, plant.lat] as [number, number],
       zoom: Math.max(map.getZoom(), 13.4),
@@ -269,7 +313,7 @@ export default function MapView(props: MapViewProps) {
 
   if (!webgl) {
     return (
-      <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_50%_40%,rgb(56_189_248/0.14),transparent_60%)] p-6 text-center text-sm text-muted">
+      <div className="flex h-full items-center justify-center bg-night-2 p-6 text-center text-sm text-muted">
         {props.unavailableText}
       </div>
     );

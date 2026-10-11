@@ -31,7 +31,7 @@ export function PlantListItem({ plant, index, selected, onSelect }: PlantListIte
         aria-pressed={selected}
         aria-label={`${permit.company}, ${t('plant.distanceLong', { distance: formatMiles(plant.distanceMiles, lang), direction })}. ${t('plant.viewDetails')}`}
         className={`group relative w-full overflow-hidden rounded-2xl border p-4 text-left transition-colors ${
-          selected ? 'border-air-2/70 bg-white/10' : 'border-line bg-white/[0.04] hover:border-white/25 hover:bg-white/[0.07]'
+          selected ? 'border-air-2/70 bg-ink/10' : 'border-line bg-ink/[0.04] hover:border-ink/25 hover:bg-ink/[0.07]'
         }`}
       >
         <span

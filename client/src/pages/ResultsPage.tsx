@@ -11,7 +11,7 @@ import { SearchBar } from '../components/SearchBar';
 import { useI18n } from '../i18n';
 import { api } from '../lib/api';
 import { formatMiles } from '../lib/format';
-import { TYPE_HEX } from '../lib/permitColors';
+import { TYPE_COLORS } from '../lib/permitColors';
 import { navigate, searchHref, type Coords } from '../lib/router';
 import { resultsForRadius } from '../lib/searchResults';
 import { useAsync } from '../lib/useAsync';
@@ -26,9 +26,9 @@ function MapSkeleton() {
 function MapLegend() {
   const { t } = useI18n();
   const items = [
-    { color: TYPE_HEX.new, label: t('map.legendNew') },
-    { color: TYPE_HEX.renewal, label: t('map.legendRenewal') },
-    { color: TYPE_HEX.amendment, label: t('map.legendOther') },
+    { color: TYPE_COLORS.new, label: t('map.legendNew') },
+    { color: TYPE_COLORS.renewal, label: t('map.legendRenewal') },
+    { color: TYPE_COLORS.amendment, label: t('map.legendOther') },
   ];
   return (
     <ul className="pointer-events-none absolute top-3 left-3 z-10 space-y-1 rounded-xl border border-line bg-night/80 px-3 py-2 text-xs text-ink backdrop-blur lg:top-auto lg:bottom-8">
@@ -66,7 +66,7 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
         id: p.permit.id,
         lat: p.permit.lat,
         lng: p.permit.lng,
-        color: TYPE_HEX[p.permit.permitType],
+        color: TYPE_COLORS[p.permit.permitType],
         label: t('map.markerLabel', {
           company: p.permit.company,
           type: t(`type.${p.permit.permitType}`),

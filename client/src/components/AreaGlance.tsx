@@ -13,11 +13,11 @@ export function AreaGlance({ area, radiusMiles }: { area: AreaSummary; radiusMil
       <h2 id="area-glance" className="text-sm font-semibold tracking-wide text-muted uppercase">
         {t('area.heading')}
       </h2>
-      <div className="flex items-center gap-4 rounded-2xl border border-line bg-white/[0.04] p-4">
+      <div className="flex items-center gap-4 rounded-2xl border border-line bg-ink/[0.04] p-4">
         <p className="font-display text-4xl font-semibold text-air-2">{area.withinRadius}</p>
         <p className="text-sm text-muted">{t(`area.tile.${plural(area.withinRadius)}`, {radius:radiusMiles, unit})}</p>
       </div>
-      <div className="rounded-2xl border border-line bg-white/[0.04] p-4">
+      <div className="rounded-2xl border border-line bg-ink/[0.04] p-4">
         <p className="text-xs font-medium text-muted">{t('area.capacity', {radius:radiusMiles, unit})}</p>
         {area.combinedCapacityCydPerHr !== null ? (
           <>

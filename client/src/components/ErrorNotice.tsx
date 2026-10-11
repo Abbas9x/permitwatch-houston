@@ -17,7 +17,7 @@ export function ErrorNotice({ error, onRetry }: { error: ApiError; onRetry?: () 
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 rounded-full border border-line px-4 py-1.5 text-sm font-medium hover:bg-white/8"
+          className="mt-3 rounded-full border border-line px-4 py-1.5 text-sm font-medium hover:bg-ink/8"
         >
           {t('error.retry')}
         </button>

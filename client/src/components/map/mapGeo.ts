@@ -1,5 +1,6 @@
 import { circleRing, destinationPoint, DEFAULT_SEARCH_RADIUS_MILES, type LatLng } from '../../../../shared/geo';
 
+export const LIGHT_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
 export const DARK_STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
 
 /** Wide, tilted view of Houston used as the starting point of the fly-in. */

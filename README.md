@@ -17,7 +17,7 @@ Requires Node.js 22.12 or newer.
 ```bash
 npm install
 cp .env.example .env       
-npm run import -- data/concrete-plants.json # real cached TCEQ records
+npm run import -- data/sites.json # real cached TCEQ permit records
 npm run dev               # API on :8787, web app on :5173
 ```
 
@@ -47,7 +47,7 @@ Install Chromium once with `npx playwright install chromium` before running brow
 
 ## Production
 
-`render.yaml` builds the client and server, imports the real dataset, and starts one service for the frontend and API. Configure `DATABASE_PATH` and `ALLOWED_ORIGINS` as shown in `.env.example`; the Render service URL is automatically allowed. Locally, run `npm run build`, then `npm run import:prod -- data/concrete-plants.json`, then `npm start`.
+`render.yaml` builds the client and server, imports the real dataset, and starts one service for the frontend and API. Configure `DATABASE_PATH` and `ALLOWED_ORIGINS` as shown in `.env.example`; the Render service URL is automatically allowed. Locally, run `npm run build`, then `npm run import:prod -- data/sites.json`, then `npm start`.
 
 ## Data rules
 
@@ -55,3 +55,5 @@ Install Chromium once with `npx playwright install chromium` before running brow
 - Comment deadlines are shown only when they appear in the data. Nothing is computed.
 - Permits show maximum allowed activity, not measured pollution. The app makes no health claims.
 - `data/sample-permits.json` is **SAMPLE DATA**: fictional companies, flagged with a "Sample data" badge in the UI.
+
+The header appearance switch uses orange accents on black in dark mode and a white/black palette in light mode. It starts from your device appearance, then remembers your selection locally. The map style and distance wall follow the selected mode.

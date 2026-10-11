@@ -4,24 +4,24 @@
   --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Space Grotesk Variable', 'Space Grotesk', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 
-  --color-night: #05070d;
-  --color-night-2: #0a0f1c;
-  --color-ink: #e8edf5;
-  --color-muted: #a3afc2;
-  --color-faint: #6b7a90;
+  --color-night: #000000;
+  --color-night-2: #111111;
+  --color-ink: #fafafa;
+  --color-muted: #b5b5b5;
+  --color-faint: #888888;
   --color-line: rgb(255 255 255 / 0.1);
 
-  --color-air-1: #2dd4bf;
-  --color-air-2: #38bdf8;
-  --color-air-3: #a78bfa;
+  --color-air-1: #fb923c;
+  --color-air-2: #fb923c;
+  --color-air-3: #fb923c;
 
   /* Permit type colors: chosen for >= 4.5:1 contrast on the night background */
-  --color-new: #fbbf24;
-  --color-renewal: #22d3ee;
-  --color-amendment: #c4a1ff;
-  --color-unknown: #a3afc2;
-  --color-deadline: #fb7185;
-  --color-sample: #fcd34d;
+  --color-new: #fdba74;
+  --color-renewal: #fb923c;
+  --color-amendment: #f97316;
+  --color-unknown: #b5b5b5;
+  --color-deadline: #fb923c;
+  --color-sample: #fdba74;
 
   --animate-pulse-ring: pulse-ring 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
   @keyframes pulse-ring {
@@ -71,7 +71,7 @@
     border-radius: 6px;
   }
   ::selection {
-    background: rgb(56 189 248 / 0.35);
+    background: color-mix(in srgb, var(--color-air-2) 35%, transparent);
   }
 }
 
@@ -120,7 +120,7 @@
 
 /* MapLibre controls restyled for the dark theme */
 .maplibregl-ctrl-group {
-  background: rgb(10 15 28 / 0.85) !important;
+  background: color-mix(in srgb, var(--color-night-2) 85%, transparent) !important;
   border: 1px solid var(--color-line);
 }
 .maplibregl-ctrl-group button + button {
@@ -130,7 +130,7 @@
   filter: invert(1) brightness(1.6);
 }
 .maplibregl-ctrl-attrib {
-  background: rgb(5 7 13 / 0.75) !important;
+  background: color-mix(in srgb, var(--color-night) 85%, transparent) !important;
   color: var(--color-muted) !important;
   font-size: 11px;
 }
@@ -158,7 +158,7 @@
   height: 16px;
   border-radius: 9999px;
   background: var(--c);
-  border: 2px solid #05070d;
+  border: 2px solid var(--color-night);
   box-shadow:
     0 0 0 2px color-mix(in srgb, var(--c) 55%, transparent),
     0 0 18px 4px color-mix(in srgb, var(--c) 70%, transparent);
@@ -179,7 +179,7 @@
 }
 .pw-marker.is-selected .pw-marker-core {
   box-shadow:
-    0 0 0 3px #e8edf5,
+    0 0 0 3px var(--color-ink),
     0 0 26px 8px color-mix(in srgb, var(--c) 80%, transparent);
 }
 .pw-marker:focus-visible {
@@ -197,25 +197,56 @@
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: #e8edf5;
-  border: 4px solid #38bdf8;
-  box-shadow: 0 0 24px 6px rgb(56 189 248 / 0.7);
+  background: var(--color-ink);
+  border: 4px solid var(--color-air-2);
+  box-shadow: 0 0 24px 6px color-mix(in srgb, var(--color-air-2) 70%, transparent);
 }
 .pw-you::after {
   content: '';
   position: absolute;
   inset: -6px;
   border-radius: 9999px;
-  border: 2px solid rgb(56 189 248 / 0.8);
+  border: 2px solid color-mix(in srgb, var(--color-air-2) 80%, transparent);
   animation: var(--animate-pulse-ring);
 }
 .pw-ring-label {
   font: 600 11px/1 var(--font-sans);
-  color: #e8edf5;
-  background: rgb(5 7 13 / 0.75);
-  border: 1px solid rgb(255 255 255 / 0.18);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-night) 85%, transparent);
+  border: 1px solid var(--color-line);
   border-radius: 9999px;
   padding: 3px 7px;
   pointer-events: none;
   white-space: nowrap;
 }
+
+
+:root[data-theme='dark'] { color-scheme: dark; }
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-night: #ffffff;
+  --color-night-2: #f5f5f5;
+  --color-ink: #000000;
+  --color-muted: #454545;
+  --color-faint: #626262;
+  --color-line: rgb(0 0 0 / 0.18);
+  --color-air-1: #000000;
+  --color-air-2: #000000;
+  --color-air-3: #000000;
+  --color-new: #000000;
+  --color-renewal: #454545;
+  --color-amendment: #626262;
+  --color-unknown: #454545;
+  --color-deadline: #000000;
+  --color-sample: #454545;
+  scrollbar-color: rgb(0 0 0 / 0.3) transparent;
+}
+:root[data-theme='light'] .glass {
+  background: linear-gradient(160deg, #ffffff, #f5f5f5);
+  box-shadow: 0 12px 36px -20px rgb(0 0 0 / 0.2);
+}
+:root[data-theme='light'] .skeleton {
+  background-image: linear-gradient(90deg, #f5f5f5 25%, #dedede 50%, #f5f5f5 75%);
+}
+:root[data-theme='light'] .maplibregl-ctrl-icon,
+:root[data-theme='light'] .maplibregl-ctrl-attrib-button { filter: none; }

@@ -5,7 +5,7 @@ import type { ShaderMaterial } from 'three';
 
 /**
  * "Air" field: domain-warped fractal noise drifting slowly, tinted with the brand
- * teal/sky/violet over near-black. Kept dark (with a vignette) so text above it keeps
+ * orange over black. Kept dark (with a vignette) so text above it keeps
  * WCAG AA contrast. Lazy-loaded; the static gradient shows until it is ready.
  */
 const VERTEX = /* glsl */ `
@@ -57,10 +57,10 @@ const FRAGMENT = /* glsl */ `
                   fbm(p * 1.7 + 3.0 * q + vec2(8.3, 2.8) - 0.4 * t));
     float f = fbm(p * 1.1 + 2.4 * r);
 
-    vec3 night  = vec3(0.020, 0.027, 0.051);
-    vec3 teal   = vec3(0.176, 0.831, 0.749);
-    vec3 sky    = vec3(0.220, 0.741, 0.973);
-    vec3 violet = vec3(0.655, 0.545, 0.980);
+    vec3 night  = vec3(0.0, 0.0, 0.0);
+    vec3 teal   = vec3(0.976, 0.451, 0.086);
+    vec3 sky    = vec3(1.0, 0.6, 0.25);
+    vec3 violet = vec3(0.75, 0.3, 0.05);
 
     vec3 col = night;
     col = mix(col, teal * 0.5, smoothstep(0.3, 0.95, f));

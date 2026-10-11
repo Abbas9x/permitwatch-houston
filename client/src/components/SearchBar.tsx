@@ -191,7 +191,7 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
               }}
               onMouseEnter={() => setActive(index)}
               className={`flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm ${
-                index === active ? 'bg-white/10 text-ink' : 'text-ink/90'
+                index === active ? 'bg-ink/10 text-ink' : 'text-ink/90'
               }`}
             >
               <span aria-hidden="true" className="text-faint">
@@ -223,7 +223,7 @@ export function SearchBar({ initialValue = '', size = 'hero', autoFocus = false,
                 setValue(example);
                 void submit(example);
               }}
-              className="rounded-full border border-line bg-night/40 px-3 py-1 text-ink/90 backdrop-blur transition-colors hover:border-air-2/60 hover:bg-white/6"
+              className="rounded-full border border-line bg-night/40 px-3 py-1 text-ink/90 backdrop-blur transition-colors hover:border-air-2/60 hover:bg-ink/6"
             >
               {example}
             </button>

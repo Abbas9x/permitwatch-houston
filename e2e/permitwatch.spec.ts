@@ -28,7 +28,7 @@ test('search, map markers, permit details, templates, refresh and repeat search'
   await search.fill('77494');await search.press('Enter');
   await expect(page.getByText('No permitted concrete batch plants within 3 miles in our dataset.',{exact:true})).toBeVisible();
   await expect(page.locator('.pw-marker')).toHaveCount(0);
-  await expect(page.locator('header a')).toHaveCount(2);
+  await expect(page.locator('header a')).toHaveCount(1);
   expect(requests.every(url=>/\/api\/(?:search\?|geocode\/suggest\?|permits\/[A-Za-z0-9._-]+(?:\/comment-draft)?$)/.test(url))).toBe(true);
   expect(errors).toEqual([]);
 });
@@ -110,4 +110,39 @@ test('mobile distance slider supports touch input, direct links and Spanish labe
   await page.getByRole('button',{name:'Cambiar a español'}).click();
   await expect(page.getByRole('slider',{name:'Distancia de búsqueda'})).toHaveValue('1');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+});
+
+test('appearance switch preserves search, map controls, and preference on refresh', async ({page}) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.emulateMedia({colorScheme:'dark'});
+  await page.goto('/?q=77020&radius=5');
+  await expect(page.locator('.pw-ring-label')).toHaveText('5 mi');
+  await page.mouse.move(1100,650);
+  await page.mouse.down();
+  await page.mouse.move(1250,750,{steps:12});
+  await page.mouse.up();
+  await page.waitForTimeout(700); // Allow the map's pan inertia to settle.
+  const panned = await page.locator('.pw-you').boundingBox();
+  await page.getByRole('button',{name:'Switch to light mode',exact:true}).click();
+  await page.waitForTimeout(700); // Wait for the new style's layers to be restored.
+  const themed = await page.locator('.pw-you').boundingBox();
+  expect(Math.hypot(themed!.x-panned!.x, themed!.y-panned!.y)).toBeLessThan(5);
+  await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+  await expect(page.locator('html')).toHaveCSS('background-color','rgb(255, 255, 255)');
+  await expect(page.locator('.pw-ring-label')).toHaveText('5 mi');
+  await expect(page.getByRole('slider',{name:'Search distance'})).toHaveValue('5');
+  await expect(page.locator('header a')).toHaveCount(1);
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+  await expect(page.locator('.pw-marker')).toHaveCount(3);
+  await page.getByRole('button',{name:'Switch to dark mode',exact:true}).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await expect(page.locator('html')).toHaveCSS('background-color','rgb(0, 0, 0)');
+  await page.getByRole('slider',{name:'Search distance'}).fill('1');
+  await expect(page.locator('.pw-marker')).toHaveCount(1);
+  await expect(page.locator('.pw-ring-label')).toHaveText('1 mi');
+  expect(errors).toEqual([]);
+  await page.setViewportSize({width:390,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });

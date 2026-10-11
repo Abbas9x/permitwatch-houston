@@ -2,6 +2,8 @@ export const en = {
   'app.name': 'PermitWatch Houston',
   'app.tagline': "Understand the permits in your neighborhood.",
   'nav.skip': 'Skip to main content',
+  'nav.lightMode': 'Switch to light mode',
+  'nav.darkMode': 'Switch to dark mode',
   'nav.search': 'Search',
   'nav.language': 'Español',
   'nav.languageLabel': 'Cambiar a español',

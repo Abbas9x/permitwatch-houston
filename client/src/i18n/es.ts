@@ -4,6 +4,8 @@ export const es: Messages = {
   'app.name': 'PermitWatch Houston',
   'app.tagline': 'Conozca los permisos de su vecindario.',
   'nav.skip': 'Saltar al contenido principal',
+  'nav.lightMode': 'Cambiar a modo claro',
+  'nav.darkMode': 'Cambiar a modo oscuro',
   'nav.search': 'Buscar',
   'nav.language': 'English',
   'nav.languageLabel': 'Switch to English',

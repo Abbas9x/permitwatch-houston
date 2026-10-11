@@ -60,7 +60,7 @@ export function ActNow({ permit }: { permit: Permit }) {
         </ExternalLink>
         <ExternalLink
           href={permit.sourceUrl}
-          className="inline-flex items-center rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-white/8"
+          className="inline-flex items-center rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-ink/8"
         >
           {t('act.viewNotice')}
         </ExternalLink>

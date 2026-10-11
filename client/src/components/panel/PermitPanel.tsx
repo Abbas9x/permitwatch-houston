@@ -98,7 +98,7 @@ export function PermitPanel({ plant, onClose, variant }: PermitPanelProps) {
           type="button"
           onClick={onClose}
           aria-label={t('panel.close')}
-          className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-ink hover:bg-white/10"
+          className="grid size-10 shrink-0 place-items-center rounded-full border border-line text-ink hover:bg-ink/10"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4">
             <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />

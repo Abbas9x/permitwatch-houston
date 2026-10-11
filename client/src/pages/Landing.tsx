@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
+import { useTheme } from '../lib/theme';
 import { useI18n } from '../i18n';
 import { chooseBackground, type BackgroundMode } from '../lib/capabilities';
 
@@ -13,10 +14,7 @@ function StaticGradient() {
     <div
       aria-hidden="true"
       className="absolute inset-0 -z-20"
-      style={{
-        background:
-          'radial-gradient(60% 50% at 18% 22%, rgb(45 212 191 / 0.16), transparent 70%), radial-gradient(50% 50% at 86% 28%, rgb(167 139 250 / 0.16), transparent 70%), radial-gradient(60% 60% at 50% 105%, rgb(56 189 248 / 0.13), transparent 70%), #05070d',
-      }}
+      style={{ background: "radial-gradient(ellipse at 20% 20%, color-mix(in srgb, var(--color-air-2) 12%, transparent), transparent 70%), var(--color-night)" }}
     />
   );
 }
@@ -32,6 +30,7 @@ function whenIdle(callback: () => void): () => void {
 
 export function Landing() {
   const { t } = useI18n();
+  const { theme } = useTheme();
   const reducedMotion = useReducedMotion() ?? false;
   const [background, setBackground] = useState<BackgroundMode>('static');
   const [sceneReady, setSceneReady] = useState(false);
@@ -55,7 +54,7 @@ export function Landing() {
   return (
     <section className="relative isolate flex min-h-[calc(100dvh-3.5rem)] flex-col overflow-hidden">
       <StaticGradient />
-      {background === 'animated' && (
+      {background === 'animated' && theme === 'dark' && (
         <Suspense fallback={null}>
           <motion.div
             aria-hidden="true"
@@ -71,7 +70,8 @@ export function Landing() {
       {/* Scrim so text keeps AA contrast over any frame of the animation. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_60%_at_32%_45%,rgb(5_7_13/0.82),rgb(5_7_13/0.35)_70%,transparent)]"
+        className="absolute inset-0 -z-10"
+        style={{ background: "radial-gradient(ellipse at 32% 45%, color-mix(in srgb, var(--color-night) 82%, transparent), transparent)" }}
       />
 
       <motion.div
@@ -119,7 +119,7 @@ export function Landing() {
           {steps.map((step) => (
             <li key={step.n} className="glass rounded-2xl p-4">
               <p className="flex items-center gap-2 text-sm font-semibold text-ink">
-                <span aria-hidden="true" className="grid size-6 place-items-center rounded-full bg-white/10 text-xs">
+                <span aria-hidden="true" className="grid size-6 place-items-center rounded-full bg-ink/10 text-xs">
                   {step.n}
                 </span>
                 {step.title}

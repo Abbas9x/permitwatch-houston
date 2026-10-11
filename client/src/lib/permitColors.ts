@@ -7,11 +7,3 @@ export const TYPE_COLORS: Record<PermitType, string> = {
   amendment: 'var(--color-amendment)',
   unknown: 'var(--color-unknown)',
 };
-
-/** Literal hex values for canvas/WebGL contexts that can't read CSS variables. */
-export const TYPE_HEX: Record<PermitType, string> = {
-  new: '#fbbf24',
-  renewal: '#22d3ee',
-  amendment: '#c4a1ff',
-  unknown: '#a3afc2',
-};

@@ -5,7 +5,7 @@ import { NotListed } from '../PermitFacts';
 
 function Tile({ label, value, unit }: { label: string; value: string | null; unit: string }) {
   return (
-    <div className="rounded-2xl border border-line bg-white/[0.04] p-4">
+    <div className="rounded-2xl border border-line bg-ink/[0.04] p-4">
       <p className="text-xs font-medium text-muted">{label}</p>
       {value !== null ? (
         <p className="mt-1 font-display text-3xl font-semibold text-ink">

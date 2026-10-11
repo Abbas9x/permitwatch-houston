@@ -167,7 +167,7 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
                 <button
                   type="button"
                   onClick={copy}
-                  className="rounded-xl border border-line px-4 py-2 text-sm font-medium text-ink hover:bg-white/8"
+                  className="rounded-xl border border-line px-4 py-2 text-sm font-medium text-ink hover:bg-ink/8"
                 >
                   {t('draft.copy')}
                 </button>
