@@ -17,11 +17,15 @@ export function Header() {
         <Link href="/" className="flex min-w-0 items-center gap-2.5 rounded-lg" aria-label={t('app.name')}>
           <img src="/favicon.svg" alt="" width="28" height="28" className="size-7 shrink-0" />
           <span className="truncate font-display text-base font-semibold tracking-tight sm:text-lg">
-            PermitWatch <span className="text-gradient">Houston</span>
+            PermitWatch <span className="text-gradient hidden min-[400px]:inline">Houston</span>
           </span>
         </Link>
         <nav aria-label="Main" className="flex items-center gap-1">
-          <Link href="/" className={navClass(path === '/')} aria-current={path === '/' ? 'page' : undefined}>
+          <Link
+            href="/"
+            className={`${navClass(path === '/')} hidden sm:inline-flex`}
+            aria-current={path === '/' ? 'page' : undefined}
+          >
             {t('nav.search')}
           </Link>
           <Link

@@ -64,7 +64,7 @@ export const EnvSchema = z
     if (env.NODE_ENV === 'production' && env.GEMINI_MOCK !== 'off') {
       ctx.addIssue({ code: 'custom', path: ['GEMINI_MOCK'], message: 'must be "off" in production' });
     }
-    if (env.GEMINI_API_KEY && !/^[A-Za-z0-9_-]{20,200}$/.test(env.GEMINI_API_KEY)) {
+    if (env.GEMINI_API_KEY && !/^[A-Za-z0-9._-]{20,200}$/.test(env.GEMINI_API_KEY)) {
       ctx.addIssue({ code: 'custom', path: ['GEMINI_API_KEY'], message: 'does not look like a valid API key' });
     }
   });
@@ -83,7 +83,12 @@ export class EnvError extends Error {
  * problem but never echo the value, so a misconfigured secret is not logged.
  */
 export function parseEnv(source: NodeJS.ProcessEnv): Env {
-  const result = EnvSchema.safeParse(source);
+  // On Render, the service's own public URL is always an allowed origin (same-origin API calls).
+  const renderUrl = source.RENDER_EXTERNAL_URL?.trim();
+  const merged = renderUrl
+    ? { ...source, ALLOWED_ORIGINS: [source.ALLOWED_ORIGINS, renderUrl].filter(Boolean).join(',') }
+    : source;
+  const result = EnvSchema.safeParse(merged);
   if (!result.success) {
     const problems = result.error.issues.map((issue) => {
       const name = issue.path.length > 0 ? issue.path.join('.') : '(root)';

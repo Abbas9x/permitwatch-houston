@@ -73,7 +73,7 @@ export function PermitFacts({ permit }: { permit: Permit }) {
         <Fact label={t('plant.meeting')}>{formatDate(permit.publicMeetingDate, lang)}</Fact>
       )}
       <Fact label={t('plant.address')} wide>
-        {permit.address}, {permit.city}, {permit.county} County, TX {permit.zip}
+        {permit.address}, {permit.city}, {permit.county} County, TX{permit.zip ? ` ${permit.zip}` : ''}
       </Fact>
       <Fact label={t('plant.source')} wide>
         <ExternalLink href={permit.sourceUrl} className="text-air-2 underline underline-offset-4 hover:text-ink">

@@ -60,13 +60,13 @@ export function saveSummary(db: DB, permitId: string, contentHash: string, summa
   ).run(permitId, contentHash, JSON.stringify(StoredSummarySchema.parse(summary)), generator, nowIso());
 }
 
-/** Permits that have no summary, or whose summary was generated from older content. */
-export function listPermitIdsNeedingSummary(db: DB): string[] {
+/** Permits that have no summary, or whose summary was generated from older content (optionally also template-only ones). */
+export function listPermitIdsNeedingSummary(db: DB, includeTemplates = false): string[] {
   const rows = db
     .prepare(
       `SELECT p.id FROM permits p LEFT JOIN permit_summaries s ON s.permit_id = p.id
-        WHERE s.permit_id IS NULL OR s.content_hash <> p.content_hash ORDER BY p.id`,
+        WHERE s.permit_id IS NULL OR s.content_hash <> p.content_hash OR (? = 1 AND s.generator = 'template') ORDER BY p.id`,
     )
-    .all() as { id: string }[];
+    .all(includeTemplates ? 1 : 0) as { id: string }[];
   return rows.map((r) => r.id);
 }

@@ -1,11 +1,24 @@
 import { MotionConfig } from 'framer-motion';
+import { lazy, Suspense } from 'react';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { useI18n } from './i18n';
 import { useRoute } from './lib/router';
-import { Dashboard } from './pages/Dashboard';
 import { Landing } from './pages/Landing';
-import { ResultsPage } from './pages/ResultsPage';
+
+// Only the landing page ships in the first bundle; results (map, panel) and the dashboard load on demand.
+const ResultsPage = lazy(() => import('./pages/ResultsPage').then((m) => ({ default: m.ResultsPage })));
+const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })));
+
+function PageSkeleton() {
+  return (
+    <div className="mx-auto max-w-3xl space-y-3 px-4 py-6 sm:px-6" aria-hidden="true">
+      <div className="skeleton h-12 w-full rounded-2xl" />
+      <div className="skeleton h-7 w-2/3" />
+      <div className="skeleton h-[40vh] w-full rounded-2xl" />
+    </div>
+  );
+}
 
 export function App() {
   const { t } = useI18n();
@@ -29,7 +42,7 @@ export function App() {
       <div className="flex min-h-dvh flex-col">
         <Header />
         <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
-          {page}
+          <Suspense fallback={<PageSkeleton />}>{page}</Suspense>
         </main>
         <Footer />
       </div>

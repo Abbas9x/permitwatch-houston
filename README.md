@@ -16,10 +16,11 @@ Requires Node.js 22.12 or newer.
 
 ```bash
 npm install
-cp .env.example .env      # then fill in GEMINI_API_KEY (or set GEMINI_MOCK=ok to develop offline)
+cp .env.example .env       
 npm run import            # loads data/sample-permits.json (SAMPLE DATA)
 npm run dev               # API on :8787, web app on :5173
 ```
+
 
 ### Importing the real dataset
 

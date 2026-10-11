@@ -5,6 +5,7 @@ import { parse as parseCsvSync } from 'csv-parse/sync';
 import type { LocationSource } from '../../shared/permit.js';
 import { nowIso, type DB } from '../db/index.js';
 import { upsertPermit, type PermitRecord } from '../db/permitsRepo.js';
+import { adaptTceqScrape, isTceqScrape } from './adapters.js';
 import type { Logger } from '../lib/logger.js';
 import { isInTexasBounds } from '../../shared/geo.js';
 import { normalizePermitType, OPTIONAL_FIELDS, RowSchema, type PermitRow } from './rowSchema.js';
@@ -157,6 +158,7 @@ export function readDatasetFile(path: string): unknown[] {
   if (ext !== '.json') throw new Error(`Unsupported dataset file type "${ext}" (use .json or .csv)`);
   const parsed: unknown = JSON.parse(text);
   if (Array.isArray(parsed)) return parsed;
+  if (isTceqScrape(parsed)) return adaptTceqScrape(parsed);
   if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { permits?: unknown }).permits)) {
     return (parsed as { permits: unknown[] }).permits;
   }

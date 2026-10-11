@@ -15,6 +15,7 @@
     "server/**/*.test.ts",
     "server/testUtils.ts",
     "server/**/testing.ts",
-    "shared/**/*.test.ts"
+    "shared/**/*.test.ts",
+    "scripts/**/*.ts"
   ]
 }

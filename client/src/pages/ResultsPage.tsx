@@ -83,7 +83,7 @@ function Results({ data, selectedId }: { data: SearchResponse; selectedId: strin
   };
 
   return (
-    <div className="grid [grid-template-areas:'head'_'map'_'body'] lg:h-[calc(100dvh-3.5rem)] lg:grid-cols-[minmax(360px,440px)_1fr] lg:grid-rows-[auto_1fr] lg:[grid-template-areas:'head_map'_'body_map']">
+    <div className="grid grid-cols-[minmax(0,1fr)] [grid-template-areas:'head'_'map'_'body'] lg:h-[calc(100dvh-3.5rem)] lg:grid-cols-[minmax(360px,440px)_1fr] lg:grid-rows-[auto_1fr] lg:[grid-template-areas:'head_map'_'body_map']">
       <div className="space-y-3 border-line px-4 pt-5 pb-4 [grid-area:head] sm:px-6 lg:border-r lg:border-b">
         <SearchBar key={data.query} initialValue={data.query} size="compact" />
         <div>

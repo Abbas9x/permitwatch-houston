@@ -137,7 +137,8 @@ export const RowSchema = z.object({
   address: requiredText(300),
   city: requiredText(100),
   county: requiredText(100),
-  zip: z.preprocess(normalizeZip, z.string().regex(/^\d{5}$/, 'must be a 5-digit ZIP code')),
+  // Optional: many TCEQ records omit it. Empty means "not listed"; anything present must be 5 digits.
+  zip: z.preprocess((v) => (isBlank(v) ? '' : normalizeZip(v)), z.string().regex(/^(\d{5})?$/, 'must be a 5-digit ZIP code')),
   lat: optionalCoordinate(-90, 90),
   lng: optionalCoordinate(-180, 180),
   permit_type: z.preprocess((v) => normalizePermitType(v).type, z.enum(['new', 'renewal', 'amendment', 'unknown'])),

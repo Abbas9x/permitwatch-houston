@@ -203,6 +203,17 @@ export const en = {
   'dash.task.permit_summary': 'Permit summary',
   'dash.task.comment_draft': 'Comment draft',
   'dash.task.permit_qa': 'Permit Q&A',
+  'search.recent': 'Recent',
+  'search.example': 'Example',
+  'how.label': 'How PermitWatch works',
+  'how.1.title': 'Find plants near you',
+  'how.1.body': 'Every concrete batch plant air permit within 3 miles, on a map and in a list.',
+  'how.2.title': 'Understand the permit',
+  'how.2.body': 'Plain-English and Spanish summaries that use the real numbers from the permit.',
+  'how.3.title': 'Act before the deadline',
+  'how.3.body': 'Draft a respectful comment with AI, edit it, and send it yourself on TCEQ eComment.',
+  'how.greenroute': 'Powered by GreenRoute: every AI task goes to the cheapest model that can do it.',
+  'how.greenrouteLink': 'See the savings',
 } as const;
 
 export type MessageKey = keyof typeof en;
