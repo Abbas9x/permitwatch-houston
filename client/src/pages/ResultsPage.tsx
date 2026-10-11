@@ -142,7 +142,7 @@ function Results({ data, selectedId, coords, onReady, filters }: { onReady: () =
         </Suspense>
         <MapLegend />
         <AnimatePresence>
-          {selected && isDesktop && <PermitPanel key={selected.permit.id} plant={selected} onClose={close} variant="side" />}
+          {selected && <PermitPanel key={selected.permit.id} plant={selected} onClose={close} variant={isDesktop ? "side" : "sheet"} />}
         </AnimatePresence>
       </div>
 
@@ -179,9 +179,6 @@ function Results({ data, selectedId, coords, onReady, filters }: { onReady: () =
         <p className="text-xs text-muted">{t('data.coverage')}</p>
       </div>
 
-      <AnimatePresence>
-        {selected && !isDesktop && <PermitPanel key={selected.permit.id} plant={selected} onClose={close} variant="sheet" />}
-      </AnimatePresence>
     </div>
   );
 }

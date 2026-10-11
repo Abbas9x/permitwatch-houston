@@ -90,3 +90,21 @@ test('an unknown historical permit still offers an editable concerns draft witho
  await expect(draft).not.toHaveValue(/public record for this application/);
  await draft.fill('Edited concerns for review.');await expect(draft).toHaveValue('Edited concerns for review.');
 });
+
+test('written concerns survive resizing between desktop and mobile',async({page})=>{
+ await page.goto('/?q=Shores+Edge&lat=30.0485548&lng=-95.5958742&radius=2&permit=tceq-153154L001');
+ const note=page.getByRole('textbox',{name:'Anything else you want to say? (optional)',exact:true});
+ await note.fill('Please preserve my written concerns.');
+ await page.getByRole('button',{name:'Draft my concerns',exact:true}).click();
+ const draft=page.getByRole('textbox',{name:'Concerns / request for information',exact:true});
+ await expect(draft).toHaveValue(/153154L001/);
+ await draft.fill('My edited draft must survive resizing.');
+ await page.setViewportSize({width:390,height:844});
+ await expect(page.getByRole('dialog')).toHaveCount(1);
+ await expect(note).toHaveValue('Please preserve my written concerns.');
+ await expect(draft).toHaveValue('My edited draft must survive resizing.');
+ await page.setViewportSize({width:1440,height:960});
+ await expect(page.getByRole('dialog')).toHaveCount(1);
+ await expect(note).toHaveValue('Please preserve my written concerns.');
+ await expect(draft).toHaveValue('My edited draft must survive resizing.');
+});

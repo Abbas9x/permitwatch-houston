@@ -210,3 +210,23 @@ test('failed globe searches release the parked canvas and allow retry', async ({
   await page.getByRole('button', {name:'Try again',exact:true}).click();
   await expect(page.locator('.pw-ring-label')).toHaveText('3 mi');
 });
+
+test('browser Back during an animated search restores an usable landing page',async({page})=>{
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.route('**/api/search?**',async route=>{
+  await new Promise(resolve=>setTimeout(resolve,1000));
+  await route.continue().catch(()=>{});
+ });
+ await page.goto('/');
+ const search=page.getByRole('combobox',{name:'Houston address or ZIP code'});
+ await search.fill('77020');await search.press('Enter');
+ await expect(page).toHaveURL(/q=77020/);
+ await page.goBack();
+ await expect(page).toHaveURL('http://127.0.0.1:8790/');
+ await expect(page.getByTestId('map-transition')).toHaveCount(0);
+ await expect(search).toBeVisible();
+ await page.unroute('**/api/search?**');
+ await search.fill('77020');await search.press('Enter');
+ await expect(page.getByRole('heading',{name:'Environmental permits near ZIP 77020'})).toBeVisible();
+ await expect(page.getByTestId('map-transition')).toHaveCount(0);
+});
