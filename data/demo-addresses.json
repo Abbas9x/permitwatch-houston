@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-11T00:39:58Z",
-  "plantsGeneratedAt": "2026-10-11T00:39:52Z",
+  "generatedAt": "2026-10-11T03:54:06Z",
+  "sitesGeneratedAt": "2026-10-11T03:46:20Z",
   "radiusMiles": 3,
   "addresses": [
     {
@@ -10,58 +10,212 @@
       "lat": 29.620910408131,
       "lng": -95.337424974076,
       "locationSource": "geocoded",
-      "plantsWithin1Mile": 1,
-      "plantsWithin2Miles": 10,
-      "plantsWithin3Miles": 12,
+      "sitesWithin1Mile": 2,
+      "sitesWithin2Miles": 24,
+      "sitesWithin3Miles": 38,
       "pendingWithin3Miles": 0,
+      "within3MilesByCategory": {
+        "hazardous_waste_facility": 4,
+        "concrete_batch_plant": 12,
+        "construction_project": 8,
+        "industrial_facility": 7,
+        "busy_road": 1,
+        "wastewater_plant": 1,
+        "scrap_yard": 2,
+        "superfund_site": 1,
+        "power_plant": 1,
+        "rail_yard": 1
+      },
       "nearby": [
         {
-          "plantId": "tceq-136961",
+          "siteId": "rcra-TXR000053199",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 0.94
+        },
+        {
+          "siteId": "tceq-136961",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1
         },
         {
-          "plantId": "tceq-55078",
+          "siteId": "tceq-55078",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.07
         },
         {
-          "plantId": "tceq-72039",
+          "siteId": "tceq-72039",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.08
         },
         {
-          "plantId": "tceq-131789",
+          "siteId": "txdot-097601047",
+          "category": "construction_project",
+          "distanceMiles": 1.11
+        },
+        {
+          "siteId": "tceq-131789",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.21
         },
         {
-          "plantId": "tceq-75323",
+          "siteId": "tceq-75323",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.22
         },
         {
-          "plantId": "tceq-50653",
+          "siteId": "tri-77048LDCST136WA",
+          "category": "industrial_facility",
+          "distanceMiles": 1.32
+        },
+        {
+          "siteId": "tceq-50653",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.33
         },
         {
-          "plantId": "tceq-49005",
+          "siteId": "hcpid-2509120120",
+          "category": "construction_project",
+          "distanceMiles": 1.37
+        },
+        {
+          "siteId": "tri-77048DRWCH6121A",
+          "category": "industrial_facility",
+          "distanceMiles": 1.45
+        },
+        {
+          "siteId": "txdot-aadt-102H19T",
+          "category": "busy_road",
+          "distanceMiles": 1.48
+        },
+        {
+          "siteId": "rcra-TXD079388955",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 1.5
+        },
+        {
+          "siteId": "tri-7704WPRLND3935S",
+          "category": "industrial_facility",
+          "distanceMiles": 1.54
+        },
+        {
+          "siteId": "tceq-49005",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.58
         },
         {
-          "plantId": "tceq-130769",
+          "siteId": "tceq-130769",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.72
         },
         {
-          "plantId": "tceq-165627",
+          "siteId": "npdes-TX0063061",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.72
+        },
+        {
+          "siteId": "frs-110070527865",
+          "category": "scrap_yard",
+          "distanceMiles": 1.79
+        },
+        {
+          "siteId": "hcpid-2511130168",
+          "category": "construction_project",
+          "distanceMiles": 1.83
+        },
+        {
+          "siteId": "hcpid-2404190182",
+          "category": "construction_project",
+          "distanceMiles": 1.83
+        },
+        {
+          "siteId": "tceq-165627",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.9
         },
         {
-          "plantId": "tceq-150646",
+          "siteId": "frs-110005113377",
+          "category": "scrap_yard",
+          "distanceMiles": 1.98
+        },
+        {
+          "siteId": "tceq-150646",
+          "category": "concrete_batch_plant",
           "distanceMiles": 2
         },
         {
-          "plantId": "tceq-135854",
+          "siteId": "tceq-sf-SUP115",
+          "category": "superfund_site",
+          "distanceMiles": 2
+        },
+        {
+          "siteId": "hcpid-2511210048",
+          "category": "construction_project",
+          "distanceMiles": 2.01
+        },
+        {
+          "siteId": "tceq-135854",
+          "category": "concrete_batch_plant",
           "distanceMiles": 2.05
         },
         {
-          "plantId": "tceq-144445L001",
+          "siteId": "hcpid-2403040208",
+          "category": "construction_project",
+          "distanceMiles": 2.1
+        },
+        {
+          "siteId": "rcra-TXR000080515",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 2.26
+        },
+        {
+          "siteId": "tri-7704WCPRCR353SU",
+          "category": "industrial_facility",
+          "distanceMiles": 2.32
+        },
+        {
+          "siteId": "tri-7706WCRDND76SAN",
+          "category": "industrial_facility",
+          "distanceMiles": 2.35
+        },
+        {
+          "siteId": "eia-65575",
+          "category": "power_plant",
+          "distanceMiles": 2.43
+        },
+        {
+          "siteId": "tri-79762VNWTR311LA",
+          "category": "industrial_facility",
+          "distanceMiles": 2.47
+        },
+        {
+          "siteId": "rcra-TXD980868632",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 2.49
+        },
+        {
+          "siteId": "tri-7707WPPLDC715AL",
+          "category": "industrial_facility",
+          "distanceMiles": 2.51
+        },
+        {
+          "siteId": "txdot-097601045",
+          "category": "construction_project",
+          "distanceMiles": 2.71
+        },
+        {
+          "siteId": "hcpid-2604150018",
+          "category": "construction_project",
+          "distanceMiles": 2.79
+        },
+        {
+          "siteId": "tceq-144445L001",
+          "category": "concrete_batch_plant",
           "distanceMiles": 2.95
+        },
+        {
+          "siteId": "intermodal-aa82fa2d9d8b",
+          "category": "rail_yard",
+          "distanceMiles": 2.97
         }
       ]
     },
@@ -72,26 +226,518 @@
       "lat": 29.913214681107,
       "lng": -95.382598166847,
       "locationSource": "geocoded",
-      "plantsWithin1Mile": 2,
-      "plantsWithin2Miles": 3,
-      "plantsWithin3Miles": 4,
+      "sitesWithin1Mile": 15,
+      "sitesWithin2Miles": 49,
+      "sitesWithin3Miles": 99,
       "pendingWithin3Miles": 0,
+      "within3MilesByCategory": {
+        "industrial_facility": 9,
+        "wastewater_plant": 21,
+        "concrete_batch_plant": 4,
+        "construction_project": 48,
+        "scrap_yard": 4,
+        "hazardous_waste_facility": 3,
+        "busy_road": 4,
+        "transfer_station": 1,
+        "fuel_terminal": 1,
+        "disposal_well": 3,
+        "superfund_site": 1
+      },
       "nearby": [
         {
-          "plantId": "tceq-51178",
+          "siteId": "tri-7706WNLSTL1462H",
+          "category": "industrial_facility",
+          "distanceMiles": 0.12
+        },
+        {
+          "siteId": "npdes-TX0070769",
+          "category": "wastewater_plant",
+          "distanceMiles": 0.14
+        },
+        {
+          "siteId": "npdes-TX0027707",
+          "category": "wastewater_plant",
+          "distanceMiles": 0.36
+        },
+        {
+          "siteId": "tceq-51178",
+          "category": "concrete_batch_plant",
           "distanceMiles": 0.45
         },
         {
-          "plantId": "tceq-157195",
+          "siteId": "npdes-TX0088650",
+          "category": "wastewater_plant",
+          "distanceMiles": 0.49
+        },
+        {
+          "siteId": "hcpid-2308250001",
+          "category": "construction_project",
+          "distanceMiles": 0.51
+        },
+        {
+          "siteId": "tri-7706WNTRCS1429W",
+          "category": "industrial_facility",
+          "distanceMiles": 0.61
+        },
+        {
+          "siteId": "hcpid-2501290063",
+          "category": "construction_project",
+          "distanceMiles": 0.73
+        },
+        {
+          "siteId": "tceq-157195",
+          "category": "concrete_batch_plant",
           "distanceMiles": 0.74
         },
         {
-          "plantId": "tceq-148312",
+          "siteId": "hcpid-2601140090",
+          "category": "construction_project",
+          "distanceMiles": 0.74
+        },
+        {
+          "siteId": "frs-110070546936",
+          "category": "scrap_yard",
+          "distanceMiles": 0.77
+        },
+        {
+          "siteId": "tri-7703WFLWSR1422E",
+          "category": "industrial_facility",
+          "distanceMiles": 0.78
+        },
+        {
+          "siteId": "hcpid-2411070099",
+          "category": "construction_project",
+          "distanceMiles": 0.8
+        },
+        {
+          "siteId": "hcpid-2403250088",
+          "category": "construction_project",
+          "distanceMiles": 0.94
+        },
+        {
+          "siteId": "hcpid-2508190152",
+          "category": "construction_project",
+          "distanceMiles": 1
+        },
+        {
+          "siteId": "rcra-TXD021493176",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 1.03
+        },
+        {
+          "siteId": "npdes-TX0069582",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.05
+        },
+        {
+          "siteId": "hcpid-2409170169",
+          "category": "construction_project",
+          "distanceMiles": 1.14
+        },
+        {
+          "siteId": "hcpid-2510200208",
+          "category": "construction_project",
+          "distanceMiles": 1.18
+        },
+        {
+          "siteId": "npdes-TX0020478",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.21
+        },
+        {
+          "siteId": "hcpid-2506100230",
+          "category": "construction_project",
+          "distanceMiles": 1.25
+        },
+        {
+          "siteId": "npdes-TX0089281",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.27
+        },
+        {
+          "siteId": "hcpid-2511240110",
+          "category": "construction_project",
+          "distanceMiles": 1.3
+        },
+        {
+          "siteId": "tri-77039SCHLM1121B",
+          "category": "industrial_facility",
+          "distanceMiles": 1.32
+        },
+        {
+          "siteId": "tri-77039RYLNS1144B",
+          "category": "industrial_facility",
+          "distanceMiles": 1.34
+        },
+        {
+          "siteId": "hcpid-2406260121",
+          "category": "construction_project",
+          "distanceMiles": 1.43
+        },
+        {
+          "siteId": "tceq-148312",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.54
         },
         {
-          "plantId": "tceq-78606",
+          "siteId": "hcpid-2311300076",
+          "category": "construction_project",
+          "distanceMiles": 1.57
+        },
+        {
+          "siteId": "tri-77037TXSWL10210",
+          "category": "industrial_facility",
+          "distanceMiles": 1.57
+        },
+        {
+          "siteId": "tri-77039RYLBT14635",
+          "category": "industrial_facility",
+          "distanceMiles": 1.57
+        },
+        {
+          "siteId": "npdes-TX0063860",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.59
+        },
+        {
+          "siteId": "tri-7703WPPLTN13639",
+          "category": "industrial_facility",
+          "distanceMiles": 1.63
+        },
+        {
+          "siteId": "hcpid-2410090077",
+          "category": "construction_project",
+          "distanceMiles": 1.64
+        },
+        {
+          "siteId": "npdes-TX0122521",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.7
+        },
+        {
+          "siteId": "npdes-TX0095656",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.7
+        },
+        {
+          "siteId": "npdes-TX0092037",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.71
+        },
+        {
+          "siteId": "frs-110033727778",
+          "category": "scrap_yard",
+          "distanceMiles": 1.76
+        },
+        {
+          "siteId": "frs-110033929621",
+          "category": "scrap_yard",
+          "distanceMiles": 1.77
+        },
+        {
+          "siteId": "hcpid-2601290099",
+          "category": "construction_project",
+          "distanceMiles": 1.78
+        },
+        {
+          "siteId": "txdot-011006152",
+          "category": "construction_project",
+          "distanceMiles": 1.82
+        },
+        {
+          "siteId": "npdes-TX0135364",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.82
+        },
+        {
+          "siteId": "hcpid-2408200182",
+          "category": "construction_project",
+          "distanceMiles": 1.83
+        },
+        {
+          "siteId": "txdot-325602120",
+          "category": "construction_project",
+          "distanceMiles": 1.83
+        },
+        {
+          "siteId": "txdot-325602111",
+          "category": "construction_project",
+          "distanceMiles": 1.83
+        },
+        {
+          "siteId": "npdes-TX0072184",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.89
+        },
+        {
+          "siteId": "npdes-TX0084531",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.96
+        },
+        {
+          "siteId": "txdot-aadt-102H4513",
+          "category": "busy_road",
+          "distanceMiles": 1.97
+        },
+        {
+          "siteId": "txdot-aadt-102H81",
+          "category": "busy_road",
+          "distanceMiles": 1.98
+        },
+        {
+          "siteId": "npdes-TX0122190",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.98
+        },
+        {
+          "siteId": "txdot-aadt-102H804T",
+          "category": "busy_road",
+          "distanceMiles": 2.04
+        },
+        {
+          "siteId": "npdes-TX0021261",
+          "category": "wastewater_plant",
+          "distanceMiles": 2.07
+        },
+        {
+          "siteId": "hcpid-2507140011",
+          "category": "construction_project",
+          "distanceMiles": 2.1
+        },
+        {
+          "siteId": "hcpid-2512190140",
+          "category": "construction_project",
+          "distanceMiles": 2.11
+        },
+        {
+          "siteId": "hcpid-2508290108",
+          "category": "construction_project",
+          "distanceMiles": 2.11
+        },
+        {
+          "siteId": "hcpid-2601190015",
+          "category": "construction_project",
+          "distanceMiles": 2.11
+        },
+        {
+          "siteId": "frs-110070370504",
+          "category": "scrap_yard",
+          "distanceMiles": 2.11
+        },
+        {
+          "siteId": "npdes-TX0030988",
+          "category": "wastewater_plant",
+          "distanceMiles": 2.13
+        },
+        {
+          "siteId": "hcpid-2409190119",
+          "category": "construction_project",
+          "distanceMiles": 2.17
+        },
+        {
+          "siteId": "tceq-msw-40211",
+          "category": "transfer_station",
+          "distanceMiles": 2.18
+        },
+        {
+          "siteId": "hcpid-2604200087",
+          "category": "construction_project",
+          "distanceMiles": 2.21
+        },
+        {
+          "siteId": "txdot-011006162",
+          "category": "construction_project",
+          "distanceMiles": 2.25
+        },
+        {
+          "siteId": "txdot-011006158",
+          "category": "construction_project",
+          "distanceMiles": 2.25
+        },
+        {
+          "siteId": "npdes-TX0087785",
+          "category": "wastewater_plant",
+          "distanceMiles": 2.28
+        },
+        {
+          "siteId": "hcpid-2512050017",
+          "category": "construction_project",
+          "distanceMiles": 2.33
+        },
+        {
+          "siteId": "npdes-TX0033189",
+          "category": "wastewater_plant",
+          "distanceMiles": 2.39
+        },
+        {
+          "siteId": "hcpid-2510090146",
+          "category": "construction_project",
+          "distanceMiles": 2.4
+        },
+        {
+          "siteId": "hcpid-2310030179",
+          "category": "construction_project",
+          "distanceMiles": 2.41
+        },
+        {
+          "siteId": "hcpid-2512100152",
+          "category": "construction_project",
+          "distanceMiles": 2.43
+        },
+        {
+          "siteId": "hcpid-2601210156",
+          "category": "construction_project",
+          "distanceMiles": 2.44
+        },
+        {
+          "siteId": "txdot-325602093",
+          "category": "construction_project",
+          "distanceMiles": 2.46
+        },
+        {
+          "siteId": "hcpid-2508010178",
+          "category": "construction_project",
+          "distanceMiles": 2.47
+        },
+        {
+          "siteId": "txdot-325602121",
+          "category": "construction_project",
+          "distanceMiles": 2.48
+        },
+        {
+          "siteId": "hcpid-2512100177",
+          "category": "construction_project",
+          "distanceMiles": 2.49
+        },
+        {
+          "siteId": "hifld-terminal-48201060",
+          "category": "fuel_terminal",
+          "distanceMiles": 2.49
+        },
+        {
+          "siteId": "hcpid-2512100156",
+          "category": "construction_project",
+          "distanceMiles": 2.5
+        },
+        {
+          "siteId": "rrc-20103282",
+          "category": "disposal_well",
+          "distanceMiles": 2.5
+        },
+        {
+          "siteId": "hcpid-2202030122",
+          "category": "construction_project",
+          "distanceMiles": 2.52
+        },
+        {
+          "siteId": "npdes-TX0070611",
+          "category": "wastewater_plant",
+          "distanceMiles": 2.54
+        },
+        {
+          "siteId": "hcpid-2602130118",
+          "category": "construction_project",
+          "distanceMiles": 2.62
+        },
+        {
+          "siteId": "hcpid-2511250051",
+          "category": "construction_project",
+          "distanceMiles": 2.62
+        },
+        {
+          "siteId": "tceq-sf-SUP153",
+          "category": "superfund_site",
+          "distanceMiles": 2.62
+        },
+        {
+          "siteId": "hcpid-2603250002",
+          "category": "construction_project",
+          "distanceMiles": 2.64
+        },
+        {
+          "siteId": "hcpid-2404080165",
+          "category": "construction_project",
+          "distanceMiles": 2.65
+        },
+        {
+          "siteId": "rcra-TXR000057620",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 2.65
+        },
+        {
+          "siteId": "hcpid-2607070205",
+          "category": "construction_project",
+          "distanceMiles": 2.66
+        },
+        {
+          "siteId": "tceq-78606",
+          "category": "concrete_batch_plant",
           "distanceMiles": 2.69
+        },
+        {
+          "siteId": "hcpid-2409120053",
+          "category": "construction_project",
+          "distanceMiles": 2.71
+        },
+        {
+          "siteId": "npdes-TX0083381",
+          "category": "wastewater_plant",
+          "distanceMiles": 2.71
+        },
+        {
+          "siteId": "rcra-TXR000083606",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 2.72
+        },
+        {
+          "siteId": "rrc-20108004",
+          "category": "disposal_well",
+          "distanceMiles": 2.73
+        },
+        {
+          "siteId": "hcpid-2506190129",
+          "category": "construction_project",
+          "distanceMiles": 2.74
+        },
+        {
+          "siteId": "rrc-20103288",
+          "category": "disposal_well",
+          "distanceMiles": 2.78
+        },
+        {
+          "siteId": "tri-7703WPRCSN1614E",
+          "category": "industrial_facility",
+          "distanceMiles": 2.82
+        },
+        {
+          "siteId": "txdot-aadt-102H78",
+          "category": "busy_road",
+          "distanceMiles": 2.84
+        },
+        {
+          "siteId": "npdes-TX0093475",
+          "category": "wastewater_plant",
+          "distanceMiles": 2.88
+        },
+        {
+          "siteId": "hcpid-2511170132",
+          "category": "construction_project",
+          "distanceMiles": 2.9
+        },
+        {
+          "siteId": "hcpid-2511180034",
+          "category": "construction_project",
+          "distanceMiles": 2.91
+        },
+        {
+          "siteId": "hcpid-2511180050",
+          "category": "construction_project",
+          "distanceMiles": 2.93
+        },
+        {
+          "siteId": "hcpid-2603130118",
+          "category": "construction_project",
+          "distanceMiles": 2.96
         }
       ]
     },
@@ -102,30 +748,345 @@
       "lat": 29.635888296446,
       "lng": -95.436981792258,
       "locationSource": "geocoded",
-      "plantsWithin1Mile": 0,
-      "plantsWithin2Miles": 3,
-      "plantsWithin3Miles": 5,
-      "pendingWithin3Miles": 1,
+      "sitesWithin1Mile": 0,
+      "sitesWithin2Miles": 31,
+      "sitesWithin3Miles": 64,
+      "pendingWithin3Miles": 2,
+      "within3MilesByCategory": {
+        "power_plant": 3,
+        "concrete_batch_plant": 5,
+        "industrial_facility": 8,
+        "construction_project": 17,
+        "superfund_site": 1,
+        "scrap_yard": 2,
+        "wastewater_plant": 1,
+        "disposal_well": 19,
+        "pending_air_permit": 1,
+        "transfer_station": 1,
+        "hazardous_waste_facility": 2,
+        "busy_road": 3,
+        "landfill": 1
+      },
       "nearby": [
         {
-          "plantId": "tceq-77728",
+          "siteId": "eia-63335",
+          "category": "power_plant",
+          "distanceMiles": 1.1
+        },
+        {
+          "siteId": "eia-66338",
+          "category": "power_plant",
+          "distanceMiles": 1.11
+        },
+        {
+          "siteId": "eia-60468",
+          "category": "power_plant",
+          "distanceMiles": 1.17
+        },
+        {
+          "siteId": "tceq-77728",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.18
         },
         {
-          "plantId": "tceq-123329",
+          "siteId": "tri-7704WHLMSR11HLM",
+          "category": "industrial_facility",
+          "distanceMiles": 1.28
+        },
+        {
+          "siteId": "tceq-123329",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.31
         },
         {
-          "plantId": "tceq-178869",
+          "siteId": "tceq-178869",
+          "category": "concrete_batch_plant",
           "distanceMiles": 1.31
         },
         {
-          "plantId": "tceq-147030",
+          "siteId": "tri-7704WCMXCN22HLM",
+          "category": "industrial_facility",
+          "distanceMiles": 1.31
+        },
+        {
+          "siteId": "txdot-002709113",
+          "category": "construction_project",
+          "distanceMiles": 1.42
+        },
+        {
+          "siteId": "tceq-sf-SUP121",
+          "category": "superfund_site",
+          "distanceMiles": 1.5
+        },
+        {
+          "siteId": "tri-77045KCDCH12701",
+          "category": "industrial_facility",
+          "distanceMiles": 1.54
+        },
+        {
+          "siteId": "tri-77045HCSWD12229",
+          "category": "industrial_facility",
+          "distanceMiles": 1.54
+        },
+        {
+          "siteId": "txdot-002709109",
+          "category": "construction_project",
+          "distanceMiles": 1.56
+        },
+        {
+          "siteId": "txdot-002709104",
+          "category": "construction_project",
+          "distanceMiles": 1.56
+        },
+        {
+          "siteId": "frs-110070126465",
+          "category": "scrap_yard",
+          "distanceMiles": 1.63
+        },
+        {
+          "siteId": "npdes-TX0034924",
+          "category": "wastewater_plant",
+          "distanceMiles": 1.74
+        },
+        {
+          "siteId": "rrc-20182515",
+          "category": "disposal_well",
+          "distanceMiles": 1.77
+        },
+        {
+          "siteId": "rrc-20182513",
+          "category": "disposal_well",
+          "distanceMiles": 1.81
+        },
+        {
+          "siteId": "rrc-20182514",
+          "category": "disposal_well",
+          "distanceMiles": 1.81
+        },
+        {
+          "siteId": "rrc-20182512",
+          "category": "disposal_well",
+          "distanceMiles": 1.84
+        },
+        {
+          "siteId": "rrc-20132969",
+          "category": "disposal_well",
+          "distanceMiles": 1.88
+        },
+        {
+          "siteId": "rrc-20182506",
+          "category": "disposal_well",
+          "distanceMiles": 1.88
+        },
+        {
+          "siteId": "rrc-20130397",
+          "category": "disposal_well",
+          "distanceMiles": 1.91
+        },
+        {
+          "siteId": "rrc-20132970",
+          "category": "disposal_well",
+          "distanceMiles": 1.92
+        },
+        {
+          "siteId": "rrc-20132966",
+          "category": "disposal_well",
+          "distanceMiles": 1.92
+        },
+        {
+          "siteId": "rrc-20182518",
+          "category": "disposal_well",
+          "distanceMiles": 1.92
+        },
+        {
+          "siteId": "rrc-20182517",
+          "category": "disposal_well",
+          "distanceMiles": 1.93
+        },
+        {
+          "siteId": "rrc-20182520",
+          "category": "disposal_well",
+          "distanceMiles": 1.97
+        },
+        {
+          "siteId": "rrc-20182500",
+          "category": "disposal_well",
+          "distanceMiles": 1.97
+        },
+        {
+          "siteId": "rrc-20182499",
+          "category": "disposal_well",
+          "distanceMiles": 1.98
+        },
+        {
+          "siteId": "rrc-20130347",
+          "category": "disposal_well",
+          "distanceMiles": 2
+        },
+        {
+          "siteId": "tceq-76691",
+          "category": "pending_air_permit",
+          "distanceMiles": 2.01
+        },
+        {
+          "siteId": "rrc-20182840",
+          "category": "disposal_well",
+          "distanceMiles": 2.03
+        },
+        {
+          "siteId": "rrc-20182503",
+          "category": "disposal_well",
+          "distanceMiles": 2.05
+        },
+        {
+          "siteId": "tri-77045CBMNT12500",
+          "category": "industrial_facility",
+          "distanceMiles": 2.12
+        },
+        {
+          "siteId": "tceq-147030",
+          "category": "concrete_batch_plant",
           "distanceMiles": 2.14
         },
         {
-          "plantId": "tceq-131670",
+          "siteId": "hcpid-2604210162",
+          "category": "construction_project",
+          "distanceMiles": 2.14
+        },
+        {
+          "siteId": "frs-110035040498",
+          "category": "scrap_yard",
+          "distanceMiles": 2.23
+        },
+        {
+          "siteId": "hcpid-2508250174",
+          "category": "construction_project",
+          "distanceMiles": 2.26
+        },
+        {
+          "siteId": "rrc-20130565",
+          "category": "disposal_well",
+          "distanceMiles": 2.35
+        },
+        {
+          "siteId": "rrc-20132967",
+          "category": "disposal_well",
+          "distanceMiles": 2.4
+        },
+        {
+          "siteId": "tri-77053CSSPR14211",
+          "category": "industrial_facility",
+          "distanceMiles": 2.42
+        },
+        {
+          "siteId": "tri-77047TRMPH435EA",
+          "category": "industrial_facility",
+          "distanceMiles": 2.44
+        },
+        {
+          "siteId": "tceq-131670",
+          "category": "concrete_batch_plant",
           "distanceMiles": 2.46
+        },
+        {
+          "siteId": "hcpid-2506200108",
+          "category": "construction_project",
+          "distanceMiles": 2.5
+        },
+        {
+          "siteId": "hcpid-2509290112",
+          "category": "construction_project",
+          "distanceMiles": 2.56
+        },
+        {
+          "siteId": "tceq-msw-40274",
+          "category": "transfer_station",
+          "distanceMiles": 2.57
+        },
+        {
+          "siteId": "hcpid-2505220147",
+          "category": "construction_project",
+          "distanceMiles": 2.61
+        },
+        {
+          "siteId": "hcpid-2506200087",
+          "category": "construction_project",
+          "distanceMiles": 2.61
+        },
+        {
+          "siteId": "hcpid-2508230002",
+          "category": "construction_project",
+          "distanceMiles": 2.62
+        },
+        {
+          "siteId": "hcpid-2509050173",
+          "category": "construction_project",
+          "distanceMiles": 2.62
+        },
+        {
+          "siteId": "hcpid-2102100139",
+          "category": "construction_project",
+          "distanceMiles": 2.71
+        },
+        {
+          "siteId": "hcpid-2505020086",
+          "category": "construction_project",
+          "distanceMiles": 2.76
+        },
+        {
+          "siteId": "rcra-TXR000087304",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 2.79
+        },
+        {
+          "siteId": "hcpid-2512110028",
+          "category": "construction_project",
+          "distanceMiles": 2.84
+        },
+        {
+          "siteId": "rcra-TXR000079096",
+          "category": "hazardous_waste_facility",
+          "distanceMiles": 2.84
+        },
+        {
+          "siteId": "tri-77054FMNTR1703C",
+          "category": "industrial_facility",
+          "distanceMiles": 2.9
+        },
+        {
+          "siteId": "txdot-aadt-102H809T",
+          "category": "busy_road",
+          "distanceMiles": 2.93
+        },
+        {
+          "siteId": "txdot-027116170",
+          "category": "construction_project",
+          "distanceMiles": 2.94
+        },
+        {
+          "siteId": "txdot-325604083",
+          "category": "construction_project",
+          "distanceMiles": 2.95
+        },
+        {
+          "siteId": "txdot-aadt-102SP166",
+          "category": "busy_road",
+          "distanceMiles": 2.96
+        },
+        {
+          "siteId": "txdot-027116166",
+          "category": "construction_project",
+          "distanceMiles": 2.96
+        },
+        {
+          "siteId": "tceq-msw-1403",
+          "category": "landfill",
+          "distanceMiles": 2.97
+        },
+        {
+          "siteId": "txdot-aadt-102H28801",
+          "category": "busy_road",
+          "distanceMiles": 3
         }
       ]
     }

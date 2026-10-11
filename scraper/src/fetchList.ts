@@ -16,7 +16,7 @@ const CACHE_PATH = join(RAW_DIR, "pending.html");
 
 // Section header rows carry the section name as the id of their first cell.
 // Letter sub-headers ("...-A", "...-B") belong to the same section.
-const SECTION_ID = "Concrete Batch Plant Standard Permits";
+export const SECTION_ID = "Concrete Batch Plant Standard Permits";
 
 /** One row of the concrete batch plant section, values as printed (null when blank). */
 export interface PendingRow {
@@ -31,6 +31,8 @@ export interface PendingRow {
   applicationUrl: string | null;
   /** Link text, e.g. "Technically Complete Application". */
   applicationStage: string | null;
+  /** The page section, e.g. "Concrete Batch Plant Standard Permits". */
+  section: string;
 }
 
 export async function loadPendingHtml(): Promise<string> {
@@ -39,7 +41,8 @@ export async function loadPendingHtml(): Promise<string> {
   return body.toString("utf8");
 }
 
-export function parsePendingRows(html: string): PendingRow[] {
+/** Rows of one section (the concrete batch plant section by default), or of every section with `null`. */
+export function parsePendingRows(html: string, sectionId: string | null = SECTION_ID): PendingRow[] {
   const $ = cheerio.load(html);
   const rows: PendingRow[] = [];
   let section: string | null = null;
@@ -51,7 +54,7 @@ export function parsePendingRows(html: string): PendingRow[] {
       section = headerId.replace(/-[A-Z#]$/, "");
       return;
     }
-    if (section !== SECTION_ID || cells.length !== 5) return;
+    if (!section || (sectionId !== null && section !== sectionId) || cells.length !== 5) return;
 
     const [applicantCell, facilityCell, permitCell, dateCell, appCell] = cells.toArray().map((c) => $(c));
     const appLink = appCell.find("a").first();
@@ -65,6 +68,7 @@ export function parsePendingRows(html: string): PendingRow[] {
       noticeUrl: toUrl(applicantCell.find("a").first().attr("href")),
       applicationUrl: toUrl(appLink.attr("href")),
       applicationStage: clean(appLink.text()),
+      section,
     });
   });
 

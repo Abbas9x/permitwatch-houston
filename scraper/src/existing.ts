@@ -1,33 +1,41 @@
-// Step 5: already-permitted concrete batch plants in Harris County.
+// Step 5: already-permitted concrete batch plants in the Houston area.
 //
 // Source: TCEQ's NSR Air Permits search (www2.tceq.texas.gov/airperm), queried
-// for county HARRIS, permit type STANDARD PERMIT, unit type CONCRETE BATCH
+// for TCEQ Region 12, permit type STANDARD PERMIT, unit type CONCRETE BATCH
 // PLANTS, completed projects, plain-text output. Each result row is one
 // project (initial, renewal, amendment...) on a permit; a permit is "existing"
 // when its permit status is EFFECTIVE. The search has no coordinates, so
-// addresses are geocoded with the Census geocoder.
+// addresses are geocoded in one batch (see geocode.ts).
 //
 // Usage: npm run existing [-- --refresh]
 
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import * as cheerio from "cheerio";
-import { loadManualLocations, nowIso } from "./extract.js";
-import { NOMINATIM_NOTE, geocode, inHarrisBbox } from "./geocode.js";
+import { nowIso } from "./extract.js";
+import { NOMINATIM_NOTE, geocodeMany, isStreetAddress } from "./geocode.js";
 import { RAW_DIR, cachedPostForm } from "./http.js";
 import { makeId } from "./ids.js";
-import type { PermitType, Plant } from "./types.js";
+import { TCEQ_REGION, inRegion } from "./region.js";
+import type { ConcretePlant, PermitType } from "./types.js";
 
 const SEARCH_URL = "https://www2.tceq.texas.gov/airperm/index.cfm";
 const SEARCH_START_URL = `${SEARCH_URL}?fuseaction=airpermits.start`;
-const CACHE_PATH = join(RAW_DIR, "existing", "nsr-harris-cbp.html");
 
-export const EXISTING_SOURCE = `TCEQ NSR Air Permits search (${SEARCH_START_URL}): Harris County standard permits for concrete batch plants with permit status EFFECTIVE`;
+// One search per TCEQ region; only Region 12 (Houston) for now.
+const REGIONS = [TCEQ_REGION];
+// The search silently stops at this many rows.
+const RESULT_CAP = 7000;
+
+export const searchCachePath = (region: string) => join(RAW_DIR, "existing", `nsr-region-${region.padStart(2, "0")}.html`);
+
+export const EXISTING_SOURCE = "TCEQ NSR Air Permits search";
+export const EXISTING_SOURCE_URL = SEARCH_START_URL;
 
 // Unit type 8471 is "CONCRETE BATCH PLANTS" in the search form's list.
-const SEARCH_FORM = new URLSearchParams({
+export const SEARCH_FORM = new URLSearchParams({
   RequestTimeout: "3000",
-  loc_cnty_name: "HARRIS",
+  loc_cnty_name: "0",
   proj_id: "",
   tnrcc_region_cd: "0",
   addn_num_txt: "",
@@ -63,6 +71,7 @@ type ProjectRow = Record<(typeof FIELDS)[number], string>;
 /** One row per project, as printed. */
 export function parseSearchResults(html: string): ProjectRow[] {
   const text = cheerio.load(html).text();
+  if (/There\s+are\s+no\s+projects\s+for\s+the\s+criteria/.test(text)) return [];
   const headerEnd = text.indexOf("Near City Name|");
   if (headerEnd < 0) throw new Error("NSR search results: header row not found (did the search fail?)");
   // Every record starts with the program area "NSR|"; fields never contain "|".
@@ -74,6 +83,42 @@ export function parseSearchResults(html: string): ProjectRow[] {
       const values = ["NSR", ...rec.split("|").map((v) => v.replace(/\s+/g, " ").trim())];
       return Object.fromEntries(FIELDS.map((f, i) => [f, values[i] ?? ""])) as ProjectRow;
     });
+}
+
+/** Run the NSR search with some form fields changed; the result is cached at `cacheName` under data/raw/existing/. */
+export async function searchNsr(overrides: Record<string, string>, cacheName: string): Promise<ProjectRow[]> {
+  const form = new URLSearchParams(SEARCH_FORM);
+  for (const [k, v] of Object.entries(overrides)) form.set(k, v);
+  const html = (await cachedPostForm(SEARCH_URL, form, SEARCH_START_URL, join(RAW_DIR, "existing", cacheName))).toString("utf8");
+  const rows = parseSearchResults(html);
+  if (rows.length >= RESULT_CAP) throw new Error(`NSR search ${cacheName} returned ${rows.length} rows, the search's cap; results are incomplete.`);
+  return rows;
+}
+
+/** Every completed concrete plant project in the searched regions, one search per region. */
+export async function loadAllProjects(): Promise<ProjectRow[]> {
+  const rows: ProjectRow[] = [];
+  for (const region of REGIONS) {
+    const form = new URLSearchParams(SEARCH_FORM);
+    form.set("tnrcc_region_cd", region);
+    const html = (await cachedPostForm(SEARCH_URL, form, SEARCH_START_URL, searchCachePath(region))).toString("utf8");
+    const regionRows = parseSearchResults(html);
+    if (regionRows.length >= RESULT_CAP) {
+      throw new Error(`Region ${region} returned ${regionRows.length} rows, the search's cap; results are incomplete. Split this region further.`);
+    }
+    rows.push(...regionRows);
+  }
+  return rows;
+}
+
+// "HARRIS" -> "Harris", "FORT BEND" -> "Fort Bend", "MCLENNAN" -> "McLennan", "DEWITT" -> "DeWitt"
+export function countyName(upper: string): string | null {
+  if (!upper) return null;
+  return upper
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .replace(/\bMc(\w)/g, (_, c) => `Mc${c.toUpperCase()}`)
+    .replace(/^Dewitt$/, "DeWitt");
 }
 
 // MM/DD/YYYY -> YYYY-MM-DD
@@ -90,87 +135,65 @@ const PROJECT_TYPES: Record<string, PermitType> = {
   REVISION: "amendment",
 };
 
-/** Build one existing Plant per EFFECTIVE permit, from its most recently received project. */
-export async function extractExistingHarris(scrapedAt: string): Promise<Plant[]> {
-  const html = (await cachedPostForm(SEARCH_URL, SEARCH_FORM, SEARCH_START_URL, CACHE_PATH)).toString("utf8");
-  const rows = parseSearchResults(html);
+/** Build one existing plant per EFFECTIVE permit in the region, from its most recently received project. */
+export async function extractExisting(scrapedAt: string): Promise<ConcretePlant[]> {
+  const rows = await loadAllProjects();
 
   const byPermit = new Map<string, ProjectRow[]>();
   for (const row of rows) {
-    if (row.permitStatus !== "EFFECTIVE" || row.countyName !== "HARRIS" || !row.permitNumber) continue;
+    if (row.permitStatus !== "EFFECTIVE" || !row.permitNumber || !inRegion(countyName(row.countyName))) continue;
     byPermit.set(row.permitNumber, [...(byPermit.get(row.permitNumber) ?? []), row]);
   }
+  const latestByPermit = new Map(
+    [...byPermit].map(([permit, projects]) => [
+      permit,
+      projects.reduce((a, b) => ((toIsoDate(b.receivedDate) ?? "") > (toIsoDate(a.receivedDate) ?? "") ? b : a)),
+    ]),
+  );
 
-  const manualLocations = await loadManualLocations();
-  const plants: Plant[] = [];
-  let geocoded = 0;
-  for (const [permitNumber, projects] of byPermit) {
-    const latest = projects.reduce((a, b) =>
-      (toIsoDate(b.receivedDate) ?? "") > (toIsoDate(a.receivedDate) ?? "") ? b : a,
-    );
+  // Geocode every street address in one batch.
+  const toGeocode = [...latestByPermit]
+    .filter(([, p]) => isStreetAddress(p.physicalLocation))
+    .map(([permit, p]) => ({ id: permit, street: p.physicalLocation, city: p.nearCityName || null }));
+  const geocoded = await geocodeMany(toGeocode);
+
+  const plants: ConcretePlant[] = [];
+  for (const [permitNumber, latest] of latestByPermit) {
     const address = latest.physicalLocation || null;
-    const city = latest.nearCityName || null;
-    const notes: string[] = [];
-
-    let coords: { lat: number; lng: number } | null = null;
-    let locationSource: Plant["locationSource"] = null;
-    const manual = manualLocations[permitNumber];
-    if (manual) {
-      coords = { lat: manual.lat, lng: manual.lng };
-      locationSource = "manual";
-      notes.push(manual.note);
-    } else if (address && /^\d/.test(address)) {
-      const result = await geocode([address, city, "TX"].filter(Boolean).join(", "));
-      if (result && !inHarrisBbox(result.lat, result.lng)) {
-        notes.push(`The geocoder placed this address outside Harris County (${result.lat}, ${result.lng}), so no coordinates are given.`);
-      } else if (result) {
-        coords = { lat: result.lat, lng: result.lng };
-        if (result.source === "nominatim") notes.push(NOMINATIM_NOTE);
-      } else {
-        notes.push("Neither the Census nor the OpenStreetMap geocoder found a single exact match for the address.");
-      }
-    } else {
-      notes.push("The permit search gives no street address, so the location could not be geocoded.");
-    }
-    if (coords && !locationSource) {
-      locationSource = "geocoded";
-      geocoded++;
-    }
-
+    const result = geocoded.get(permitNumber);
     const name = latest.projectName || null;
     plants.push({
       id: makeId(permitNumber, name, address),
       permitNumber,
-      category: "concrete_batch_plant",
       name,
       operator: latest.customerName || null,
       address,
-      city,
-      county: "Harris",
-      zip: (locationSource === "manual" ? manual?.zip : undefined) ?? null,
-      lat: coords?.lat ?? null,
-      lng: coords?.lng ?? null,
-      locationSource,
+      city: latest.nearCityName || null,
+      county: countyName(latest.countyName),
+      zip: null,
+      lat: result?.lat ?? null,
+      lng: result?.lng ?? null,
+      locationSource: result ? "geocoded" : null,
       status: "existing",
       // From the most recent project on the permit.
       permitType: PROJECT_TYPES[latest.projectType] ?? null,
       dateReceived: toIsoDate(latest.receivedDate),
       commentDeadline: null,
       productionRate: null,
-      emissions: [],
       noticeUrl: null,
       scrapedAt,
-      notes: notes.length ? notes.join(" ") : null,
+      notes: result?.source === "nominatim" ? NOMINATIM_NOTE : null,
     });
   }
 
-  console.log(`${rows.length} completed Harris County concrete plant projects in the NSR permit search`);
-  console.log(`  ${byPermit.size} permits with status EFFECTIVE, ${geocoded} geocoded`);
+  const mapped = plants.filter((p) => p.lat !== null).length;
+  console.log(`${rows.length} completed concrete plant projects in the NSR permit search`);
+  console.log(`  ${plants.length} permits with status EFFECTIVE in the region, ${mapped} with coordinates`);
   return plants;
 }
 
 async function main() {
-  const plants = await extractExistingHarris(nowIso());
+  const plants = await extractExisting(nowIso());
   for (const p of plants) {
     console.log(`  ${p.id} | ${p.name} | ${p.address}, ${p.city} | ${p.lat},${p.lng} | ${p.permitType} ${p.dateReceived}${p.notes ? ` | ${p.notes}` : ""}`);
   }

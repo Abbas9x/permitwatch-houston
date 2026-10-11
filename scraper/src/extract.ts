@@ -1,36 +1,26 @@
-// Step 3: turn each pending concrete plant into a Plant record using its
-// public notices, keep Harris County only, and fill in missing coordinates
-// with the Census geocoder.
+// Step 3: turn each pending concrete plant in the Houston area into a record
+// using its public notices, and fill in missing coordinates with the
+// geocoders.
 //
 // Usage: npm run extract [-- --refresh]
-// Writes data/raw/pending-harris.json (an intermediate file; step 4 writes
-// data/concrete-plants.json).
+// Writes data/raw/pending.json (an intermediate file; step 4 writes
+// data/sites.json).
 //
 // Fields are read with rules from the notice text. Anything a rule can't read
 // stays null; nothing is inferred.
 
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 import { loadPendingHtml, parsePendingRows, type PendingRow } from "./fetchList.js";
-import { NOMINATIM_NOTE, geocode } from "./geocode.js";
+import { NOMINATIM_NOTE, geocode, isStreetAddress } from "./geocode.js";
 import { RAW_DIR } from "./http.js";
 import { makeId } from "./ids.js";
 import { getNotices, loadListedNotices, type Notice } from "./notices.js";
-import type { Plant, PermitType } from "./types.js";
+import { inRegion } from "./region.js";
+import type { ConcretePlant, PermitType } from "./types.js";
 
-const OUTPUT_PATH = join(RAW_DIR, "pending-harris.json");
-
-// Hand-entered locations by permit number, for plants whose notice has no map
-// link. Used before the geocoder; see scraper/manual-locations.json.
-const MANUAL_LOCATIONS_PATH = fileURLToPath(new URL("../manual-locations.json", import.meta.url));
-
-export interface ManualLocation {
-  lat: number;
-  lng: number;
-  zip?: string;
-  note: string;
-}
+const OUTPUT_PATH = join(RAW_DIR, "pending.json");
 
 interface Location {
   address: string;
@@ -68,7 +58,8 @@ export function parseLocation(text: string): Location | null {
 export function parseMapLink(text: string): { lat: number; lng: number } | null {
   const m = text.match(/marker=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/);
   if (!m) return null;
-  const lng = Number(m[1]);
+  // Some notices drop the minus sign; every Texas longitude is west (negative).
+  const lng = -Math.abs(Number(m[1]));
   const lat = Number(m[2]);
   // Sanity check: Texas spans roughly 25.8–36.5°N and 93.5–106.7°W.
   if (lat < 25 || lat > 37 || lng < -107 || lng > -93) return null;
@@ -97,9 +88,8 @@ async function buildPlant(
   row: PendingRow,
   notices: Notice[],
   onNoticePage: boolean,
-  manual: ManualLocation | undefined,
   scrapedAt: string,
-): Promise<Plant> {
+): Promise<ConcretePlant> {
   // NAPD, then NORI, then PLS: the formal notices are the most complete.
   const firstOf = <T>(f: (n: Notice) => T | null): T | null => {
     for (const n of notices) {
@@ -113,14 +103,10 @@ async function buildPlant(
   const notes: string[] = [];
 
   let coords = firstOf((n) => parseMapLink(n.text));
-  let locationSource: Plant["locationSource"] = coords ? "tceq_map_link" : null;
-  if (!coords && manual) {
-    coords = { lat: manual.lat, lng: manual.lng };
-    locationSource = "manual";
-    notes.push(manual.note);
-  } else if (!coords && location && location.county === "Harris") {
+  let locationSource: ConcretePlant["locationSource"] = coords ? "tceq_map_link" : null;
+  if (!coords && location) {
     // Only geocode street addresses, not driving directions.
-    if (/^\d/.test(location.address)) {
+    if (isStreetAddress(location.address)) {
       const query = [location.address, location.city, `TX ${location.zip ?? ""}`.trim()].filter(Boolean).join(", ");
       const result = await geocode(query);
       if (result) {
@@ -140,13 +126,12 @@ async function buildPlant(
   return {
     id: makeId(row.permitNumber, name, address),
     permitNumber: row.permitNumber,
-    category: "concrete_batch_plant",
     name,
     operator: row.applicant,
     address,
     city: location?.city ?? null,
     county: location?.county ?? null,
-    zip: location?.zip ?? (locationSource === "manual" ? manual?.zip : undefined) ?? null,
+    zip: location?.zip ?? null,
     lat: coords?.lat ?? null,
     lng: coords?.lng ?? null,
     locationSource,
@@ -156,8 +141,6 @@ async function buildPlant(
     // Notices only say "15 days after the final newspaper notice", never a date.
     commentDeadline: null,
     productionRate: firstOf((n) => parseProductionRate(n.text)),
-    // Notices name the pollutants but never give tons per year.
-    emissions: [],
     // The notice page entry when TCEQ lists one, otherwise the notice PDF itself.
     noticeUrl: onNoticePage ? row.noticeUrl : (notices[0]?.url ?? row.noticeUrl),
     scrapedAt,
@@ -166,16 +149,15 @@ async function buildPlant(
 }
 
 /**
- * Build Plant records for every pending concrete plant in Harris County and
+ * Build records for every pending concrete plant in the Houston area and
  * print how many were skipped and why.
  */
-export async function extractPendingHarris(scrapedAt: string): Promise<Plant[]> {
+export async function extractPending(scrapedAt: string): Promise<ConcretePlant[]> {
   const rows = parsePendingRows(await loadPendingHtml());
   const listed = await loadListedNotices();
-  const manualLocations = await loadManualLocations();
 
-  const kept: Plant[] = [];
-  const skipped = { noNotice: 0, noCounty: [] as string[], otherCounty: 0, noIdentity: 0 };
+  const kept: ConcretePlant[] = [];
+  const skipped = { noNotice: 0, noCounty: [] as string[], outsideRegion: 0, noIdentity: 0 };
 
   for (const row of rows) {
     if (!row.permitNumber && !row.facilityName) {
@@ -188,24 +170,19 @@ export async function extractPendingHarris(scrapedAt: string): Promise<Plant[]> 
       continue;
     }
     const entryId = row.noticeUrl?.split("#")[1];
-    const manual = row.permitNumber ? manualLocations[row.permitNumber] : undefined;
-    const plant = await buildPlant(row, notices, !!entryId && listed.has(entryId), manual, scrapedAt);
+    const plant = await buildPlant(row, notices, !!entryId && listed.has(entryId), scrapedAt);
     if (plant.county === null) skipped.noCounty.push(row.permitNumber ?? "?");
-    else if (plant.county !== "Harris") skipped.otherCounty++;
+    else if (!inRegion(plant.county)) skipped.outsideRegion++;
     else kept.push(plant);
   }
 
-  console.log(`${rows.length} pending concrete plants on the list`);
+  console.log(`${rows.length} pending concrete plants on the list (statewide)`);
   console.log(`  skipped, no permit number, name or address: ${skipped.noIdentity}`);
   console.log(`  skipped, no public notice found: ${skipped.noNotice}`);
   console.log(`  skipped, county not readable from notices: ${skipped.noCounty.length} ${skipped.noCounty.join(", ")}`);
-  console.log(`  skipped, outside Harris County: ${skipped.otherCounty}`);
-  console.log(`  kept (Harris County): ${kept.length}`);
+  console.log(`  skipped, outside the Houston area: ${skipped.outsideRegion}`);
+  console.log(`  kept: ${kept.length}`);
   return kept;
-}
-
-export async function loadManualLocations(): Promise<Record<string, ManualLocation>> {
-  return JSON.parse(await readFile(MANUAL_LOCATIONS_PATH, "utf8")) as Record<string, ManualLocation>;
 }
 
 export function nowIso(): string {
@@ -213,7 +190,7 @@ export function nowIso(): string {
 }
 
 async function main() {
-  const kept = await extractPendingHarris(nowIso());
+  const kept = await extractPending(nowIso());
   await writeFile(OUTPUT_PATH, JSON.stringify(kept, null, 2) + "\n", "utf8");
   console.log(`Wrote ${OUTPUT_PATH}`);
   for (const p of kept) {

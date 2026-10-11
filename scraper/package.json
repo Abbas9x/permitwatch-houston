@@ -12,8 +12,7 @@
     "validate": "tsx src/validate.ts",
     "existing": "tsx src/existing.ts",
     "stats": "tsx src/stats.ts",
-    "demo": "tsx src/demo.ts",
-    "lookups": "tsx src/lookups.ts"
+    "demo": "tsx src/demo.ts"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
