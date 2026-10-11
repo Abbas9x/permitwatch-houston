@@ -32,4 +32,4 @@ Data before backend before frontend. Keep main/shared work safe; no force push o
 ## Phase 4 — verification
 - [x] Run check, E2E, secret scan, build and local stress; test real multi-category demo, clickable markers, source links, repeated searches and refresh.
 - [x] Independently review, correct defects, document counts/limitations/demo/files and review the diff.
-- [ ] Commit and push main safely after the final verification.
+- [x] Commit and push main safely after the final verification. Feature commit: `c27bc23`; remote hash verified.

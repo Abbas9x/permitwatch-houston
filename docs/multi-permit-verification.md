@@ -57,7 +57,7 @@ The manifest still uses the existing deployment importer. Its strict prevalidati
 
 Extended existing routes instead of creating a parallel API:
 
-- `GET /api/search`: existing address/ZIP or explicit latitude/longitude, radius 1–10 miles, optional `category` and `status`. Default is all categories and statuses.
+- `GET /api/search`: required `q` address/ZIP label, optional explicit latitude/longitude, radius 1–10 miles, optional `category` and `status`. Default is all categories and statuses.
 - `GET /api/permits/:id`: category/status, facility and source facts, nullable missing values and official links.
 - Existing comment-draft route: source-aware eligibility; returns `409 comment_period_unconfirmed` for unsupported unknown/historical authorizations without a listed current deadline.
 
@@ -66,9 +66,9 @@ Filters apply consistently to results, area category counts and nearest matching
 Example:
 
 ```text
-/api/search?lat=29.810683571296&lng=-95.213255154669&radius=3
-/api/search?lat=29.810683571296&lng=-95.213255154669&radius=3&category=wastewater_permit
-/api/search?lat=29.810683571296&lng=-95.213255154669&radius=3&status=expired
+/api/search?q=Houston&lat=29.810683571296&lng=-95.213255154669&radius=3
+/api/search?q=Houston&lat=29.810683571296&lng=-95.213255154669&radius=3&category=wastewater_permit
+/api/search?q=Houston&lat=29.810683571296&lng=-95.213255154669&radius=3&status=expired
 ```
 
 A known approval/effective status does not establish present operation. Pending does not mean approved. Missing limits, deadlines, operators and notice URLs stay missing; they do not cause server errors.
@@ -153,4 +153,4 @@ The final commit provides the exact path list and diff.
 
 ## 17–19. Git status, commit and push
 
-Integration target is the existing shared `main` branch. Before integration, a fresh fetch showed no incoming teammate commits against baseline `62cd754`. No force push, reset or extra branch was used. Final commit hash, push confirmation and working-tree status are reported in the completion message; this report is included in that commit and cannot contain its own hash.
+Integration target is the existing shared `main` branch. Before integration, a fresh fetch showed no incoming teammate commits against baseline `62cd754`. No force push, reset or extra branch was used. Feature commit `c27bc235b7e8770fb21cfc574e12b3c664a2710f` was pushed to GitHub main and its remote hash verified. The final documentation commit and clean working-tree status are reported in the completion message.
