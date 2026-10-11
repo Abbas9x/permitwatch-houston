@@ -1,4 +1,7 @@
 import { discardHeldEarth } from '../components/map/earthHandoff';
+import {PERMIT_CATEGORIES, type PermitFilters} from '../../../shared/permit';
+import {PermitFiltersControl} from '../components/PermitFiltersControl';
+import {CATEGORY_SYMBOLS} from '../lib/permitCategories';
 import { MAX_SEARCH_RADIUS_MILES } from '../../../shared/geo';
 import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
@@ -33,6 +36,9 @@ function MapLegend() {
   ];
   return (
     <ul className="pw-map-legend pointer-events-none absolute top-3 left-3 z-10 space-y-1 rounded-xl border border-line bg-night/80 px-3 py-2 text-xs text-ink backdrop-blur lg:top-auto lg:bottom-8">
+      <li className="font-semibold">{t('map.categories')}</li>
+      {PERMIT_CATEGORIES.map(category=><li key={category} className="flex items-center gap-2"><span aria-hidden="true" className="w-3 text-center">{CATEGORY_SYMBOLS[category]}</span>{t(`category.${category}`)}</li>)}
+      <li aria-hidden="true" className="my-1 border-t border-line" />
       {items.map((item) => (
         <li key={item.label} className="flex items-center gap-2">
           <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: item.color, boxShadow: `0 0 8px ${item.color}` }} />
@@ -48,7 +54,7 @@ function SampleBanner() {
   return <p className="rounded-xl border border-sample/40 bg-sample/10 px-4 py-3 text-sm text-sample">{t('sample.banner')}</p>;
 }
 
-function Results({ data, selectedId, coords }: { data: SearchResponse; selectedId: string | null; coords: Coords | null }) {
+function Results({ data, selectedId, coords, filters }: { data: SearchResponse; selectedId: string | null; coords: Coords | null; filters: PermitFilters }) {
   const { t, tn, lang } = useI18n();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const reducedMotion = useReducedMotion() ?? false;
@@ -68,8 +74,9 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
         lat: p.permit.lat,
         lng: p.permit.lng,
         color: TYPE_COLORS[p.permit.permitType],
+        category: p.permit.category,
         label: t('map.markerLabel', {
-          company: p.permit.company,
+          company: `${p.permit.facilityName??p.permit.company} (${t(`category.${p.permit.category}`)})`,
           type: t(`type.${p.permit.permitType}`),
           distance: formatMiles(p.distanceMiles, lang),
           direction: t(`dir.${p.compass}`),
@@ -78,20 +85,26 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
     [data, t, lang],
   );
 
-  const select = (id: string) => navigate(searchHref(data.query, id, coords, data.radiusMiles), { replace: true });
+  const select = (id: string) => navigate(searchHref(data.query, id, coords, data.radiusMiles, filters), { replace: true });
   const close = () => {
     const id = selectedId;
-    navigate(searchHref(data.query, null, coords, data.radiusMiles), { replace: true });
+    const focusedAtClose = document.activeElement;
+    navigate(searchHref(data.query, null, coords, data.radiusMiles, filters), { replace: true });
     if (id) {
-      requestAnimationFrame(() => document.querySelector<HTMLElement>(`[data-plant-button="${CSS.escape(id)}"]`)?.focus());
+      requestAnimationFrame(() => {
+        // Restore keyboard context only if the resident has not already focused another control.
+        if(document.activeElement===focusedAtClose || document.activeElement===document.body)
+          document.querySelector<HTMLElement>(`[data-plant-button="${CSS.escape(id)}"]`)?.focus();
+      });
     }
   };
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] [grid-template-areas:'head'_'map'_'body'] lg:h-[calc(100dvh-3.5rem)] lg:grid-cols-[minmax(360px,440px)_1fr] lg:grid-rows-[auto_1fr] lg:[grid-template-areas:'head_map'_'body_map']">
       <div className="space-y-3 border-line px-4 pt-5 pb-4 [grid-area:head] sm:px-6 lg:border-r lg:border-b">
-        <SearchBar key={data.query} initialValue={data.query} size="compact" radiusMiles={data.radiusMiles} />
-        <RadiusSlider value={data.radiusMiles} onChange={radius => navigate(searchHref(data.query, null, coords, radius), {replace:true})} />
+        <SearchBar key={data.query} initialValue={data.query} size="compact" radiusMiles={data.radiusMiles} filters={filters} />
+        <RadiusSlider value={data.radiusMiles} onChange={radius => navigate(searchHref(data.query, null, coords, radius, filters), {replace:true})} />
+        <PermitFiltersControl value={filters} onChange={next=>navigate(searchHref(data.query,null,coords,data.radiusMiles,next),{replace:true})} />
         <div>
           <h1 ref={headingRef} tabIndex={-1} className="text-xl leading-tight font-semibold text-ink focus:outline-none sm:text-2xl">
             {t('results.heading', { place: data.location.label })}
@@ -160,6 +173,7 @@ function Results({ data, selectedId, coords }: { data: SearchResponse; selectedI
           </ul>
         )}
         <p className="text-xs text-muted">{t('disclaimer.permits')}</p>
+        <p className="text-xs text-muted">{t('data.coverage')}</p>
       </div>
 
       <AnimatePresence>
@@ -184,21 +198,21 @@ function ResultsSkeleton() {
   );
 }
 
-export function ResultsPage({ q, selectedId, coords, radiusMiles }: { q: string; selectedId: string | null; coords: Coords | null; radiusMiles: number }) {
-  const key = coords ? `${q}@${coords.lat},${coords.lng}` : q;
-  const { state, retry } = useAsync(key, (signal) => api.search(q, coords, signal, MAX_SEARCH_RADIUS_MILES));
+export function ResultsPage({ q, selectedId, coords, radiusMiles, filters = {} }: { q: string; selectedId: string | null; coords: Coords | null; radiusMiles: number; filters?: PermitFilters }) {
+  const key = `${coords ? `${q}@${coords.lat},${coords.lng}` : q}|${filters.category??"all"}|${filters.status??"all"}`;
+  const { state, retry } = useAsync(key, (signal) => api.search(q, coords, signal, MAX_SEARCH_RADIUS_MILES, filters));
 
   useEffect(() => {
     if (state?.status === 'error') discardHeldEarth();
   }, [state?.status]);
 
   const data = useMemo(() => state?.status === 'success' ? resultsForRadius(state.data, radiusMiles) : null, [state, radiusMiles]);
-  if (data) return <Results data={data} selectedId={selectedId} coords={coords} />;
+  if (data) return <Results data={data} selectedId={selectedId} coords={coords} filters={filters} />;
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6">
       {state?.status === 'error' ? (
         <>
-          <SearchBar key={q} initialValue={q} size="compact" radiusMiles={radiusMiles} />
+          <SearchBar key={q} initialValue={q} size="compact" radiusMiles={radiusMiles} filters={filters} />
           <ErrorNotice error={state.error} onRetry={retry} />
         </>
       ) : (

@@ -121,4 +121,62 @@ export const MIGRATIONS: readonly string[] = [
     CHECK (category IN ('concrete_batch_plant', 'air_permit'));
   ALTER TABLE permits ADD COLUMN facility_name TEXT;
   `,
+  /* 4: expand categories and retain explicit authorization status/source metadata. */ `
+  CREATE TEMP TABLE saved_summaries AS SELECT * FROM permit_summaries;
+  DROP TABLE permit_summaries;
+
+  CREATE TABLE expanded_permits (
+    id                         TEXT PRIMARY KEY,
+    registration_number        TEXT NOT NULL,
+    company                    TEXT NOT NULL,
+    address                    TEXT NOT NULL,
+    city                       TEXT NOT NULL,
+    county                     TEXT NOT NULL,
+    zip                        TEXT NOT NULL,
+    lat                        REAL NOT NULL,
+    lng                        REAL NOT NULL,
+    location_source            TEXT NOT NULL CHECK (location_source IN ('dataset', 'census_geocoder', 'zip_centroid')),
+    permit_type                TEXT NOT NULL CHECK (permit_type IN ('new', 'renewal', 'amendment', 'unknown')),
+    max_production_cyd_per_hr  REAL,
+    max_hours_per_year         REAL,
+    pollutants_json            TEXT NOT NULL DEFAULT '[]',
+    controls                   TEXT,
+    notice_type                TEXT,
+    notice_issuance_date       TEXT,
+    comment_deadline           TEXT,
+    public_meeting_date        TEXT,
+    source_url                 TEXT NOT NULL,
+    raw_text                   TEXT NOT NULL DEFAULT '',
+    is_sample                  INTEGER NOT NULL DEFAULT 0 CHECK (is_sample IN (0, 1)),
+    content_hash               TEXT NOT NULL,
+    imported_at                TEXT NOT NULL,
+    category                   TEXT NOT NULL DEFAULT 'concrete_batch_plant' CHECK (category IN ('concrete_batch_plant','air_permit','wastewater_permit','solid_waste_permit')),
+    facility_name              TEXT,
+    permit_status              TEXT NOT NULL DEFAULT 'unknown' CHECK (permit_status IN ('pending','effective','issued','administratively_continued','expired','unknown')),
+    source_status              TEXT,
+    operator_name              TEXT,
+    permittee_name             TEXT,
+    data_source                TEXT,
+    retrieved_at               TEXT,
+    application_date           TEXT,
+    notice_url                 TEXT,
+    location_notes             TEXT
+  );
+
+  INSERT INTO expanded_permits (id, registration_number, company, address, city, county, zip, lat, lng, location_source, permit_type, max_production_cyd_per_hr, max_hours_per_year, pollutants_json, controls, notice_type, notice_issuance_date, comment_deadline, public_meeting_date, source_url, raw_text, is_sample, content_hash, imported_at, category, facility_name) SELECT id, registration_number, company, address, city, county, zip, lat, lng, location_source, permit_type, max_production_cyd_per_hr, max_hours_per_year, pollutants_json, controls, notice_type, notice_issuance_date, comment_deadline, public_meeting_date, source_url, raw_text, is_sample, content_hash, imported_at, category, facility_name FROM permits;
+  DROP TABLE permits;
+  ALTER TABLE expanded_permits RENAME TO permits;
+  CREATE INDEX idx_permits_lat_lng ON permits (lat, lng);
+  CREATE INDEX idx_permits_category_status ON permits (category, permit_status);
+  CREATE TABLE permit_summaries (
+    permit_id     TEXT PRIMARY KEY REFERENCES permits (id) ON DELETE CASCADE,
+    content_hash  TEXT NOT NULL,
+    summary_json  TEXT NOT NULL,
+    generator     TEXT NOT NULL,
+    created_at    TEXT NOT NULL
+  );
+
+  INSERT INTO permit_summaries SELECT * FROM saved_summaries;
+  DROP TABLE saved_summaries;
+  `,
 ];

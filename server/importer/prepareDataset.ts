@@ -7,6 +7,7 @@ export function prepareDataset(rows: unknown[]) {
   const rejected: RowIssue[]=[];
   const warnings: RowIssue[]=[];
   const seen=new Set<string>();
+  const authorizations=new Set<string>();
   for (const [index,raw] of rows.entries()) {
     const validation=validateRow(raw);
     const rowNumber=index+1;
@@ -14,12 +15,16 @@ export function prepareDataset(rows: unknown[]) {
     const {row}=validation;
     const messages:string[]=[];
     const source=new URL(row.source_url);
-    if (source.protocol!=='https:' || !(source.hostname==='tceq.texas.gov' || source.hostname.endsWith('.tceq.texas.gov')) || source.username || source.password) messages.push('source_url: must be an official HTTPS TCEQ link');
+    const tceq=source.hostname==='tceq.texas.gov' || source.hostname.endsWith('.tceq.texas.gov');
+    const epa=row.category==='wastewater_permit' && source.hostname==='echo.epa.gov' && source.pathname==='/detailed-facility-report' && !!source.searchParams.get('fid');
+    if (source.protocol!=='https:' || !(tceq || epa) || source.username || source.password) messages.push('source_url: must be an official HTTPS TCEQ link or EPA wastewater record');
+    const authorization=`${row.category}:${row.registration_number.toUpperCase()}`;
+    if (authorizations.has(authorization)) messages.push('registration_number: duplicate authorization in this category');
     if (row.is_sample) messages.push('is_sample: fictional records cannot be published');
     if (row.lat===undefined || row.lng===undefined) messages.push('lat/lng: usable Texas coordinates are required');
     if (seen.has(row.id)) messages.push(`id: duplicate "${row.id}"`);
     if (messages.length) {rejected.push({rowNumber,rowId:row.id,messages});continue;}
-    seen.add(row.id);permits.push(row);
+    seen.add(row.id);authorizations.add(authorization);permits.push(row);
     if (validation.warnings.length) warnings.push({rowNumber,rowId:row.id,messages:validation.warnings});
   }
   return {permits,rejected,warnings};

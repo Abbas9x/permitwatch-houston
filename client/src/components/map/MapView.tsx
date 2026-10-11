@@ -3,6 +3,8 @@ import { Map as MapLibreMap, Marker, NavigationControl, setWorkerUrl, type GeoJS
 // MapLibre 6 loads its tile worker from a sibling file; bundlers move it, so point MapLibre at the emitted asset.
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import type {PermitCategory} from '../../../../shared/permit';
+import {CATEGORY_SYMBOLS} from '../../lib/permitCategories';
 import { useTheme } from '../../lib/theme';
 import { takeEarth } from './earthHandoff';
 import type { LatLng } from '../../../../shared/geo';
@@ -13,6 +15,7 @@ export interface MapPlant {
   lat: number;
   lng: number;
   color: string;
+  category?: PermitCategory;
   label: string;
 }
 
@@ -57,6 +60,9 @@ function updatePlantElement(el: HTMLButtonElement, plant: MapPlant) {
   el.style.setProperty('--c', plant.color);
   el.setAttribute('aria-label', plant.label);
   el.title = plant.label;
+  const core=el.querySelector('.pw-marker-core');
+  if(core) core.textContent=plant.category ? CATEGORY_SYMBOLS[plant.category] : '';
+  el.dataset.category=plant.category??'concrete_batch_plant';
 }
 
 export default function MapView(props: MapViewProps) {

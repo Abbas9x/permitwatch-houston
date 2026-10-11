@@ -1,3 +1,4 @@
+import type {PermitFilters} from '../../../shared/permit';
 import { DEFAULT_SEARCH_RADIUS_MILES } from '../../../shared/geo';
 import type {
   ApiErrorBody,
@@ -77,12 +78,14 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 }
 
 export const api = {
-  search: (q: string, coords: Coords | null, signal?: AbortSignal, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES) => {
+  search: (q: string, coords: Coords | null, signal?: AbortSignal, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES, filters: PermitFilters = {}) => {
     const params = new URLSearchParams({ q, radius: String(radiusMiles) });
     if (coords && Number.isFinite(coords.lat) && Number.isFinite(coords.lng)) {
       params.set('lat', String(coords.lat));
       params.set('lng', String(coords.lng));
     }
+    if(filters.category) params.set('category',filters.category);
+    if(filters.status) params.set('status',filters.status);
     return apiRequest<SearchResponse>(`/api/search?${params.toString()}`, { signal, timeoutMs: 25_000 });
   },
   suggest: (q: string, signal?: AbortSignal) =>

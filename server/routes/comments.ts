@@ -1,3 +1,4 @@
+import {shouldCheckOfficialRecord} from '../../shared/commentPolicy.js';
 import { Router } from 'express';
 import { z } from 'zod';
 import type { CommentDraftResponse } from '../../shared/api.js';
@@ -26,6 +27,7 @@ export function commentRouter({ db }: { db: DB }) {
       const {id} = parseInput(ParamsSchema, req.params, 'That permit ID is not valid.');
       const record = getPermitRecord(db,id);
       if (!record) throw new HttpError(404,'permit_not_found','We could not find that permit.');
+      if(shouldCheckOfficialRecord(toPermit(record))) throw new HttpError(409,'comment_period_unconfirmed','This record does not establish a current comment period. Check the official source for current notices.');
       const body = parseInput(CommentBodySchema,req.body);
       const response: CommentDraftResponse = {
         draft:templateCommentDraft(toPermit(record),body.concerns,body.personalNote,body.language),

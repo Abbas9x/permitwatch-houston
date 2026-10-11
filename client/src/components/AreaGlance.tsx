@@ -1,3 +1,5 @@
+import {PERMIT_CATEGORIES} from '../../../shared/permit';
+import {CATEGORY_SYMBOLS} from '../lib/permitCategories';
 import type { AreaSummary } from '../../../shared/api';
 import { useI18n } from '../i18n';
 import { formatNumber } from '../lib/format';
@@ -17,7 +19,10 @@ export function AreaGlance({ area, radiusMiles }: { area: AreaSummary; radiusMil
         <p className="font-display text-4xl font-semibold text-air-2">{area.withinRadius}</p>
         <p className="text-sm text-muted">{t(`area.tile.${plural(area.withinRadius)}`, {radius:radiusMiles, unit})}</p>
       </div>
-      <div className="rounded-2xl border border-line bg-ink/[0.04] p-4">
+      {area.categoryCounts && <ul aria-label={t('area.categories')} className="space-y-2 rounded-2xl border border-line bg-ink/[0.04] p-4 text-sm">
+        {PERMIT_CATEGORIES.map(category=><li key={category} className="flex justify-between gap-3"><span><span aria-hidden="true" className="mr-2">{CATEGORY_SYMBOLS[category]}</span>{t(`category.${category}`)}</span><span className="font-semibold text-ink tabular-nums">{area.categoryCounts?.[category]??0}</span></li>)}
+      </ul>}
+      {(area.categoryCounts?.concrete_batch_plant??area.withinRadius)>0 && <div className="rounded-2xl border border-line bg-ink/[0.04] p-4">
         <p className="text-xs font-medium text-muted">{t('area.capacity', {radius:radiusMiles, unit})}</p>
         {area.combinedCapacityCydPerHr !== null ? (
           <>
@@ -25,13 +30,13 @@ export function AreaGlance({ area, radiusMiles }: { area: AreaSummary; radiusMil
               {t('area.capacityValue', { value: formatNumber(area.combinedCapacityCydPerHr, lang, 2) })}
             </p>
             <p className="mt-1 text-xs leading-relaxed text-muted">
-              {t('area.capacityNote', { listed: area.capacityListedCount, total: area.withinRadius })}
+              {t('area.capacityNote', { listed: area.capacityListedCount, total: area.categoryCounts?.concrete_batch_plant??area.withinRadius })}
             </p>
           </>
         ) : (
           <p className="mt-1 text-sm text-muted">{t('area.capacityNone')}</p>
         )}
-      </div>
+      </div>}
     </section>
   );
 }

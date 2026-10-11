@@ -24,7 +24,9 @@ await new Promise(resolve=>server.once('listening',resolve));
 const base=`http://127.0.0.1:${server.address().port}`;
 const id=imported.importedIds[0];
 const paths=['/api/health','/api/search?q=77045','/api/search?q=77020', '/api/search?q=77020&radius=1', '/api/search?q=77020&radius=10',
-  '/api/search?q=Houston&lat=29.7&lng=-95.4',`/api/permits/${id}`,'/api/geocode/suggest?q=pa'];
+  '/api/search?q=Houston&lat=29.7&lng=-95.4',
+  ...['concrete_batch_plant','air_permit','wastewater_permit','solid_waste_permit'].map(category=>`/api/search?q=Houston&lat=29.81068&lng=-95.21326&radius=10&category=${category}`),
+  '/api/search?q=Houston&lat=29.81068&lng=-95.21326&radius=10&status=expired',`/api/permits/${id}`,'/api/geocode/suggest?q=pa'];
 const unhandled=[];const onUnhandled=error=>unhandled.push(String(error));process.on('unhandledRejection',onUnhandled);
 const results=[];const before=process.memoryUsage().rss;
 try {
@@ -37,6 +39,9 @@ try {
           const response=await fetch(base+path,{signal:AbortSignal.timeout(5000)});const body=await response.json();
           if(response.status!==200 || !body || typeof body!=='object')throw new Error('Bad status/JSON');
           if(path.startsWith('/api/search') && (!Array.isArray(body.plants) || body.area.withinRadius!==body.plants.length || body.plants.some(p=>p.distanceMiles>body.radiusMiles)))throw new Error('Malformed search result');
+          const category=new URL(base+path).searchParams.get('category');const status=new URL(base+path).searchParams.get('status');
+          if(category && body.plants.some(p=>p.permit.category!==category))throw new Error('Category mismatch');
+          if(status && body.plants.some(p=>p.permit.permitStatus!==status))throw new Error('Status mismatch');
           if(path.startsWith('/api/permits/') && body.permit?.id!==id)throw new Error('Incorrect detail');
         } catch {failures++;}
         timings.push(performance.now()-begin);

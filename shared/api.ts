@@ -1,6 +1,6 @@
 /** Response shapes for the PermitWatch JSON API (shared by server and client). */
 import type { CompassPoint } from './geo.js';
-import type { Permit } from './permit.js';
+import type { Permit, PermitCategory } from './permit.js';
 
 export interface ApiErrorBody {
   error: {
@@ -39,6 +39,7 @@ export interface NearbyPlant {
 export interface AreaSummary {
   /** Number of plants within the selected search distance. */
   withinRadius: number;
+  categoryCounts?: Record<PermitCategory, number>;
   within1: number;
   within2: number;
   within3: number;

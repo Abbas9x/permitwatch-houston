@@ -119,3 +119,8 @@ describe('sites.json categories', () => {
     expect(facilityName('HOLMES ROAD PLANT B', 'ACME')).toBe('HOLMES ROAD PLANT B');
   });
 });
+
+it('does not present a known effective air authorization as a pending application',()=>{
+ const text=templateSummaryText({...base,permitStatus:'effective',sourceStatus:'Effective'},'en');
+ expect(text.summary).toContain('Effective');expect(text.summary).not.toContain('has an air permit application');expect(text.whatsChanging).not.toContain('This is an application');
+});

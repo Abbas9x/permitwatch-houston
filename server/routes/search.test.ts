@@ -66,6 +66,7 @@ describe('GET /api/search', () => {
     const body = (await request(app).get('/api/search').query({ q: '77020' })).body as SearchResponse;
     expect(body.area).toEqual({
       withinRadius: 3,
+      categoryCounts: {concrete_batch_plant:3, air_permit:0, wastewater_permit:0, solid_waste_permit:0},
       within1: 1,
       within2: 2,
       within3: 3,

@@ -3,7 +3,7 @@ import type { NearbyPlant } from '../../../shared/api';
 import { useI18n } from '../i18n';
 import { daysUntil, formatDate, formatMiles, formatNumber } from '../lib/format';
 import { TYPE_COLORS } from '../lib/permitColors';
-import { CategoryBadge, PermitTypeBadge, SampleBadge } from './Badges';
+import { CategoryBadge, PermitStatusBadge, PermitTypeBadge, SampleBadge } from './Badges';
 
 interface PlantListItemProps {
   plant: NearbyPlant;
@@ -15,6 +15,9 @@ interface PlantListItemProps {
 export function PlantListItem({ plant, index, selected, onSelect }: PlantListItemProps) {
   const { t, lang } = useI18n();
   const { permit } = plant;
+  const facility = permit.facilityName ?? permit.company;
+  const airOrConcrete = permit.category === 'air_permit' || permit.category === 'concrete_batch_plant';
+  const operator = permit.operatorName === undefined && airOrConcrete ? permit.company : permit.operatorName;
   const direction = t(`dir.${plant.compass}`);
   const days = permit.commentDeadline ? daysUntil(permit.commentDeadline) : null;
 
@@ -29,7 +32,7 @@ export function PlantListItem({ plant, index, selected, onSelect }: PlantListIte
         data-plant-button={permit.id}
         onClick={() => onSelect(permit.id)}
         aria-pressed={selected}
-        aria-label={`${permit.company}, ${t('plant.distanceLong', { distance: formatMiles(plant.distanceMiles, lang), direction })}. ${t('plant.viewDetails')}`}
+        aria-label={`${facility}, ${t('plant.distanceLong', { distance: formatMiles(plant.distanceMiles, lang), direction })}. ${t('plant.viewDetails')}`}
         className={`group relative w-full overflow-hidden rounded-2xl border p-4 text-left transition-colors ${
           selected ? 'border-air-2/70 bg-ink/10' : 'border-line bg-ink/[0.04] hover:border-ink/25 hover:bg-ink/[0.07]'
         }`}
@@ -43,13 +46,14 @@ export function PlantListItem({ plant, index, selected, onSelect }: PlantListIte
           <div className="min-w-0">
             <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
               <CategoryBadge category={permit.category} />
-              <PermitTypeBadge type={permit.permitType} />
+              {(airOrConcrete || permit.permitType !== 'unknown') && <PermitTypeBadge type={permit.permitType} />}
+              <PermitStatusBadge status={permit.permitStatus} />
               {permit.isSample && <SampleBadge />}
             </div>
-            <h3 className="truncate font-display text-base font-semibold text-ink">{permit.company}</h3>
-            {permit.facilityName && <p className="truncate text-xs text-ink/80">{permit.facilityName}</p>}
+            <h3 className="truncate font-display text-base font-semibold text-ink">{facility}</h3>
+            {operator && operator !== facility && <p className="truncate text-xs text-ink/80">{t('plant.operator')}: {operator}</p>}
             <p className="mt-0.5 text-xs text-muted">
-              {t(permit.category === 'air_permit' ? 'plant.permitNumber' : 'plant.registration', { number: permit.registrationNumber })}
+              {t(permit.category === 'concrete_batch_plant' ? 'plant.registration' : 'plant.permitNumber', { number: permit.registrationNumber })}
             </p>
           </div>
           <div className="shrink-0 text-right">
@@ -61,11 +65,11 @@ export function PlantListItem({ plant, index, selected, onSelect }: PlantListIte
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
-          <span>
+          {permit.category === 'concrete_batch_plant' && <span>
             {permit.maxProductionCydPerHr !== null
               ? t('plant.maxProductionValue', { value: formatNumber(permit.maxProductionCydPerHr, lang) })
               : `${t('plant.maxProduction')}: ${t('plant.notListed')}`}
-          </span>
+          </span>}
           {permit.noticeIssuanceDate && (
             <span>
               {t('plant.noticeDate')}: {formatDate(permit.noticeIssuanceDate, lang)}

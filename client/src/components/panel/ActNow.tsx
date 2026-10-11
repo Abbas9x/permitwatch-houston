@@ -1,4 +1,5 @@
 import { TCEQ_LINKS, type Permit } from '../../../../shared/permit';
+import { shouldCheckOfficialRecord } from '../../../../shared/commentPolicy';
 import { useI18n } from '../../i18n';
 import { daysUntil, formatDate } from '../../lib/format';
 import { ExternalLink } from '../Link';
@@ -42,31 +43,38 @@ function DeadlineStatus({ permit }: { permit: Permit }) {
 
 export function ActNow({ permit }: { permit: Permit }) {
   const { t, lang } = useI18n();
+  const recordOnly = shouldCheckOfficialRecord(permit);
+  const deadlineDays = permit.commentDeadline ? daysUntil(permit.commentDeadline) : null;
   return (
     <section aria-labelledby={`act-${permit.id}`} className="space-y-4 rounded-2xl border border-deadline/25 bg-deadline/[0.04] p-4">
       <h3 id={`act-${permit.id}`} className="text-lg font-semibold text-ink">
-        {t('act.heading')}
+        {t(recordOnly ? 'act.checkRecord' : 'act.heading')}
       </h3>
-      <DeadlineStatus permit={permit} />
+      {recordOnly ? <>
+        <p className="text-sm leading-relaxed text-ink">{t('act.noKnownPeriod')}</p>
+        {deadlineDays !== null && deadlineDays < 0 && <DeadlineStatus permit={permit} />}
+      </> : <DeadlineStatus permit={permit} />}
       {permit.publicMeetingDate && (
         <p className="text-sm text-ink">{t('act.meeting', { date: formatDate(permit.publicMeetingDate, lang) })}</p>
       )}
       <div className="flex flex-wrap gap-2">
-        <ExternalLink
+        {!recordOnly && <ExternalLink
           href={TCEQ_LINKS.eComment}
           className="inline-flex items-center rounded-xl bg-gradient-to-r from-air-1 via-air-2 to-air-3 px-4 py-2.5 text-sm font-semibold text-night"
         >
           {t('act.ecomment')}
-        </ExternalLink>
+        </ExternalLink>}
         <ExternalLink
-          href={permit.sourceUrl}
+          href={recordOnly ? permit.sourceUrl : permit.noticeUrl ?? permit.sourceUrl}
           className="inline-flex items-center rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-ink hover:bg-ink/8"
         >
-          {t('act.viewNotice')}
+          {t(recordOnly ? 'act.viewRecord' : 'act.viewNotice')}
         </ExternalLink>
       </div>
-      <p className="text-xs leading-relaxed text-muted">{t('act.publicRecord')}</p>
-      <CommentDrafter permit={permit} />
+      {!recordOnly && <>
+        <p className="text-xs leading-relaxed text-muted">{t('act.publicRecord')}</p>
+        <CommentDrafter permit={permit} />
+      </>}
     </section>
   );
 }

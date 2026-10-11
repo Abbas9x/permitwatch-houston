@@ -7,15 +7,21 @@ import {
   DEFAULT_SEARCH_RADIUS_MILES,
   type LatLng,
 } from '../../shared/geo.js';
+import type { PermitFilters } from '../../shared/permit.js';
+import type { PermitRecord } from '../db/permitsRepo.js';
 import type { DB } from '../db/index.js';
 import { listPermitRecords, listPermitRecordsInBox, toPermit } from '../db/permitsRepo.js';
 import { getSummaries } from '../db/summariesRepo.js';
 
 const round = (n: number, places: number) => Math.round(n * 10 ** places) / 10 ** places;
 
+function matches(record: PermitRecord, filters: PermitFilters): boolean {
+  return (!filters.category || record.category === filters.category) && (!filters.status || (record.permit_status ?? 'unknown') === filters.status);
+}
+
 /** Every plant within `radiusMiles`, nearest first. */
-export function findNearby(db: DB, center: LatLng, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES): NearbyPlant[] {
-  const candidates = listPermitRecordsInBox(db, boundingBox(center, radiusMiles));
+export function findNearby(db: DB, center: LatLng, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES, filters: PermitFilters = {}): NearbyPlant[] {
+  const candidates = listPermitRecordsInBox(db, boundingBox(center, radiusMiles)).filter(record=>matches(record,filters));
   const summaries = getSummaries(db, candidates.map((c) => c.id));
   return candidates
     .map((record) => {
@@ -39,10 +45,11 @@ export function findNearby(db: DB, center: LatLng, radiusMiles = DEFAULT_SEARCH_
 export { summarizeArea } from '../../shared/area.js';
 
 /** Nearest plant anywhere in the dataset (used when nothing is within the search radius). */
-export function findNearestOverall(db: DB, center: LatLng): SearchResponse['nearestOutside'] {
+export function findNearestOverall(db: DB, center: LatLng, filters: PermitFilters = {}): SearchResponse['nearestOutside'] {
   let best: SearchResponse['nearestOutside'] = null;
   let bestDistance = Infinity;
   for (const record of listPermitRecords(db)) {
+    if (!matches(record,filters)) continue;
     const d = haversineMiles(center, record);
     if (d < bestDistance) {
       bestDistance = d;

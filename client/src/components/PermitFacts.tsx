@@ -4,7 +4,7 @@ import { useI18n } from '../i18n';
 import { formatDate, formatNumber } from '../lib/format';
 import { ExternalLink } from './Link';
 
-/** "Not listed in notice – check TCEQ", linking to the permit's own source. */
+/** Missing source values always link to the official record for confirmation. */
 export function NotListed({ sourceUrl }: { sourceUrl: string }) {
   const { t } = useI18n();
   return (
@@ -27,9 +27,19 @@ function Fact({ label, children, wide = false }: { label: string; children: Reac
 export function PermitFacts({ permit }: { permit: Permit }) {
   const { t, lang } = useI18n();
   const missing = <NotListed sourceUrl={permit.sourceUrl} />;
+  const airOrConcrete = permit.category === 'air_permit' || permit.category === 'concrete_batch_plant';
+  const operator = permit.operatorName === undefined && airOrConcrete ? permit.company : permit.operatorName;
 
   return (
     <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+      <Fact label={t('plant.category')}>{t(`category.${permit.category}`)}</Fact>
+      <Fact label={t('plant.status')}>
+        {t(`status.${permit.permitStatus ?? 'unknown'}`)}
+        {permit.sourceStatus && permit.permitStatus && permit.permitStatus !== 'unknown' && <span className="ml-1 text-muted">({permit.sourceStatus})</span>}
+      </Fact>
+      <Fact label={t('plant.operator')}>{operator ?? missing}</Fact>
+      {permit.permitteeName && <Fact label={t('plant.permittee')}>{permit.permitteeName}</Fact>}
+      {(airOrConcrete || permit.permitType !== 'unknown') && <Fact label={t('plant.type')}>{t(`type.${permit.permitType}`)}</Fact>}
       {/* Production rate and operating hours are concrete-plant permit fields. */}
       {permit.category === 'concrete_batch_plant' && (
         <>
@@ -45,7 +55,7 @@ export function PermitFacts({ permit }: { permit: Permit }) {
           </Fact>
         </>
       )}
-      <Fact label={t(permit.category === 'air_permit' ? 'plant.airContaminants' : 'plant.pollutants')} wide>
+      {(airOrConcrete || permit.pollutants.length > 0) && <Fact label={t(permit.category === 'air_permit' ? 'plant.airContaminants' : 'plant.pollutants')} wide>
         {permit.pollutants.length > 0 ? (
           <ul className="flex flex-wrap gap-1.5">
             {permit.pollutants.map((p) => (
@@ -57,16 +67,17 @@ export function PermitFacts({ permit }: { permit: Permit }) {
         ) : (
           missing
         )}
-      </Fact>
-      <Fact label={t('plant.controls')} wide>
+      </Fact>}
+      {(airOrConcrete || permit.controls) && <Fact label={t('plant.controls')} wide>
         {permit.controls ?? missing}
-      </Fact>
-      <Fact label={t('plant.noticeType')} wide>
+      </Fact>}
+      {(airOrConcrete || permit.noticeType) && <Fact label={t('plant.noticeType')} wide>
         {permit.noticeType ?? missing}
-      </Fact>
-      <Fact label={t('plant.noticeDate')}>
+      </Fact>}
+      {(airOrConcrete || permit.noticeIssuanceDate) && <Fact label={t('plant.noticeDate')}>
         {permit.noticeIssuanceDate ? formatDate(permit.noticeIssuanceDate, lang) : missing}
-      </Fact>
+      </Fact>}
+      {permit.applicationDate && <Fact label={t('plant.applicationDate')}>{formatDate(permit.applicationDate, lang)}</Fact>}
       <Fact label={t('plant.deadline')}>
         {permit.commentDeadline ? (
           <span className="font-semibold text-deadline">{formatDate(permit.commentDeadline, lang)}</span>
@@ -80,11 +91,19 @@ export function PermitFacts({ permit }: { permit: Permit }) {
       <Fact label={t('plant.address')} wide>
         {permit.address}, {permit.city}, {permit.county} County, TX{permit.zip ? ` ${permit.zip}` : ''}
       </Fact>
+      {permit.locationNotes && <Fact label={t('plant.locationNotes')} wide>{permit.locationNotes}</Fact>}
+      {permit.dataSource && <Fact label={t('plant.dataSource')} wide>{permit.dataSource}</Fact>}
+      {permit.retrievedAt && <Fact label={t('plant.retrievedAt')}>{formatDate(permit.retrievedAt.slice(0, 10), lang)}</Fact>}
       <Fact label={t('plant.source')} wide>
         <ExternalLink href={permit.sourceUrl} className="text-air-2 underline underline-offset-4 hover:text-ink">
           {t('plant.sourceLink')}
         </ExternalLink>
       </Fact>
+      {permit.noticeUrl && permit.noticeUrl !== permit.sourceUrl && <Fact label={t('act.viewNotice')} wide>
+        <ExternalLink href={permit.noticeUrl} className="text-air-2 underline underline-offset-4 hover:text-ink">
+          {t('act.viewNotice')}
+        </ExternalLink>
+      </Fact>}
     </dl>
   );
 }
