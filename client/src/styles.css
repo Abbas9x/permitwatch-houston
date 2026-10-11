@@ -11,9 +11,9 @@
   --color-faint: #888888;
   --color-line: rgb(255 255 255 / 0.1);
 
-  --color-air-1: #fb923c;
+  --color-air-1: #fed7aa;
   --color-air-2: #fb923c;
-  --color-air-3: #fb923c;
+  --color-air-3: #fbbf24;
 
   /* Permit type colors: chosen for >= 4.5:1 contrast on the night background */
   --color-new: #fdba74;
@@ -157,7 +157,7 @@
   width: 16px;
   height: 16px;
   border-radius: 9999px;
-  background: var(--c);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 65%, white), var(--c));
   border: 2px solid var(--color-night);
   box-shadow:
     0 0 0 2px color-mix(in srgb, var(--c) 55%, transparent),
@@ -250,3 +250,28 @@
 }
 :root[data-theme='light'] .maplibregl-ctrl-icon,
 :root[data-theme='light'] .maplibregl-ctrl-attrib-button { filter: none; }
+
+/* Light maps use hollow, crisp markers instead of dark glowing disks. */
+:root[data-theme='light'] .pw-marker-core {
+  background: #ffffff;
+  border: 2px solid var(--c);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.18);
+}
+:root[data-theme='light'] .pw-marker-pulse { display: none; }
+:root[data-theme='light'] .pw-marker.is-selected .pw-marker-core {
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 4px var(--c);
+}
+:root[data-theme='light'] .pw-you::before {
+  inset: 3px;
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.18);
+}
+:root[data-theme='light'] .pw-you::after {
+  inset: -3px;
+  border: 1px solid rgb(0 0 0 / 0.3);
+  background: transparent;
+  animation: none;
+}
+:root[data-theme='light'] .pw-map-legend { color: #000000; background: rgb(255 255 255 / 0.95); }
+:root[data-theme='light'] .pw-map-legend span { box-shadow: none !important; }

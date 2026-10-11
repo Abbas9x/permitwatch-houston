@@ -204,6 +204,10 @@ export default function MapView(props: MapViewProps) {
     map.setPaintProperty('pw-rings-walls', 'fill-extrusion-color', color);
     map.setPaintProperty('pw-rings-fill', 'fill-color', color);
     map.setPaintProperty('pw-rings-line', 'line-color', color);
+    map.setPaintProperty('pw-rings-line', 'line-width', lightWall ? 1.25 : 2);
+    map.setPaintProperty('pw-rings-outline', 'line-color', lightWall ? '#525252' : '#000000');
+    map.setPaintProperty('pw-rings-outline', 'line-width', lightWall ? 3.5 : 6);
+    map.setPaintProperty('pw-rings-walls', 'fill-extrusion-opacity', ['interpolate', ['linear'], ['zoom'], 12.5, lightWall ? 0.12 : 0.42, 14, lightWall ? 0.06 : 0.18, 15.5, lightWall ? 0.02 : 0.06]);
   }, [ready, lightWall]);
 
   // Search location: rings, "you" marker, ring labels, and the camera fly-in.
@@ -239,8 +243,8 @@ export default function MapView(props: MapViewProps) {
       const eased = 1 - (1 - t) ** 3;
       map.setPaintProperty('pw-rings-walls', 'fill-extrusion-height', ['*', ['get', 'h'], eased]);
       map.setPaintProperty('pw-rings-line', 'line-opacity', 0.85 * eased);
-      map.setPaintProperty('pw-rings-outline', 'line-opacity', 0.95 * eased);
-      map.setPaintProperty('pw-rings-fill', 'fill-opacity', 0.045 * eased);
+      map.setPaintProperty('pw-rings-outline', 'line-opacity', (lightWall ? 0.8 : 0.95) * eased);
+      map.setPaintProperty('pw-rings-fill', 'fill-opacity', (lightWall ? 0 : 0.045) * eased);
       if (t < 1) frame = requestAnimationFrame(animateRing);
     };
     frame = requestAnimationFrame(animateRing);
@@ -256,7 +260,7 @@ export default function MapView(props: MapViewProps) {
 
     return () => cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- react to location, distance and motion preference
-  }, [ready, center.lat, center.lng, radiusMiles, reducedMotion]);
+  }, [ready, center.lat, center.lng, radiusMiles, reducedMotion, lightWall]);
 
   // Plant markers: keep DOM buttons in sync with the result list.
   useEffect(() => {

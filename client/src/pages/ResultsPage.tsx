@@ -31,7 +31,7 @@ function MapLegend() {
     { color: TYPE_COLORS.amendment, label: t('map.legendOther') },
   ];
   return (
-    <ul className="pointer-events-none absolute top-3 left-3 z-10 space-y-1 rounded-xl border border-line bg-night/80 px-3 py-2 text-xs text-ink backdrop-blur lg:top-auto lg:bottom-8">
+    <ul className="pw-map-legend pointer-events-none absolute top-3 left-3 z-10 space-y-1 rounded-xl border border-line bg-night/80 px-3 py-2 text-xs text-ink backdrop-blur lg:top-auto lg:bottom-8">
       {items.map((item) => (
         <li key={item.label} className="flex items-center gap-2">
           <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: item.color, boxShadow: `0 0 8px ${item.color}` }} />
