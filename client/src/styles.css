@@ -11,15 +11,15 @@
   --color-faint: #888888;
   --color-line: rgb(255 255 255 / 0.1);
 
-  --color-air-1: #fed7aa;
-  --color-air-2: #fb923c;
-  --color-air-3: #fbbf24;
+  --color-air-1: #fb923c;
+  --color-air-2: #c4b5fd;
+  --color-air-3: #7dd3fc;
 
   /* Permit type colors: chosen for >= 4.5:1 contrast on the night background */
-  --color-new: #fdba74;
-  --color-renewal: #fb923c;
-  --color-amendment: #f97316;
-  --color-unknown: #b5b5b5;
+  --color-new: #fbbf24;
+  --color-renewal: #38bdf8;
+  --color-amendment: #c084fc;
+  --color-unknown: var(--color-amendment);
   --color-deadline: #fb923c;
   --color-sample: #fdba74;
 
@@ -233,10 +233,10 @@
   --color-air-1: #000000;
   --color-air-2: #000000;
   --color-air-3: #000000;
-  --color-new: #000000;
-  --color-renewal: #454545;
-  --color-amendment: #626262;
-  --color-unknown: #454545;
+  --color-new: #b45309;
+  --color-renewal: #0369a1;
+  --color-amendment: #7e22ce;
+  --color-unknown: var(--color-amendment);
   --color-deadline: #000000;
   --color-sample: #454545;
   scrollbar-color: rgb(0 0 0 / 0.3) transparent;
