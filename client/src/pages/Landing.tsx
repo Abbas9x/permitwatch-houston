@@ -1,12 +1,12 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { SearchBar } from '../components/SearchBar';
-import { useTheme } from '../lib/theme';
 import { useI18n } from '../i18n';
-import { chooseBackground, type BackgroundMode } from '../lib/capabilities';
+import { isLowPowerDevice, supportsWebGL, type BackgroundMode } from '../lib/capabilities';
 
 // The WebGL scene is a separate chunk, requested only after first paint, so the search bar is usable instantly.
-const ShaderBackground = lazy(() => import('../components/background/ShaderBackground'));
+const EarthBackground = lazy(() => import('../components/background/EarthBackground'));
+import { holdEarthForSearch } from '../components/map/earthHandoff';
 
 /** Static fallback: also the first paint on every device. */
 function StaticGradient() {
@@ -30,16 +30,16 @@ function whenIdle(callback: () => void): () => void {
 
 export function Landing() {
   const { t } = useI18n();
-  const { theme } = useTheme();
   const reducedMotion = useReducedMotion() ?? false;
   const [background, setBackground] = useState<BackgroundMode>('static');
   const [sceneReady, setSceneReady] = useState(false);
   const [diving, setDiving] = useState(false);
 
-  useEffect(() => whenIdle(() => setBackground(chooseBackground())), []);
+  useEffect(() => whenIdle(() => setBackground(!isLowPowerDevice() && supportsWebGL() ? 'animated' : 'static')), []);
 
-  // Search transition: the air field "dives" toward the city while the hero fades, then the map flies in.
+  // Preserve the globe while the hero fades, then fly the same map to the search location.
   const beforeNavigate = async () => {
+    holdEarthForSearch();
     if (reducedMotion) return;
     setDiving(true);
     await new Promise((resolve) => setTimeout(resolve, 420));
@@ -54,7 +54,7 @@ export function Landing() {
   return (
     <section className="relative isolate flex min-h-[calc(100dvh-3.5rem)] flex-col overflow-hidden">
       <StaticGradient />
-      {background === 'animated' && theme === 'dark' && (
+      {background === 'animated' && (
         <Suspense fallback={null}>
           <motion.div
             aria-hidden="true"
@@ -63,7 +63,7 @@ export function Landing() {
             animate={{ opacity: sceneReady ? 1 : 0 }}
             transition={{ duration: 1.2 }}
           >
-            <ShaderBackground dive={diving} onReady={() => setSceneReady(true)} onFallback={() => setBackground('static')} />
+            <EarthBackground reducedMotion={reducedMotion} onReady={() => setSceneReady(true)} />
           </motion.div>
         </Suspense>
       )}
@@ -71,7 +71,7 @@ export function Landing() {
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-10"
-        style={{ background: "radial-gradient(ellipse at 32% 45%, color-mix(in srgb, var(--color-night) 82%, transparent), transparent)" }}
+        style={{ background: "radial-gradient(ellipse at 32% 45%, color-mix(in srgb, var(--color-night) 55%, transparent), transparent)" }}
       />
 
       <motion.div

@@ -4,8 +4,9 @@ import { Map as MapLibreMap, Marker, NavigationControl, setWorkerUrl, type GeoJS
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { useTheme } from '../../lib/theme';
+import { takeEarth } from './earthHandoff';
 import type { LatLng } from '../../../../shared/geo';
-import { DARK_STYLE_URL, LIGHT_STYLE_URL, hasWebGL, HOUSTON_OVERVIEW, ringBounds, ringLabelPoints, ringsGeoJson, ringWallsGeoJson } from './mapGeo';
+import { DARK_STYLE_URL, LIGHT_STYLE_URL, hasWebGL, EARTH_OVERVIEW, ringBounds, ringLabelPoints, ringsGeoJson, ringWallsGeoJson } from './mapGeo';
 
 export interface MapPlant {
   id: string;
@@ -81,27 +82,35 @@ export default function MapView(props: MapViewProps) {
   useEffect(() => {
     const container = containerRef.current;
     if (!webgl || !container) return;
-    currentStyle.current = styleUrl();
-    const map = new MapLibreMap({
+    const earth = takeEarth(container);
+    currentStyle.current = earth?.style ?? styleUrl();
+    const map = earth?.map ?? new MapLibreMap({
       container,
       style: currentStyle.current,
-      center: HOUSTON_OVERVIEW.center,
-      zoom: HOUSTON_OVERVIEW.zoom,
-      pitch: HOUSTON_OVERVIEW.pitch,
-      bearing: HOUSTON_OVERVIEW.bearing,
+      center: EARTH_OVERVIEW.center,
+      zoom: EARTH_OVERVIEW.zoom,
+      pitch: EARTH_OVERVIEW.pitch,
+      bearing: EARTH_OVERVIEW.bearing,
       maxPitch: 75,
       attributionControl: { compact: true },
       // On phones the map sits in the page flow: two-finger pan so one finger still scrolls the page.
       cooperativeGestures: window.matchMedia('(max-width: 1023px)').matches,
     });
     mapRef.current = map;
+    if (earth) {
+      map.scrollZoom.enable();map.boxZoom.enable();map.dragRotate.enable();map.dragPan.enable();
+      map.keyboard.enable();map.doubleClickZoom.enable();map.touchZoomRotate.enable();map.touchPitch.enable();
+      if (window.matchMedia('(max-width: 1023px)').matches) map.cooperativeGestures.enable();
+      map.getCanvas().tabIndex = 0;
+    }
     const markers = plantMarkers.current;
     map.addControl(new NavigationControl({ visualizePitch: true }), 'top-right');
     const slowTimer = window.setTimeout(() => setSlow(true), 12_000);
 
     // 'style.load' fires as soon as the style is parsed; 'load' would also wait for every initial tile,
     // which at a tilted city-wide view takes many seconds. Tiles keep streaming in behind the rings and markers.
-    map.on('style.load', () => {
+    const prepareStyle = () => {
+      map.setProjection({type:'globe'});
       window.clearTimeout(slowTimer);
       // Atmosphere: a lit horizon and fog instead of a black void when the map is tilted or rotated.
       map.setSky({
@@ -175,10 +184,13 @@ export default function MapView(props: MapViewProps) {
         },
       });
       setReady(version => version + 1);
-    });
+    };
+    map.on('style.load', prepareStyle);
+    if (earth?.ready) prepareStyle();
 
     return () => {
       window.clearTimeout(slowTimer);
+      map.off('style.load', prepareStyle);
       markers.clear();
       overlayMarkers.current = [];
       map.remove();

@@ -11,9 +11,9 @@
   --color-faint: #888888;
   --color-line: rgb(255 255 255 / 0.1);
 
-  --color-air-1: #fb923c;
-  --color-air-2: #c4b5fd;
-  --color-air-3: #7dd3fc;
+  --color-air-1: #c99572;
+  --color-air-2: #a291aa;
+  --color-air-3: #8da7b6;
 
   /* Permit type colors: chosen for >= 4.5:1 contrast on the night background */
   --color-new: #fbbf24;
@@ -275,3 +275,9 @@
 }
 :root[data-theme='light'] .pw-map-legend { color: #000000; background: rgb(255 255 255 / 0.95); }
 :root[data-theme='light'] .pw-map-legend span { box-shadow: none !important; }
+
+/* A held Earth stays behind the loading view until the results claim its canvas. */
+#root { position: relative; z-index: 1; }
+.pw-earth-handoff { position: fixed; inset: 3.5rem 0 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.pw-earth-handoff > div { width: 100%; height: 100%; }
+.pw-earth { pointer-events: none; }

@@ -3,8 +3,8 @@ import { circleRing, destinationPoint, DEFAULT_SEARCH_RADIUS_MILES, type LatLng 
 export const LIGHT_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
 export const DARK_STYLE_URL = 'https://tiles.openfreemap.org/styles/dark';
 
-/** Wide, tilted view of Houston used as the starting point of the fly-in. */
-export const HOUSTON_OVERVIEW = { center: [-95.3698, 29.7604] as [number, number], zoom: 9.3, pitch: 58, bearing: -24 };
+/** Global starting view for the Earth-to-address camera flight. */
+export const EARTH_OVERVIEW = { center: [-95, 20] as [number, number], zoom: 1.8, pitch: 0, bearing: 0 };
 
 export function ringsGeoJson(center: LatLng, radiusMiles = DEFAULT_SEARCH_RADIUS_MILES) {
   return {

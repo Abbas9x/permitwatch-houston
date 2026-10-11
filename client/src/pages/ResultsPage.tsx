@@ -1,3 +1,4 @@
+import { discardHeldEarth } from '../components/map/earthHandoff';
 import { MAX_SEARCH_RADIUS_MILES } from '../../../shared/geo';
 import { AnimatePresence, useReducedMotion } from 'framer-motion';
 import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
@@ -186,6 +187,10 @@ function ResultsSkeleton() {
 export function ResultsPage({ q, selectedId, coords, radiusMiles }: { q: string; selectedId: string | null; coords: Coords | null; radiusMiles: number }) {
   const key = coords ? `${q}@${coords.lat},${coords.lng}` : q;
   const { state, retry } = useAsync(key, (signal) => api.search(q, coords, signal, MAX_SEARCH_RADIUS_MILES));
+
+  useEffect(() => {
+    if (state?.status === 'error') discardHeldEarth();
+  }, [state?.status]);
 
   const data = useMemo(() => state?.status === 'success' ? resultsForRadius(state.data, radiusMiles) : null, [state, radiusMiles]);
   if (data) return <Results data={data} selectedId={selectedId} coords={coords} />;

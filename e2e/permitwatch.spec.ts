@@ -88,7 +88,7 @@ test('distance slider synchronizes the map, results, capacity and shared URL', a
   }).toBeLessThan(5); // Detail-panel camera padding must not offset the resized boundary.
 
   await expect(page.getByRole('region',{name:'Your area at a glance'})).toContainText('250 cubic yards/hour');
-  await expect(page.getByText('1 plant within 1 mile',{exact:true})).toBeVisible();
+  await expect(page.getByText('1 permit within 1 mile',{exact:true})).toBeVisible();
   expect(searches).toHaveLength(1); // Moving the distance does not repeat geocoding/search requests.
   await page.reload();await expect(slider).toHaveValue('1');
   await expect(page.locator('.pw-marker')).toHaveCount(1);
@@ -145,4 +145,45 @@ test('appearance switch preserves search, map controls, and preference on refres
   expect(errors).toEqual([]);
   await page.setViewportSize({width:390,height:844});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('Earth canvas continues into the searched location in both appearances', async ({page}) => {
+  await page.addInitScript(()=>{
+    Object.defineProperty(navigator,'hardwareConcurrency',{value:8});
+    Object.defineProperty(navigator,'deviceMemory',{value:8});
+  });
+  const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.emulateMedia({colorScheme:'dark'});
+  await page.goto('/');
+  const canvas=page.locator('.pw-earth .maplibregl-canvas');
+  await expect(canvas).toBeVisible({timeout:15000});
+  const earth=await canvas.elementHandle();
+  await page.getByRole('button',{name:'Switch to light mode',exact:true}).click();
+  await expect(canvas).toBeVisible({timeout:15000});
+  const search=page.getByRole('combobox',{name:'Houston address or ZIP code'});
+  await search.fill('77020');await search.press('Enter');
+  await expect(page.locator('.pw-ring-label')).toHaveText('3 mi');
+  expect(await earth!.evaluate(element=>element===document.querySelector('.maplibregl-canvas'))).toBe(true);
+  await expect(page.locator('.pw-marker')).toHaveCount(3);
+  await expect(page.locator('.pw-earth-handoff')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+
+test('failed globe searches release the parked canvas and allow retry', async ({page}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'hardwareConcurrency', {value:8});
+    Object.defineProperty(navigator, 'deviceMemory', {value:8});
+  });
+  await page.route('**/api/search?**', route => route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:{code:'unavailable',message:'Search is temporarily unavailable. Please retry.'}})}));
+  await page.goto('/');
+  await expect(page.locator('.pw-earth .maplibregl-canvas')).toBeVisible({timeout:15000});
+  const search = page.getByRole('combobox', {name:'Houston address or ZIP code'});
+  await search.fill('77020');await search.press('Enter');
+  await expect(page.getByRole('alert').filter({hasText:'Search is temporarily unavailable'})).toBeVisible();
+  await expect(page.locator('.pw-earth-handoff')).toHaveCount(0);
+  await expect(page.locator('.maplibregl-canvas')).toHaveCount(0);
+  await page.unroute('**/api/search?**');
+  await page.getByRole('button', {name:'Try again',exact:true}).click();
+  await expect(page.locator('.pw-ring-label')).toHaveText('3 mi');
 });
