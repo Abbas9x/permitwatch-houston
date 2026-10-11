@@ -58,6 +58,7 @@ export function ActNow({ permit }: { permit: Permit }) {
         <p className="text-sm text-ink">{t('act.meeting', { date: formatDate(permit.publicMeetingDate, lang) })}</p>
       )}
       <div className="flex flex-wrap gap-2">
+        <ExternalLink href={TCEQ_LINKS.complaints} className="inline-flex items-center rounded-xl border border-line px-4 py-2.5 text-sm font-semibold text-ink hover:bg-ink/8">{t('act.reportConcern')}</ExternalLink>
         {!recordOnly && <ExternalLink
           href={TCEQ_LINKS.eComment}
           className="inline-flex items-center rounded-xl bg-gradient-to-r from-air-1 via-air-2 to-air-3 px-4 py-2.5 text-sm font-semibold text-night"
@@ -73,8 +74,8 @@ export function ActNow({ permit }: { permit: Permit }) {
       </div>
       {!recordOnly && <>
         <p className="text-xs leading-relaxed text-muted">{t('act.publicRecord')}</p>
-        <CommentDrafter permit={permit} />
       </>}
+      <CommentDrafter permit={permit} concernsOnly={recordOnly} />
     </section>
   );
 }

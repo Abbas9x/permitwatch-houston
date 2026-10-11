@@ -1,3 +1,4 @@
+import { shouldCheckOfficialRecord } from '../../shared/commentPolicy.js';
 import type { PermitSummaryText } from '../../shared/api.js';
 import type { Permit, PermitCategory } from '../../shared/permit.js';
 import type { CommentConcern, Language } from '../../shared/validation.js';
@@ -205,6 +206,7 @@ export function templateCommentDraft(
   personalNote: string,
   lang: Language,
 ): CommentDraft {
+  if (shouldCheckOfficialRecord(permit)) return templateConcernDraft(permit, concerns, personalNote, lang);
   const en = lang === 'en';
   const concernText = listJoin(
     concerns.map((c) => CONCERN_LABELS[lang][c]),
@@ -260,4 +262,26 @@ export function templateCommentDraft(
       : `Comentario público sobre el permiso de aire, registro ${permit.registrationNumber} (${permit.company})`,
     body: lines.join('\n'),
   };
+}
+
+
+/** A resident can raise concerns or ask for information without a pending application. */
+function templateConcernDraft(permit: Permit, concerns: CommentConcern[], personalNote: string, lang: Language): CommentDraft {
+  const en = lang === 'en';
+  const facility = permit.facilityName ?? permit.company;
+  const topics: Record<Language, Record<CommentConcern, string>> = {
+    en: {dust:'dust and particulate matter',truck_traffic:'truck traffic',noise:'noise',hours:'operating hours',proximity_homes_schools:'nearby homes, schools and parks',cumulative:'other nearby industry',water_runoff:'stormwater runoff',more_information:'more information and available public meetings'},
+    es: {dust:'polvo y partículas',truck_traffic:'tráfico de camiones',noise:'ruido',hours:'horas de operación',proximity_homes_schools:'viviendas, escuelas y parques cercanos',cumulative:'otras industrias cercanas',water_runoff:'escorrentía de aguas pluviales',more_information:'más información y reuniones públicas disponibles'},
+  };
+  const lines = [en ? 'To TCEQ:' : 'A TCEQ:', '', en
+    ? `I am writing about ${facility}, permit record ${permit.registrationNumber}, at the reported address ${permit.address}, ${permit.city}, ${permit.county} County, Texas.`
+    : `Escribo sobre ${facility}, registro de permiso ${permit.registrationNumber}, en la dirección indicada ${permit.address}, ${permit.city}, condado de ${permit.county}, Texas.`,
+    en ? `Official source: ${permit.sourceUrl}` : `Fuente oficial: ${permit.sourceUrl}`,
+    en ? 'I would like information about the current permit conditions and the appropriate process for raising my concerns.' : 'Quisiera información sobre las condiciones actuales del permiso y el proceso adecuado para plantear mis preocupaciones.',
+  ];
+  if(concerns.length) lines.push(en ? `My concerns relate to ${listJoin(concerns.map(c=>topics[lang][c]),lang)}.` : `Mis preocupaciones se relacionan con ${listJoin(concerns.map(c=>topics[lang][c]),lang)}.`);
+  if(personalNote.trim()) lines.push(personalNote.trim());
+  lines.push(en ? 'The source record does not establish a current public-comment period. Please let me know whether any new notices or comment opportunities apply and how to submit any observations for review.' : 'El registro no establece un período actual de comentarios públicos. Por favor indíquenme si hay nuevos avisos u oportunidades para comentar y cómo presentar observaciones para su revisión.');
+  lines.push('',en ? '[Your name, if you choose to provide it]' : '[Su nombre, si desea proporcionarlo]');
+  return {subject:en ? `Concerns / request for information: permit ${permit.registrationNumber} (${facility})` : `Preocupaciones / solicitud de información: permiso ${permit.registrationNumber} (${facility})`,body:lines.join('\n')};
 }

@@ -191,6 +191,16 @@ export const en = {
   "map.categories": "Permit categories",
   "area.categories": "Permits by category",
   "data.coverage": "Source snapshot covers selected Houston-area permits, not every facility. Status does not establish current operation.",
+  "act.reportConcern": "Report an environmental concern",
+  "concerns.heading": "Draft your concerns",
+  "concerns.intro": "Choose your concerns and describe any observations in your own words. Create an editable draft, then use the official TCEQ complaint process for an observed environmental problem. A permit record alone does not establish a violation.",
+  "concerns.notePlaceholder": "Describe what you observed, where and when, or what information you want to request.",
+  "concerns.submit": "Draft my concerns",
+  "concerns.resultLabel": "Your concerns draft (edit freely)",
+  "concerns.body": "Concerns / request for information",
+  "concerns.byTemplate": "Built from the record and your input. Add only observations you can describe yourself. You choose how to send it; this is not confirmation of an open permit-comment period.",
+  "map.sharedLocation": "{count} permits share this location; markers are separated for selection.",
+  "map.homeLegend": "Your search location (not a permit)",
 } as const;
 
 export type MessageKey = keyof typeof en;

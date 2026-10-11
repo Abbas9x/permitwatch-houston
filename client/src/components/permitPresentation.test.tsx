@@ -50,11 +50,12 @@ describe('permit presentation',()=>{
   it.each(['wastewater_permit','solid_waste_permit'] as const)('does not solicit comments for issued %s without a listed future deadline',category=>{
     renderEn(<ActNow permit={{...base,category}} />);
     expect(screen.queryByRole('link',{name:/Comment on TCEQ eComment/})).toBeNull();
-    expect(screen.queryByRole('button',{name:/draft/i})).toBeNull();
-    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.getByRole('button',{name:'Draft my concerns'})).toBeTruthy();
+    expect(screen.getByRole('textbox',{name:'Anything else you want to say? (optional)'})).toBeTruthy();
     const links=screen.getAllByRole('link');
-    expect(links).toHaveLength(1);
-    expect(links[0]!.getAttribute('href')).toBe(base.sourceUrl);
+    expect(links).toHaveLength(2);
+    expect(screen.getByRole('link',{name:/official record/i}).getAttribute('href')).toBe(base.sourceUrl);
+    expect(screen.getByRole('link',{name:'Report an environmental concern'})).toBeTruthy();
   });
 
   it.each([
@@ -65,7 +66,7 @@ describe('permit presentation',()=>{
   ] as const)('requires a listed current deadline for $category / $permitStatus comment actions',record=>{
     renderEn(<ActNow permit={{...base,...record}} />);
     expect(screen.queryByRole('link',{name:/Comment on TCEQ eComment/})).toBeNull();
-    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.getByRole('textbox',{name:'Anything else you want to say? (optional)'})).toBeTruthy();
     expect(screen.getByRole('link',{name:/official record/i}).getAttribute('href')).toBe(base.sourceUrl);
   });
 
@@ -88,7 +89,7 @@ describe('permit presentation',()=>{
     vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-10-11T17:00:00Z'));
     renderEn(<ActNow permit={{...base,category:'concrete_batch_plant',permitStatus:'unknown',commentDeadline:'2026-10-10'}} />);
     expect(screen.queryByRole('link',{name:/Comment on TCEQ eComment/})).toBeNull();
-    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.getByRole('textbox',{name:'Anything else you want to say? (optional)'})).toBeTruthy();
     expect(screen.getByText(/has passed/)).toBeTruthy();
   });
 

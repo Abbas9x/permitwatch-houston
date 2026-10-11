@@ -29,6 +29,7 @@ export interface MapViewProps {
   reducedMotion: boolean;
   ariaLabel: string;
   youLabel: string;
+  sharedLocationLabel?: (count: number) => string;
   unavailableText: string;
   loadingText: string;
   /** Shown when tiles take unusually long (slow network or cold server), instead of claiming the map is unsupported. */
@@ -66,8 +67,29 @@ function updatePlantElement(el: HTMLButtonElement, plant: MapPlant) {
   el.dataset.category=plant.category??'concrete_batch_plant';
 }
 
+/** Separate icons in screen pixels while retaining each source coordinate. */
+function sharedMarkerOffsets(plants: MapPlant[]) {
+  const groups = new Map<string, MapPlant[]>();
+  for (const plant of plants) {
+    const key = `${plant.lat},${plant.lng}`;
+    const group = groups.get(key) ?? [];
+    group.push(plant);
+    groups.set(key, group);
+  }
+  const offsets = new Map<string, {offset: [number, number]; count: number}>();
+  for (const group of groups.values()) {
+    group.sort((a,b)=>a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+    const radius = group.length > 1 ? 24 / Math.sin(Math.PI / group.length) : 0;
+    group.forEach((plant,index)=>{
+      const angle = Math.PI + index * 2 * Math.PI / group.length;
+      offsets.set(plant.id,{offset:[radius*Math.cos(angle),radius*Math.sin(angle)],count:group.length});
+    });
+  }
+  return offsets;
+}
+
 export default function MapView(props: MapViewProps) {
-  const { center, radiusMiles, plants, selectedId, reducedMotion } = props;
+  const { center, radiusMiles, plants, selectedId, reducedMotion, sharedLocationLabel } = props;
   const { theme } = useTheme();
   const lightWall = theme === 'light';
   const styleUrl = useEffectEvent(() => theme === 'light' ? LIGHT_STYLE_URL : DARK_STYLE_URL);
@@ -263,6 +285,14 @@ export default function MapView(props: MapViewProps) {
     you.className = 'pw-you';
     you.setAttribute('role', 'img');
     you.setAttribute('aria-label', props.youLabel);
+    you.title = props.youLabel;
+    const house = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    house.setAttribute('viewBox','0 0 24 24');
+    house.setAttribute('aria-hidden','true');
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d','M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9');
+    path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','2');path.setAttribute('stroke-linecap','round');path.setAttribute('stroke-linejoin','round');
+    house.append(path);you.append(house);
     const markers = [new Marker({ element: you }).setLngLat([center.lng, center.lat]).addTo(map)];
     for (const { radius, point } of ringLabelPoints(center, radiusMiles)) {
       const label = document.createElement('div');
@@ -309,6 +339,7 @@ export default function MapView(props: MapViewProps) {
     if (!ready || !map || !map.getSource(RING_SOURCE)) return;
     const existing = plantMarkers.current;
     const nextIds = new Set(plants.map((p) => p.id));
+    const offsets = sharedMarkerOffsets(plants);
     for (const [id, { marker }] of existing) {
       if (!nextIds.has(id)) {
         marker.remove();
@@ -328,8 +359,15 @@ export default function MapView(props: MapViewProps) {
       }
       entry.marker.setLngLat([plant.lng, plant.lat]);
       updatePlantElement(entry.el, plant);
+      const placement = offsets.get(plant.id)!;
+      entry.marker.setOffset(placement.offset);
+      if(placement.count > 1){
+        entry.el.dataset.sharedLocation = String(placement.count);
+        const label = `${plant.label}. ${sharedLocationLabel?.(placement.count) ?? ''}`;
+        entry.el.setAttribute('aria-label',label);entry.el.title=label;
+      }else delete entry.el.dataset.sharedLocation;
     }
-  }, [ready, plants]);
+  }, [ready, plants, sharedLocationLabel]);
 
   // Selection: highlight the marker and bring it into view beside the panel.
   useEffect(() => {

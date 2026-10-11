@@ -57,5 +57,6 @@ export type Permit = z.infer<typeof PermitSchema>;
 /** Public TCEQ pages we link to for confirmation. */
 export const TCEQ_LINKS = {
   eComment: 'https://www14.tceq.texas.gov/epic/eComment/',
+  complaints: 'https://www.tceq.texas.gov/compliance/complaints/',
   airPermitSearch: 'https://www.tceq.texas.gov/permitting/air/nav/air_status_permits.html',
 } as const;

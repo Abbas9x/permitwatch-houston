@@ -9,7 +9,7 @@ import { ErrorNotice } from '../ErrorNotice';
 
 type Status = { kind: 'idle' } | { kind: 'loading' } | { kind: 'error'; error: ApiError } | { kind: 'done'; response: CommentDraftResponse };
 
-export function CommentDrafter({ permit }: { permit: Permit }) {
+export function CommentDrafter({ permit, concernsOnly = false }: { permit: Permit; concernsOnly?: boolean }) {
   const { t, lang } = useI18n();
   const [concerns, setConcerns] = useState<Set<CommentConcern>>(new Set());
   const [note, setNote] = useState('');
@@ -65,10 +65,10 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
 
 
   return (
-    <div className="space-y-4 border-t border-line pt-4">
+    <div className="space-y-4 rounded-xl border border-line bg-night/95 p-4">
       <div>
-        <h4 className="text-base font-semibold text-ink">{t('draft.heading')}</h4>
-        <p className="mt-1 text-sm leading-relaxed text-muted">{t('draft.intro')}</p>
+        <h4 className="text-base font-semibold text-ink">{t(concernsOnly ? 'concerns.heading' : 'draft.heading')}</h4>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{t(concernsOnly ? 'concerns.intro' : 'draft.intro')}</p>
       </div>
 
       <form onSubmit={submit} noValidate className="space-y-4">
@@ -105,7 +105,7 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
             onChange={(e) => setNote(e.target.value.slice(0, PERSONAL_NOTE_MAX))}
             maxLength={PERSONAL_NOTE_MAX}
             rows={3}
-            placeholder={t('draft.notePlaceholder')}
+            placeholder={t(concernsOnly ? 'concerns.notePlaceholder' : 'draft.notePlaceholder')}
             className="w-full resize-y rounded-xl border border-line bg-night/60 px-3 py-2 text-sm text-ink placeholder:text-faint focus:border-air-2/70 focus:outline-none"
           />
           <p className="mt-1 text-right text-xs text-faint">
@@ -122,7 +122,7 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
           disabled={status.kind === 'loading'}
           className="w-full rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-night transition-opacity disabled:opacity-60"
         >
-          {status.kind === 'loading' ? t('draft.drafting') : t('draft.submit')}
+          {status.kind === 'loading' ? t('draft.drafting') : t(concernsOnly ? 'concerns.submit' : 'draft.submit')}
         </button>
       </form>
 
@@ -137,7 +137,7 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
         <AnimatePresence>
           {status.kind === 'done' && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-              <p className="text-sm font-medium text-ink">{t('draft.resultLabel')}</p>
+              <p className="text-sm font-medium text-ink">{t(concernsOnly ? 'concerns.resultLabel' : 'draft.resultLabel')}</p>
               <div>
                 <label htmlFor={ids.subject} className="mb-1 block text-xs font-medium text-muted">
                   {t('draft.subject')}
@@ -151,7 +151,7 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
               </div>
               <div>
                 <label htmlFor={ids.body} className="mb-1 block text-xs font-medium text-muted">
-                  {t('draft.body')}
+                  {t(concernsOnly ? 'concerns.body' : 'draft.body')}
                 </label>
                 <textarea
                   id={ids.body}
@@ -162,7 +162,7 @@ export function CommentDrafter({ permit }: { permit: Permit }) {
                   className="w-full resize-y rounded-xl border border-line bg-night/60 px-3 py-2 text-sm leading-relaxed text-ink focus:border-air-2/70 focus:outline-none"
                 />
               </div>
-              <p className="text-xs leading-relaxed text-muted">{t('draft.byTemplate')}</p>
+              <p className="text-xs leading-relaxed text-muted">{t(concernsOnly ? 'concerns.byTemplate' : 'draft.byTemplate')}</p>
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"

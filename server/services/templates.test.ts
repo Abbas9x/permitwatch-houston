@@ -124,3 +124,13 @@ it('does not present a known effective air authorization as a pending applicatio
  const text=templateSummaryText({...base,permitStatus:'effective',sourceStatus:'Effective'},'en');
  expect(text.summary).toContain('Effective');expect(text.summary).not.toContain('has an air permit application');expect(text.whatsChanging).not.toContain('This is an application');
 });
+
+
+it('lets residents draft concerns about unknown/expired authorizations without inventing a pending application or observations',()=>{
+ for(const category of ['concrete_batch_plant','wastewater_permit','solid_waste_permit'] as const)for(const lang of ['en','es'] as const){
+  const draft=templateCommentDraft({...base,category,permitStatus:'unknown'},['dust'],'Please explain the current conditions.',lang);
+  expect(draft.subject).toContain('2487');expect(draft.body).toContain('Please explain the current conditions.');
+  expect(draft.body).not.toMatch(/public record for this application|expediente público de esta solicitud|would be permitted|tendría permiso|I observed|He observado/);
+  expect(draft.body).toContain(lang==='en'?'current permit conditions':'condiciones actuales');
+ }
+});

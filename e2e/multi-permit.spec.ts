@@ -58,3 +58,35 @@ test('real filters preserve radius, refresh, another address and mobile Spanish 
  await page.getByRole('button',{name:'Cambiar a español'}).click();await expect(page.getByRole('combobox',{name:'Categoría del permiso',exact:true})).toHaveValue('wastewater_permit');await expect(page.getByRole('combobox',{name:'Estado del permiso',exact:true})).toHaveValue('effective');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
 });
+
+test('shared coordinates keep five real permits separately clickable and exclude the home marker from the count',async({page})=>{
+ await page.goto('/?q=Shores+Edge&lat=30.0485548&lng=-95.5958742&radius=2');
+ await expect(page.locator('.pw-marker')).toHaveCount(5);
+ await expect(page.locator('[data-plant-button]')).toHaveCount(5);
+ await expect(page.getByText('5 permits within 2 miles',{exact:true})).toBeVisible();
+ await expect(page.locator('.pw-you')).toHaveCount(1);
+ const first=page.locator('[data-plant-id="tceq-153154L001"]');const second=page.locator('[data-plant-id="tceq-74460L002"]');
+ const a=await first.boundingBox();const b=await second.boundingBox();
+ expect(Math.hypot(a!.x-b!.x,a!.y-b!.y)).toBeGreaterThanOrEqual(44);
+ for(const marker of [first,second]){
+  await marker.click();await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByRole('button',{name:'Close permit details',exact:true}).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+ }
+ await expect(page.locator('.pw-you svg')).toHaveCount(1);
+});
+
+test('an unknown historical permit still offers an editable concerns draft without claiming an open comment period',async({page})=>{
+ await page.goto('/?q=Shores+Edge&lat=30.0485548&lng=-95.5958742&radius=2&permit=tceq-153154L001');
+ const dialog=page.getByRole('dialog');await expect(dialog).toBeVisible();
+ await expect(dialog.getByRole('link',{name:'Comment on TCEQ eComment',exact:true})).toHaveCount(0);
+ await expect(dialog.getByRole('link',{name:'Report an environmental concern',exact:true})).toHaveAttribute('href','https://www.tceq.texas.gov/compliance/complaints/');
+ await dialog.locator('label').filter({hasText:'Dust and particulate matter'}).click();
+ await dialog.getByRole('textbox',{name:'Anything else you want to say? (optional)',exact:true}).fill('Please explain the current permit conditions.');
+ await dialog.getByRole('button',{name:'Draft my concerns',exact:true}).click();
+ const draft=dialog.getByRole('textbox',{name:'Concerns / request for information',exact:true});
+ await expect(draft).toHaveValue(/153154L001/);
+ await expect(draft).toHaveValue(/Please explain the current permit conditions/);
+ await expect(draft).not.toHaveValue(/public record for this application/);
+ await draft.fill('Edited concerns for review.');await expect(draft).toHaveValue('Edited concerns for review.');
+});

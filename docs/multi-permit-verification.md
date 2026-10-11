@@ -59,7 +59,7 @@ Extended existing routes instead of creating a parallel API:
 
 - `GET /api/search`: required `q` address/ZIP label, optional explicit latitude/longitude, radius 1–10 miles, optional `category` and `status`. Default is all categories and statuses.
 - `GET /api/permits/:id`: category/status, facility and source facts, nullable missing values and official links.
-- Existing comment-draft route: source-aware eligibility; returns `409 comment_period_unconfirmed` for unsupported unknown/historical authorizations without a listed current deadline.
+- Existing comment-draft route: source-aware wording; unknown/historical authorizations return an editable concerns / information-request draft without claiming a current application comment period.
 
 Filters apply consistently to results, area category counts and nearest matching records outside the radius. Existing deterministic distance and bearing calculations are reused. Invalid categories/statuses, repeated parameters, malformed coordinates, incomplete coordinate pairs and invalid radius values are rejected cleanly.
 
@@ -154,3 +154,12 @@ The final commit provides the exact path list and diff.
 ## 17–19. Git status, commit and push
 
 Integration target is the existing shared `main` branch. Before integration, a fresh fetch showed no incoming teammate commits against baseline `62cd754`. No force push, reset or extra branch was used. Feature commit `c27bc235b7e8770fb21cfc574e12b3c664a2710f` was pushed to GitHub main and its remote hash verified. The final documentation commit and clean working-tree status are reported in the completion message.
+
+
+## October 11 follow-up: shared map points and concerns drafting
+
+At 19710 Shores Edge Dr, radius 2 miles, five permits share four locations. SPAWGLASS `153154L001` and WILLIAMS BROTHERS `74460L002` have identical source coordinates; the home point is excluded from the count. Marker icons now use separate screen offsets for identical coordinates, with source coordinates/distances untouched. A house symbol and legend identify the search location.
+
+Historical/unknown permit records now offer a concerns drafter and official TCEQ environmental-complaint link. Generated drafts retain record/location/source facts and user-written concerns, without asserting a pending application, open deadline, operating status or violation. Formal eComment calls to action retain the source-aware period policy. Existing concerns validation, rate limiting, editable drafts and manual submission remain in place.
+
+Regression tests first reproduced the zero-pixel marker separation, missing complaint link/form, and backend 409. Corrected behavior passes 210 tests plus 13 browser scenarios; the production build and secret scan pass. The current local preview uses port 8789.

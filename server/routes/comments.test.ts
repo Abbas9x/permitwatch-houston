@@ -24,7 +24,7 @@ describe('data-only comment drafts', () => {
       }
       db.prepare("UPDATE permits SET permit_status='unknown' WHERE id='sample-005'").run();
       const unconfirmed=await request(app).post('/api/permits/sample-005/comment-draft').send({concerns:['dust'],language:'en'});
-      expect(unconfirmed.status).toBe(409);expect(unconfirmed.body.error.code).toBe('comment_period_unconfirmed');
+      expect(unconfirmed.status).toBe(200);expect(unconfirmed.body.draft.subject).toContain('Concerns');expect(unconfirmed.body.draft.body).not.toContain('public record for this application');
       expect((await request(app).post('/api/permits/unknown/comment-draft').send({concerns:['dust'],language:'en'})).status).toBe(404);
       expect((await request(app).post('/api/permits/sample-005/ask').send({question:'Hours?',language:'en'})).status).toBe(404);
     } finally {db.close();}
