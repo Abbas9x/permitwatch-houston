@@ -1,3 +1,4 @@
+import { pickOfficialSource } from "./sourceUrl.js";
 // Step 3: turn each pending concrete plant in the Houston area into a record
 // using its public notices, and fill in missing coordinates with the
 // geocoders.
@@ -142,7 +143,7 @@ async function buildPlant(
     commentDeadline: null,
     productionRate: firstOf((n) => parseProductionRate(n.text)),
     // The notice page entry when TCEQ lists one, otherwise the notice PDF itself.
-    noticeUrl: onNoticePage ? row.noticeUrl : (notices[0]?.url ?? row.noticeUrl),
+    noticeUrl: pickOfficialSource([onNoticePage ? row.noticeUrl : null, ...notices.map((n) => n.url), row.noticeUrl]),
     scrapedAt,
     notes: notes.length ? notes.join(" ") : null,
   };

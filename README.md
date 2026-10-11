@@ -17,12 +17,16 @@ Requires Node.js 22.12 or newer.
 ```bash
 npm install
 cp .env.example .env       
-npm run import -- data/sites.json # real cached TCEQ permit records
+npm run import -- data/validated-permits.json # real cached TCEQ permit records
 npm run dev               # API on :8787, web app on :5173
 ```
 
 
-### Importing the real dataset
+### Refreshing and importing the real dataset
+
+The original broad dataset remains in `data/sites.json`. Deployments use the accepted records in `data/validated-permits.json`; exclusions and missing-field coverage are recorded in `data/permit-validation.json`. See [the data workflow](data/README.md) for refresh and validation commands.
+
+### Importing a dataset
 
 ```bash
 npm run import -- path/to/permits.csv                   # .csv or .json; bad rows are rejected and logged, never crash
@@ -47,7 +51,7 @@ Install Chromium once with `npx playwright install chromium` before running brow
 
 ## Production
 
-`render.yaml` builds the client and server, imports the real dataset, and starts one service for the frontend and API. Configure `DATABASE_PATH` and `ALLOWED_ORIGINS` as shown in `.env.example`; the Render service URL is automatically allowed. Locally, run `npm run build`, then `npm run import:prod -- data/sites.json`, then `npm start`.
+`render.yaml` builds the client and server, imports the real dataset, and starts one service for the frontend and API. Configure `DATABASE_PATH` and `ALLOWED_ORIGINS` as shown in `.env.example`; the Render service URL is automatically allowed. Locally, run `npm run build`, then `npm run import:prod -- data/validated-permits.json`, then `npm start`.
 
 ## Data rules
 

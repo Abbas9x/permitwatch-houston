@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-10-11T08:16:42.083Z",
+  "source": "data/permit-sites.json",
+  "sourceGeneratedAt": "2026-10-11T08:16:32Z",
+  "sourceSha256": "fac7b8c0ab1ee3679bc62348d7d569034b329d91c0a09e261112313acd4fab87",
+  "refreshMode": "Reprocessed cached official indexes and downloaded notice documents from the preceding refresh.",
+  "sourceRecords": 214,
+  "eligible": 214,
+  "accepted": 213,
+  "rejected": [
+    {
+      "rowNumber": 200,
+      "messages": [
+        "address: Invalid input: expected string, received null",
+        "city: Invalid input: expected string, received null"
+      ]
+    }
+  ],
+  "warnings": [],
+  "coverage": {
+    "commentDeadlines": 0,
+    "productionRates": 5,
+    "pollutantLists": 57
+  },
+  "limitations": [
+    "Validation confirms required fields and usable coordinates, not the current legal status of each permit.",
+    "Missing deadlines and production limits are left absent, never calculated or invented."
+  ]
+}

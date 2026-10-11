@@ -12,7 +12,8 @@
     "validate": "tsx src/validate.ts",
     "existing": "tsx src/existing.ts",
     "stats": "tsx src/stats.ts",
-    "demo": "tsx src/demo.ts"
+    "demo": "tsx src/demo.ts",
+    "permits": "tsx src/refreshPermits.ts --refresh-lists"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

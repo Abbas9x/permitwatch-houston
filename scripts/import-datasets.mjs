@@ -31,6 +31,11 @@ if (!existsSync(IMPORTER)) {
   process.exit(1);
 }
 
+// Validate every manifest file before clearing or writing any database.
+for (const file of files) {
+  execFileSync(process.execPath, [IMPORTER, file, '--validate-only'], { stdio: 'inherit' });
+}
+
 if (process.argv.includes('--fresh')) {
   const db = process.env.DATABASE_PATH;
   if (process.env.RENDER && db) {
@@ -43,6 +48,6 @@ if (process.argv.includes('--fresh')) {
 
 for (const file of files) {
   console.warn(`Importing ${file} ...`);
-  execFileSync(process.execPath, [IMPORTER, file], { stdio: 'inherit' });
+  execFileSync(process.execPath, [IMPORTER, file, '--strict-real'], { stdio: 'inherit' });
 }
 console.warn(`Imported ${files.length} dataset(s) from ${MANIFEST}.`);

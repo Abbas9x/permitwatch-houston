@@ -70,7 +70,8 @@ export async function getNotices(
     if (!url) continue;
 
     const fileName = decodeURIComponent(new URL(url).pathname.split("/").pop()!);
-    const pdf = await cachedGet(url, join(RAW_DIR, "notices", fileName));
+    const retryMissing = process.argv.includes("--refresh-lists") && listedLinks.has(kind);
+    const pdf = await cachedGet(url, join(RAW_DIR, "notices", fileName), retryMissing);
     if (!pdf) continue;
     notices.push({ kind, url, text: await pdfText(pdf) });
   }
