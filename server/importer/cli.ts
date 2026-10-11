@@ -11,6 +11,7 @@ import { createServices, importerGeocode } from '../container.js';
 import { openDatabase } from '../db/index.js';
 import { deleteSamplePermits } from '../db/permitsRepo.js';
 import { createLogger } from '../lib/logger.js';
+import { prepareDataset } from './prepareDataset.js';
 import { generateSummaries } from './summaries.js';
 import { importRows, readDatasetFile } from './importer.js';
 
@@ -18,12 +19,14 @@ const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
     'remove-samples': { type: 'boolean', default: false },
+    'strict-real': { type: 'boolean', default: false },
+    'validate-only': { type: 'boolean', default: false },
   },
 });
 
 const env = loadEnvOrExit();
 const logger = createLogger(env.LOG_LEVEL);
-const db = openDatabase(env.DATABASE_PATH);
+
 const file = positionals[0] ?? 'data/sample-permits.json';
 
 let rows: unknown[];
@@ -34,6 +37,19 @@ try {
   process.exit(1);
 }
 
+if (values['strict-real'] || values['validate-only']) {
+  const prepared = prepareDataset(rows);
+  if (prepared.rejected.length || !prepared.permits.length) {
+    console.error('Publication validation failed; database was left unchanged.', prepared.rejected);
+    process.exit(1);
+  }
+  rows = prepared.permits;
+}
+if (values['validate-only']) {
+  console.warn(`Validated ${rows.length} real permits in ${file}; no database opened.`);
+  process.exit(0);
+}
+const db = openDatabase(env.DATABASE_PATH);
 const services = createServices(db, logger);
 
 const report = await importRows(rows, { db, logger, source: file, geocode: importerGeocode(services.addressGeocoder) });

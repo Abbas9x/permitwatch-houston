@@ -3,13 +3,13 @@
 // data/raw/ so reruns don't refetch.
 
 import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { basename, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const RAW_DIR = fileURLToPath(new URL("../../data/raw/", import.meta.url));
 
-const USER_AGENT = "PermitWatch-scraper (CodeRED hackathon project; https://github.com/davidssien/CODERED-Hackathon)";
+const USER_AGENT = "PermitWatch-scraper (CodeRED hackathon project; https://github.com/Abbas9x/permitwatch-houston)";
 const MIN_GAP_MS = 1000;
 
 let lastRequestAt = 0;
@@ -17,6 +17,17 @@ let queue: Promise<unknown> = Promise.resolve();
 
 /** Global --refresh flag: refetch instead of reading the cache. */
 export const REFRESH = process.argv.includes("--refresh");
+const refreshed = new Set<string>();
+const retriedMissing = new Set<string>();
+/** Refresh source indexes once per run; reuse downloaded PDFs and geocoding caches. */
+function shouldRefresh(cachePath: string): boolean {
+  if (REFRESH) return true;
+  const list = basename(cachePath);
+  const isIndex = list === "pending.html" || list === "notices.html" || /^nsr-.*\.html$/.test(list);
+  if (!process.argv.includes("--refresh-lists") || !isIndex || refreshed.has(cachePath)) return false;
+  refreshed.add(cachePath);
+  return true;
+}
 
 /** Run requests one at a time, at least MIN_GAP_MS apart. */
 function enqueue<T>(task: () => Promise<T>): Promise<T> {
@@ -33,7 +44,7 @@ async function politeFetch(url: string, init: RequestInit = {}): Promise<Respons
     const wait = lastRequestAt + MIN_GAP_MS - Date.now();
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));
     lastRequestAt = Date.now();
-    const res = await fetch(url, { ...init, headers: { "User-Agent": USER_AGENT, ...init.headers } });
+    const res = await fetch(url, { ...init, signal: init.signal ?? AbortSignal.timeout(60_000), headers: { "User-Agent": USER_AGENT, ...init.headers } });
     const retryable = res.status === 429 || res.status >= 500;
     if (!retryable || attempt >= RETRY_DELAYS_MS.length) return res;
     await res.arrayBuffer();
@@ -45,12 +56,15 @@ async function politeFetch(url: string, init: RequestInit = {}): Promise<Respons
  * GET `url`, caching the body at `cachePath`. Returns null for a 404, and
  * remembers it with a `<cachePath>.404` marker. Other errors throw.
  */
-export function cachedGet(url: string, cachePath: string): Promise<Buffer | null> {
+export function cachedGet(url: string, cachePath: string, retryMissing = false): Promise<Buffer | null> {
   return enqueue(async () => {
     const missingMarker = `${cachePath}.404`;
-    if (!REFRESH) {
+    if (!shouldRefresh(cachePath)) {
       if (existsSync(cachePath)) return readFile(cachePath);
-      if (existsSync(missingMarker)) return null;
+      if (existsSync(missingMarker)) {
+        if (!retryMissing || retriedMissing.has(cachePath)) return null;
+        retriedMissing.add(cachePath);
+      }
     }
 
     const res = await politeFetch(url);
@@ -62,6 +76,7 @@ export function cachedGet(url: string, cachePath: string): Promise<Buffer | null
     if (!res.ok) throw new Error(`GET ${url} failed: ${res.status} ${res.statusText}`);
     const body = Buffer.from(await res.arrayBuffer());
     await writeFile(cachePath, body);
+    await rm(missingMarker, { force: true });
     return body;
   });
 }
@@ -77,7 +92,7 @@ export function cachedPostForm(
   cachePath: string,
 ): Promise<Buffer> {
   return enqueue(async () => {
-    if (!REFRESH && existsSync(cachePath)) return readFile(cachePath);
+    if (!shouldRefresh(cachePath) && existsSync(cachePath)) return readFile(cachePath);
 
     const session = await politeFetch(sessionUrl);
     if (!session.ok) throw new Error(`GET ${sessionUrl} failed: ${session.status} ${session.statusText}`);
@@ -103,7 +118,7 @@ export function cachedPostForm(
 /** POST `body` (e.g. a multipart form) to `url`, caching the response at `cachePath`. */
 export function cachedPost(url: string, body: FormData, cachePath: string): Promise<Buffer> {
   return enqueue(async () => {
-    if (!REFRESH && existsSync(cachePath)) return readFile(cachePath);
+    if (!shouldRefresh(cachePath) && existsSync(cachePath)) return readFile(cachePath);
     const res = await politeFetch(url, { method: "POST", body });
     if (!res.ok) throw new Error(`POST ${url} failed: ${res.status} ${res.statusText}`);
     const out = Buffer.from(await res.arrayBuffer());

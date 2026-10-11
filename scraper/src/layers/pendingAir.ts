@@ -10,6 +10,7 @@ import { searchNsr } from "../existing.js";
 import { parseLocation, parseMapLink, parsePermitType } from "../extract.js";
 import { SECTION_ID, loadPendingHtml, parsePendingRows } from "../fetchList.js";
 import { getNotices, loadListedNotices, type Notice } from "../notices.js";
+import { pickOfficialSource } from "../sourceUrl.js";
 import { TCEQ_REGION } from "../region.js";
 import type { Site } from "../types.js";
 import { sourceSite } from "./common.js";
@@ -66,7 +67,7 @@ export async function pendingAirPermits(scrapedAt: string): Promise<Site[]> {
         lat: coords.lat,
         lng: coords.lng,
         status: "pending",
-        sourceUrl: entryId && listed.has(entryId) ? row.noticeUrl : (notices[0]?.url ?? row.noticeUrl),
+        sourceUrl: pickOfficialSource([entryId && listed.has(entryId) ? row.noticeUrl : null, ...notices.map((n) => n.url), row.noticeUrl]),
         source: "TCEQ pending air permit applications and public notices",
         details: {
           permitNumber: row.permitNumber,

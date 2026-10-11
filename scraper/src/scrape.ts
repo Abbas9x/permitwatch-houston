@@ -52,7 +52,7 @@ function concreteToSite(p: ConcretePlant): Site | null {
   };
 }
 
-async function concreteSites(scrapedAt: string): Promise<Site[]> {
+export async function concreteSites(scrapedAt: string): Promise<Site[]> {
   const pending = await extractPending(scrapedAt);
   const existing = await extractExisting(scrapedAt);
 
