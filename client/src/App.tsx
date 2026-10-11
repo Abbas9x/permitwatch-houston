@@ -12,13 +12,20 @@ const ResultsPage = lazy(() => import('./pages/ResultsPage').then((m) => ({ defa
 export function App() {
   const { t } = useI18n();
   const route = useRoute();
-  const q = route.params.get('q');
+  // Only "/" shows results; any other path is the landing page, so it must not wait for a search.
+  const q = route.path === '/' ? route.params.get('q') : null;
   const permitId = route.params.get('permit');
 
   const reducedMotion = useReducedMotion();
   const [diving, setDiving] = useState(false);
   const [readySearch, setReadySearch] = useState<string | null>(null);
   const searchKey = q ? `${q}@${route.params.get('lat') ?? ''},${route.params.get('lng') ?? ''}` : null;
+  // Back to the landing page while a search is still loading: drop the dive overlay.
+  const [previousSearchKey, setPreviousSearchKey] = useState(searchKey);
+  if (previousSearchKey !== searchKey) {
+    setPreviousSearchKey(searchKey);
+    if (!searchKey) setDiving(false);
+  }
   const onReady = useCallback(() => {
     setReadySearch(searchKey);
     setDiving(false);
@@ -26,7 +33,7 @@ export function App() {
   const transitioning = searchKey ? readySearch !== searchKey : diving;
 
   let page;
-  if (route.path === '/' && q) page = <ResultsPage onReady={onReady} q={q} selectedId={permitId} coords={coordsFromParams(route.params)} radiusMiles={radiusFromParams(route.params)} filters={filtersFromParams(route.params)} />;
+  if (q) page = <ResultsPage onReady={onReady} q={q} selectedId={permitId} coords={coordsFromParams(route.params)} radiusMiles={radiusFromParams(route.params)} filters={filtersFromParams(route.params)} />;
   else page = <Landing onDive={() => setDiving(true)} />;
 
   return (

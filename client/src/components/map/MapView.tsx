@@ -133,6 +133,13 @@ export default function MapView(props: MapViewProps) {
       if (window.matchMedia('(max-width: 1023px)').matches) map.cooperativeGestures.enable();
       map.getCanvas().tabIndex = 0;
     }
+    // Browser zoom or a window resize can switch between the phone and desktop layouts after load.
+    const phoneLayout = window.matchMedia('(max-width: 1023px)');
+    const syncGestures = () => {
+      if (phoneLayout.matches) map.cooperativeGestures.enable();
+      else map.cooperativeGestures.disable();
+    };
+    phoneLayout.addEventListener('change', syncGestures);
     const markers = plantMarkers.current;
     map.addControl(new NavigationControl({ visualizePitch: true }), 'top-right');
     const slowTimer = window.setTimeout(() => setSlow(true), 12_000);
@@ -219,6 +226,7 @@ export default function MapView(props: MapViewProps) {
     if (earth?.ready) prepareStyle();
 
     return () => {
+      phoneLayout.removeEventListener('change', syncGestures);
       window.clearTimeout(slowTimer);
       map.off('style.load', prepareStyle);
       markers.clear();

@@ -62,14 +62,16 @@ export default function EarthBackground({
 
   useEffect(() => {
   /*
-   * Globe size.
+   * Globe size: phone size up to 480px, full size from 768px,
+   * and a smooth blend in between so browser zoom never makes it jump.
    */
   const getZoom = () => {
-    if (window.innerWidth < 640) {
-      return 2.5;
-    }
+    const blend = Math.min(
+      Math.max((window.innerWidth - 480) / (768 - 480), 0),
+      1
+    );
 
-    return 3.45;
+    return 2.5 + blend * (3.45 - 2.5);
   };
 
   /*
@@ -91,13 +93,14 @@ export default function EarthBackground({
   };
 
   /*
-   * Apply globe positioning.
+   * Apply globe positioning. Keeps the current rotation so a resize,
+   * browser zoom or theme change does not snap the globe back.
    */
   const positionGlobe = (
     map: MapLibreMap
   ) => {
     map.jumpTo({
-      center: [-95, 20],
+      center: [map.getCenter().lng, 20],
 
       zoom: getZoom(),
 
@@ -188,12 +191,17 @@ export default function EarthBackground({
      * Remove all labels/text from the map.
      */
     const removeAllLabels = () => {
-      if (!map.isStyleLoaded()) {
+      /*
+       * Only the style JSON is needed. isStyleLoaded() also waits for
+       * every tile, which never settles while the globe rotates, so
+       * labels could stay visible (e.g. after a theme switch).
+       */
+      const currentStyle =
+        map.getStyle() as ReturnType<MapLibreMap['getStyle']> | undefined;
+
+      if (!currentStyle) {
         return;
       }
-
-      const currentStyle =
-        map.getStyle();
 
       const layers =
         currentStyle.layers ?? [];
