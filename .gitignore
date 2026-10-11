@@ -31,3 +31,6 @@ desktop.ini
 .idea/
 .claude/settings.local.json
 .claude/launch.json
+
+# scraper cache: raw downloads, regenerable with `npm run scrape -- --refresh` in scraper/
+data/raw/

@@ -1,0 +1,26 @@
+{
+  "name": "permit-watch-scraper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Data pipeline for Permit Watch: scrapes pending concrete batch plant permits in Harris County, TX",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "list": "tsx src/fetchList.ts",
+    "extract": "tsx src/extract.ts",
+    "scrape": "tsx src/scrape.ts",
+    "validate": "tsx src/validate.ts",
+    "existing": "tsx src/existing.ts",
+    "stats": "tsx src/stats.ts",
+    "demo": "tsx src/demo.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "unpdf": "^1.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
