@@ -158,7 +158,7 @@ Integration target is the existing shared `main` branch. Before integration, a f
 
 ## October 11 follow-up: shared map points and concerns drafting
 
-At 19710 Shores Edge Dr, radius 2 miles, five permits share four locations. SPAWGLASS `153154L001` and WILLIAMS BROTHERS `74460L002` have identical source coordinates; the home point is excluded from the count. Marker icons now use separate screen offsets for identical coordinates, with source coordinates/distances untouched. A house symbol and legend identify the search location.
+At 19710 Shores Edge Dr, radius 2 miles, five permits share four locations. SPAWGLASS `153154L001` and WILLIAMS BROTHERS `74460L002` have identical source coordinates; the home point is excluded from the count. Marker icons now use separate screen offsets for identical coordinates, with source coordinates/distances untouched. The original circular marker and a legend identify the search location.
 
 Historical/unknown permit records now offer a concerns drafter and official TCEQ environmental-complaint link. Generated drafts retain record/location/source facts and user-written concerns, without asserting a pending application, open deadline, operating status or violation. Formal eComment calls to action retain the source-aware period policy. Existing concerns validation, rate limiting, editable drafts and manual submission remain in place.
 

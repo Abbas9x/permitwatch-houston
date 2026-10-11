@@ -32,7 +32,7 @@ function MapLegend() {
   ];
   return (
     <ul className="pw-map-legend pointer-events-none absolute top-3 left-3 z-10 space-y-1 rounded-xl border border-line bg-night/80 px-3 py-2 text-xs text-ink backdrop-blur lg:top-auto lg:bottom-8">
-      <li className="flex items-center gap-2"><span aria-hidden="true">⌂</span>{t('map.homeLegend')}</li>
+      <li className="flex items-center gap-2"><span aria-hidden="true">●</span>{t('map.homeLegend')}</li>
       <li className="font-semibold">{t('map.categories')}</li>
       {PERMIT_CATEGORIES.map(category=><li key={category} className="flex items-center gap-2"><span aria-hidden="true" className="w-3 text-center">{CATEGORY_SYMBOLS[category]}</span>{t(`category.${category}`)}</li>)}
       <li aria-hidden="true" className="my-1 border-t border-line" />

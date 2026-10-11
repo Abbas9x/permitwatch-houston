@@ -73,7 +73,7 @@ test('shared coordinates keep five real permits separately clickable and exclude
   await page.getByRole('button',{name:'Close permit details',exact:true}).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
  }
- await expect(page.locator('.pw-you svg')).toHaveCount(1);
+ await expect(page.getByRole('img',{name:'Your search location',exact:true})).toBeVisible();
 });
 
 test('an unknown historical permit still offers an editable concerns draft without claiming an open comment period',async({page})=>{

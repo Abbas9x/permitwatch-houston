@@ -286,13 +286,6 @@ export default function MapView(props: MapViewProps) {
     you.setAttribute('role', 'img');
     you.setAttribute('aria-label', props.youLabel);
     you.title = props.youLabel;
-    const house = document.createElementNS('http://www.w3.org/2000/svg','svg');
-    house.setAttribute('viewBox','0 0 24 24');
-    house.setAttribute('aria-hidden','true');
-    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d','M3 10.5 12 3l9 7.5M5 9v12h5v-7h4v7h5V9');
-    path.setAttribute('fill','none');path.setAttribute('stroke','currentColor');path.setAttribute('stroke-width','2');path.setAttribute('stroke-linecap','round');path.setAttribute('stroke-linejoin','round');
-    house.append(path);you.append(house);
     const markers = [new Marker({ element: you }).setLngLat([center.lng, center.lat]).addTo(map)];
     for (const { radius, point } of ringLabelPoints(center, radiusMiles)) {
       const label = document.createElement('div');
