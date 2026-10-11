@@ -25,7 +25,9 @@
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run test",
     "scan:secrets": "node scripts/scan-secrets.mjs",
-    "test:stress": "node scripts/stress-local.mjs"
+    "test:stress": "node scripts/stress-local.mjs",
+    "import:datasets": "node scripts/import-datasets.mjs",
+    "render-build": "npm run build && node scripts/import-datasets.mjs --fresh"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

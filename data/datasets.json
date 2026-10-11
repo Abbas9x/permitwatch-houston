@@ -1,0 +1,4 @@
+{
+  "_comment": "Datasets imported on every deploy, in order. To change what the live site shows, edit this list (or the files it points to) and push; Render rebuilds automatically.",
+  "datasets": ["data/sites.json"]
+}

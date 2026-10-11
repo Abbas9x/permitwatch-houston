@@ -5,8 +5,8 @@ services:
     name: permitwatch-houston
     runtime: node
     plan: free
-    # Build the app and import the real permit dataset with data-only summaries.
-    buildCommand: npm ci --include=dev && npm run build && npm run import:prod -- data/sites.json
+    # Build the app, then import every dataset listed in data/datasets.json (edit that file to change the data).
+    buildCommand: npm ci --include=dev && npm run render-build
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
